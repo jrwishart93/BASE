@@ -1,0 +1,24 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-5544-20251101-141900",
+  "datetime": "2025-11-01T14:19:00.000Z",
+  "incidentNumber": "5544",
+  "division": "P",
+  "location": "Queensferry Crossing, Fife",
+  "officers": [
+    "PC Kendrick and Clark"
+  ],
+  "enquiryOfficer": "PC Clark",
+  "type": "Vehicle",
+  "details": {
+    "reason": "Seized Stolen",
+    "colour": "White",
+    "make": "Peuguot",
+    "model": "Boxer",
+    "vrm": "FG34RFT",
+    "estimatedValueGBP": 5000
+  },
+  "remarks": "Found via ANPR - Seized",
+  "createdAt": "2025-11-01T13:20:37.488Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}

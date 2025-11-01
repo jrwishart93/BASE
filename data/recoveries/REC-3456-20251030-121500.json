@@ -1,0 +1,21 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-3456-20251030-121500",
+  "datetime": "2025-10-30T12:15:00.000Z",
+  "incidentNumber": "3456",
+  "division": "E",
+  "location": "Easter Road, Edinburgh",
+  "officers": [
+    "PC Brown and Yanks"
+  ],
+  "enquiryOfficer": "PC Yanks",
+  "type": "Drug",
+  "details": {
+    "drugType": "Cannabis",
+    "quantityOrWeight": "5g",
+    "estimatedValueGBP": 100
+  },
+  "remarks": "drugs recovered from vehicle.",
+  "createdAt": "2025-10-31T12:21:48.080Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-8976-20251009-121500",
+  "datetime": "2025-10-09T11:15:00.000Z",
+  "incidentNumber": "8976",
+  "division": "E",
+  "location": "London Road, Edinburgh",
+  "officers": [
+    "PC Hastings and Brent"
+  ],
+  "enquiryOfficer": "PC Brent",
+  "type": "Cash",
+  "details": {
+    "amountGBP": 2100
+  },
+  "remarks": "Money recovered from vehicle.",
+  "createdAt": "2025-10-31T12:22:55.017Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}

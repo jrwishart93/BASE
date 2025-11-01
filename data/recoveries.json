@@ -1,0 +1,156 @@
+[
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-9874-20251009-121500",
+    "datetime": "2025-10-09T11:15:00.000Z",
+    "incidentNumber": "9874",
+    "division": "E",
+    "location": "Princes Street, Edinburgh",
+    "officers": [
+      "PC Harding and Lewis"
+    ],
+    "enquiryOfficer": "PC Lewis",
+    "type": "Counterfeit Goods",
+    "details": {
+      "description": "40 designer handbags",
+      "quantity": 40,
+      "estimatedValueGBP": 400
+    },
+    "remarks": "Fake Handbags recovered from vehicle.",
+    "createdAt": "2025-10-31T12:24:10.463Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-8976-20251009-121500",
+    "datetime": "2025-10-09T11:15:00.000Z",
+    "incidentNumber": "8976",
+    "division": "E",
+    "location": "London Road, Edinburgh",
+    "officers": [
+      "PC Hastings and Brent"
+    ],
+    "enquiryOfficer": "PC Brent",
+    "type": "Cash",
+    "details": {
+      "amountGBP": 2100
+    },
+    "remarks": "Money recovered from vehicle.",
+    "createdAt": "2025-10-31T12:22:55.017Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-3456-20251030-121500",
+    "datetime": "2025-10-30T12:15:00.000Z",
+    "incidentNumber": "3456",
+    "division": "E",
+    "location": "Easter Road, Edinburgh",
+    "officers": [
+      "PC Brown and Yanks"
+    ],
+    "enquiryOfficer": "PC Yanks",
+    "type": "Drug",
+    "details": {
+      "drugType": "Cannabis",
+      "quantityOrWeight": "5g",
+      "estimatedValueGBP": 100
+    },
+    "remarks": "drugs recovered from vehicle.",
+    "createdAt": "2025-10-31T12:21:48.080Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-9874-20251009-121500",
+    "datetime": "2025-10-09T11:15:00.000Z",
+    "incidentNumber": "9874",
+    "division": "J",
+    "location": "High Street, Loanhead",
+    "officers": [
+      "PC Smith and McDonald"
+    ],
+    "enquiryOfficer": "PC Smith",
+    "type": "Stolen Property",
+    "details": {
+      "description": "Power Tools",
+      "quantity": 3,
+      "estimatedValueGBP": 120
+    },
+    "remarks": "Power tools  recovered from vehicle.",
+    "createdAt": "2025-10-31T12:25:24.962Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-5544-20251101-141900",
+    "datetime": "2025-11-01T14:19:00.000Z",
+    "incidentNumber": "5544",
+    "division": "P",
+    "location": "Queensferry Crossing, Fife",
+    "officers": [
+      "PC Kendrick and Clark"
+    ],
+    "enquiryOfficer": "PC Clark",
+    "type": "Vehicle",
+    "details": {
+      "reason": "Seized Stolen",
+      "colour": "White",
+      "make": "Peuguot",
+      "model": "Boxer",
+      "vrm": "FG34RFT",
+      "estimatedValueGBP": 5000
+    },
+    "remarks": "Found via ANPR - Seized",
+    "createdAt": "2025-11-01T13:20:37.488Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-4467-20251031-123500",
+    "datetime": "2025-10-31T12:35:00.000Z",
+    "incidentNumber": "4467",
+    "division": "E",
+    "location": "Great Jnt Street, Edinburgh",
+    "officers": [
+      "PC Smith and Jones"
+    ],
+    "enquiryOfficer": "PC Jones",
+    "type": "Vehicle",
+    "details": {
+      "reason": "Seized Stolen",
+      "colour": "Blue",
+      "make": "Nissan",
+      "model": "Micra",
+      "vrm": "FG44RFT",
+      "estimatedValueGBP": 650
+    },
+    "remarks": "Stolen car recovered",
+    "createdAt": "2025-10-31T12:36:10.358Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  },
+  {
+    "schema": "base.recovery.v1",
+    "id": "REC-1234-20251030-121500",
+    "datetime": "2025-10-30T12:15:00.000Z",
+    "incidentNumber": "1234",
+    "division": "E",
+    "location": "Ferry Road, Edinburgh",
+    "officers": [
+      "PC Jill and Adams"
+    ],
+    "enquiryOfficer": "PC Adams",
+    "type": "Vehicle",
+    "details": {
+      "reason": "Seized Stolen",
+      "colour": "Blue",
+      "make": "Ford",
+      "model": "Focus",
+      "vrm": "SF22DSD",
+      "estimatedValueGBP": 20000
+    },
+    "remarks": "stolen vehicle recovered.",
+    "createdAt": "2025-10-31T12:15:55.686Z",
+    "createdBy": "BASE recoveries.html v1.0"
+  }
+]
