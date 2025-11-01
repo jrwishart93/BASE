@@ -1,0 +1,61 @@
+{
+  "version": "v2024.09.01",
+  "updated": "2024-09-01T09:00:00Z",
+  "updatedBy": "BASE Maintainers",
+  "apps": [
+    {
+      "key": "intranet",
+      "label": "INTRANET",
+      "icon": "./lib/assets/images/icons/icon-intranet.png",
+      "href": "https://placeholder.local/intranet"
+    },
+    {
+      "key": "storm",
+      "label": "STORM",
+      "icon": "./lib/assets/images/icons/icon-storm.png",
+      "href": "https://placeholder.local/storm"
+    },
+    {
+      "key": "case",
+      "label": "CASE",
+      "icon": "./lib/assets/images/icons/icon-case.png",
+      "href": "https://placeholder.local/case"
+    },
+    {
+      "key": "insight",
+      "label": "INSIGHT",
+      "icon": "./lib/assets/images/icons/icon-insight.png",
+      "href": "https://placeholder.local/insight"
+    },
+    {
+      "key": "unifi",
+      "label": "UNIFI",
+      "icon": "./lib/assets/images/icons/icon-unifi.png",
+      "href": "https://placeholder.local/unifi"
+    },
+    {
+      "key": "pronto",
+      "label": "PRONTO",
+      "icon": "./lib/assets/images/icons/icon-pronto.png",
+      "href": "https://placeholder.local/pronto"
+    },
+    {
+      "key": "anpr",
+      "label": "ANPR",
+      "icon": "./lib/assets/images/icons/icon-anpr.png",
+      "href": "https://placeholder.local/anpr"
+    },
+    {
+      "key": "desc",
+      "label": "DESC",
+      "icon": "./lib/assets/images/icons/icon-desc.png",
+      "href": "https://placeholder.local/desc"
+    },
+    {
+      "key": "reports",
+      "label": "REPORTS",
+      "icon": "./lib/assets/images/icons/icon-reports.png",
+      "href": "https://placeholder.local/reports"
+    }
+  ]
+}

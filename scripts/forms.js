@@ -5,24 +5,24 @@
 
   const LEGACY_PATHS = {
     'antecedents': {
-      abs: '/Users/macbookair/Desktop/BASE/Desktop/lib/assets/html/antecedents.html',
-      rel: './lib/assets/html/antecedents.html'
+      abs: '',
+      rel: './lib/assets/forms/antecedents.html'
     },
     'locus': {
-      abs: '/Users/macbookair/Desktop/BASE/Desktop/lib/assets/html/locus.html',
-      rel: './lib/assets/html/locus.html'
+      abs: '',
+      rel: './lib/assets/forms/locus.html'
     },
     'drug-driving': {
-      abs: '/Users/macbookair/Desktop/BASE/Desktop/lib/assets/html/drug driving.html',
-      rel: './lib/assets/html/drug driving.html'
+      abs: '',
+      rel: './lib/assets/forms/drug-driving.html'
     },
     'no-insurance': {
-      abs: '/Users/macbookair/Desktop/BASE/Desktop/lib/assets/html/insurance.html',
-      rel: './lib/assets/html/insurance.html'
+      abs: '',
+      rel: './lib/assets/forms/insurance.html'
     },
     'no-mot': {
-      abs: '/Users/macbookair/Desktop/BASE/Desktop/lib/assets/html/mot.html',
-      rel: './lib/assets/html/mot.html'
+      abs: '',
+      rel: './lib/assets/forms/mot.html'
     }
   };
 
