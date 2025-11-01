@@ -34,6 +34,57 @@
   filter: drop-shadow(0 0 6px rgba(122,162,255,.35));
 }
 
+.nav-toggle{
+  display:none;
+  margin-left:auto;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  background:rgba(12,20,36,.65);
+  color:#E9EEFB;
+  align-items:center;
+  justify-content:center;
+  min-width:44px;
+  height:44px;
+  line-height:0;
+  cursor:pointer;
+  transition:background .2s ease, border-color .2s ease, color .2s ease;
+}
+.nav-toggle:hover,
+.nav-toggle:focus-visible{
+  background:rgba(26,44,72,.75);
+  border-color:rgba(122,162,255,.45);
+  color:#7AA2FF;
+  outline:none;
+}
+.nav-toggle .icon-burger{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+.nav-toggle .icon-burger span{
+  display:block;
+  width:24px; height:2px;
+  border-radius:2px;
+  background:currentColor;
+  transition:transform .2s ease, opacity .2s ease;
+}
+.nav-toggle .icon-close{
+  display:none;
+  font-size:24px;
+  line-height:1;
+  font-weight:600;
+}
+.glassnav.is-open .nav-toggle .icon-burger{ display:none; }
+.glassnav.is-open .nav-toggle .icon-close{ display:block; }
+.glassnav.is-open .nav-toggle{
+  background:rgba(26,44,72,.8);
+  border-color:rgba(122,162,255,.45);
+  color:#7AA2FF;
+}
+
 .nav-list{
   display:flex; gap:36px; margin:0; padding:0; list-style:none;
 }
@@ -78,6 +129,30 @@
 @media (prefers-reduced-motion: reduce){
   .nav-link, .nav-link .underline{ transition:none !important; }
 }
+@media (max-width: 900px){
+  .glassnav{ margin:12px; }
+  .nav-inner{
+    height:auto;
+    flex-wrap:wrap;
+    row-gap:12px;
+    padding:12px 18px 18px;
+  }
+  .nav-toggle{ display:inline-flex; }
+  .nav-list{
+    display:none;
+    flex-direction:column;
+    gap:18px;
+    width:100%;
+    padding-top:4px;
+    border-top:1px solid rgba(255,255,255,.12);
+  }
+  .glassnav.is-open .nav-list{ display:flex; }
+  .nav-list li{ width:100%; }
+  .nav-link{
+    justify-content:flex-start;
+    width:100%;
+  }
+}
 /* ============================================================ */
     `.trim();
     const style = document.createElement('style');
@@ -118,6 +193,52 @@
 
     const links = Array.from(nav.querySelectorAll('.nav-link'));
     if (!links.length) return;
+
+    const toggle = nav.querySelector('.nav-toggle');
+    const navList = nav.querySelector('.nav-list');
+
+    function setNavOpen(open) {
+      if (!toggle || !navList) return;
+      const canMatch = typeof window.matchMedia === 'function';
+      const isMobile = canMatch ? window.matchMedia('(max-width: 900px)').matches : false;
+      if (!isMobile) {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation menu');
+        navList.removeAttribute('aria-hidden');
+        return;
+      }
+
+      nav.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      navList.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+
+    if (toggle && navList) {
+      setNavOpen(false);
+      toggle.addEventListener('click', () => {
+        const open = !nav.classList.contains('is-open');
+        setNavOpen(open);
+      });
+
+      if (typeof window.matchMedia === 'function') {
+        const mq = window.matchMedia('(min-width: 901px)');
+        const mqHandler = () => { setNavOpen(false); };
+        if (typeof mq.addEventListener === 'function') {
+          mq.addEventListener('change', mqHandler);
+        } else if (typeof mq.addListener === 'function') {
+          mq.addListener(mqHandler);
+        }
+      }
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+          setNavOpen(false);
+          toggle.focus();
+        }
+      });
+    }
 
     // Set active from URL if server didn't add .is-active
     function setActiveFromURL() {
@@ -183,6 +304,16 @@
     // If labels change via DOM mutations, keep underline in sync
     const mo = new MutationObserver(sizeUnderlines);
     mo.observe(nav, { subtree:true, childList:true, characterData:true });
+
+    if (toggle && links.length) {
+      for (const link of links) {
+        link.addEventListener('click', () => {
+          if (typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 900px)').matches) {
+            setNavOpen(false);
+          }
+        });
+      }
+    }
   }
 
   // Boot

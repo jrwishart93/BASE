@@ -132,7 +132,16 @@
         <img src="./lib/assets/images/logos/base-logo.png" alt="BASE" height="44" width="44" loading="lazy">
       </a>
 
-      <ul class="nav-list">
+      <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false">
+        <span class="icon-burger" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span class="icon-close" aria-hidden="true">×</span>
+      </button>
+
+      <ul id="primary-navigation" class="nav-list">
         <li>
           <a class="nav-link" data-page="home" href="./index.html">
             <span class="label">Home</span>
