@@ -1,0 +1,49 @@
+{
+  "forms": [
+    {
+      "id": "antecedents",
+      "title": "Antecedents",
+      "type": "html",
+      "icon": "./lib/assets/images/icons/icon-antecedence.png",
+      "href": "./lib/assets/forms/antecedents.html",
+      "hrefAbs": "/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/antecedents.html",
+      "desc": "Generate antecedents text in my preferred SPR style."
+    },
+    {
+      "id": "locus",
+      "title": "Locus",
+      "type": "html",
+      "icon": "./lib/assets/images/icons/icon-locus.png",
+      "href": "./lib/assets/forms/locus.html",
+      "hrefAbs": "/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/locus.html",
+      "desc": "Interactive locus sentence builder."
+    },
+    {
+      "id": "drug-driving",
+      "title": "Drug Driving (S5)",
+      "type": "html",
+      "icon": "./lib/assets/images/icons/icon-drug-driving.svg",
+      "href": "./lib/assets/forms/drug-driving.html",
+      "hrefAbs": "/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/drug-driving.html",
+      "desc": "Pro-forma builder for Section 5 drug driving."
+    },
+    {
+      "id": "no-insurance",
+      "title": "No Insurance",
+      "type": "html",
+      "icon": "./lib/assets/images/icons/icon-no-insurance.svg",
+      "href": "./lib/assets/forms/insurance.html",
+      "hrefAbs": "/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/insurance.html",
+      "desc": "Pro-forma builder for no insurance reports."
+    },
+    {
+      "id": "no-mot",
+      "title": "No MOT",
+      "type": "html",
+      "icon": "./lib/assets/images/icons/icon-no-mot.svg",
+      "href": "./lib/assets/forms/mot.html",
+      "hrefAbs": "/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/mot.html",
+      "desc": "Pro-forma builder for No MOT reports."
+    }
+  ]
+}

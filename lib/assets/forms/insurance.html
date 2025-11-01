@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="color-scheme" content="dark" />
+<title>SPR — No Insurance — Builder</title>
+<style>
+  :root{
+    --bg0:#0B1220;
+    --bg1:#0F1A32;
+    --ink:#E9EEFB;
+    --muted:#B9C3DA;
+    --aqua:#5FF5F8;
+    --blue:#7AA2FF;
+    --glass-1: rgba(255,255,255,.10);
+    --glass-2: rgba(255,255,255,.16);
+    --stroke: rgba(255,255,255,.20);
+    --shadow: 0 16px 40px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    background:
+      radial-gradient(1000px 600px at 15% -10%, rgba(122,162,255,.22), transparent 60%),
+      radial-gradient(900px 500px at 85% 110%, rgba(95,245,248,.18), transparent 60%),
+      linear-gradient(180deg, #0B1220 0%, #0F1A32 100%);
+    font: 15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  }
+  .wrap{display:grid; grid-template-columns:380px 1fr; gap:24px; min-height:100dvh; padding:24px}
+  @media (max-width: 1020px){ .wrap{grid-template-columns:1fr; padding:16px} }
+
+  .card{background:linear-gradient(180deg,var(--glass-1),var(--glass-2)); border:1px solid var(--stroke);
+        border-radius:22px; box-shadow:var(--shadow); backdrop-filter: blur(16px) saturate(120%);}
+
+  .panel{padding:18px 18px 20px; display:flex; flex-direction:column; gap:14px}
+  .title{font-weight:700; font-size:18px; letter-spacing:.3px; display:flex; align-items:center; gap:10px}
+  .title .dot{width:9px;height:9px;border-radius:999px;
+    background:linear-gradient(135deg,var(--aqua),var(--blue));
+    box-shadow:0 0 18px rgba(122,162,255,.8), 0 0 28px rgba(95,245,248,.6);
+  }
+
+  .group{padding:12px; border:1px solid var(--stroke); border-radius:16px}
+  .group h3{margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:600; letter-spacing:.2px}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+  .row-1{display:grid; grid-template-columns:1fr; gap:10px}
+
+  label{font-size:12px; color:var(--muted)}
+  input[type="text"], input[type="date"], input[type="time"], select, textarea{
+    width:100%; padding:12px 14px; color:var(--ink); background:rgba(255,255,255,.06);
+    border:1px solid var(--stroke); border-radius:999px; outline:none;
+  }
+  textarea{border-radius:16px; min-height:88px; resize:vertical; padding:12px 14px}
+  .help{font-size:12px; color:var(--muted); margin-top:6px}
+
+  .pills{display:flex; flex-wrap:wrap; gap:8px}
+  .pill{
+    user-select:none; cursor:pointer; padding:8px 12px; border-radius:999px;
+    border:1px solid var(--stroke); background:rgba(255,255,255,.06); font-size:13px;
+    transition:transform .04s ease;
+  }
+  .pill[data-active="true"]{
+    border-color:transparent;
+    background:linear-gradient(135deg, rgba(122,162,255,.25), rgba(95,245,248,.25));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 0 1px rgba(255,255,255,.25);
+  }
+  .pill:active{transform:scale(.98)}
+
+  .actions{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{appearance:none; border:1px solid var(--stroke); border-radius:999px;
+       background:linear-gradient(135deg, rgba(122,162,255,.18), rgba(95,245,248,.14));
+       color:var(--ink); padding:10px 14px; font-weight:600; cursor:pointer}
+  .btn.secondary{background:rgba(255,255,255,.06)}
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+
+  .stage{padding:18px; display:flex; flex-direction:column; gap:12px}
+  .hdr{display:flex; align-items:center; justify-content:space-between; gap:12px;
+       padding:12px 14px; border:1px solid var(--stroke); border-radius:16px}
+  .hdr h1{font-size:16px; margin:0; font-weight:700;
+          background:linear-gradient(135deg,var(--aqua),var(--blue));
+          -webkit-background-clip:text; background-clip:text; color:transparent}
+  .report{padding:16px; border:1px solid var(--stroke); border-radius:16px; background:rgba(255,255,255,.06);
+          white-space:pre-wrap; font-size:15px; line-height:1.6}
+  .sep{height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent); margin:10px 0}
+  .dim{color:var(--muted)}
+  .footer-note{font-size:12px; color:var(--muted); text-align:right}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- LEFT: CONTROLS -->
+    <aside class="card panel" id="controls">
+      <div class="title"><span class="dot"></span><span>SPR — No Insurance — Builder</span></div>
+
+      <div class="group">
+        <h3>Report Header</h3>
+        <div class="row">
+          <div>
+            <label>Locus street</label>
+            <input id="locusStreet" type="text" placeholder="Lothian Road" />
+          </div>
+          <div>
+            <label>Town / City</label>
+            <input id="town" type="text" placeholder="Edinburgh" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Accused & Pronouns</h3>
+        <div class="pills" id="genderPills">
+          <div class="pill" data-value="male">Male</div>
+          <div class="pill" data-value="female">Female</div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Accused full name</label>
+            <input id="accusedName" type="text" placeholder="Alex Example" />
+          </div>
+          <div>
+            <label>Date of birth</label>
+            <input id="accusedDOB" type="text" placeholder="01/01/1985" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Known to police</label>
+            <select id="knownToPolice">
+              <option>known</option>
+              <option>unknown</option>
+            </select>
+          </div>
+          <div>
+            <label>Convictions</label>
+            <select id="convictions">
+              <option>no</option>
+              <option>previous</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-1" id="convictWrap" hidden>
+          <div>
+            <label>Specify previous convictions (if applicable)</label>
+            <input id="convictDetail" type="text" placeholder="e.g., speeding in 2023" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Licence status</label>
+            <select id="licence">
+              <option>full UK driving licence</option>
+              <option>provisional UK driving licence</option>
+            </select>
+          </div>
+          <div>
+            <label>Penalty points</label>
+            <select id="points">
+              <option>no</option>
+              <option>current</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Vehicle</h3>
+        <div class="row-3">
+          <div>
+            <label>Colour</label>
+            <input id="vehColour" type="text" placeholder="Blue" />
+          </div>
+          <div>
+            <label>Make</label>
+            <input id="vehMake" type="text" placeholder="BMW" />
+          </div>
+          <div>
+            <label>Model</label>
+            <input id="vehModel" type="text" placeholder="X1" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Registration mark</label>
+            <input id="vehReg" type="text" placeholder="AB12 CDE" />
+          </div>
+          <div>
+            <label>Owner/keeper is the accused</label>
+            <select id="isKeeper">
+              <option>yes</option>
+              <option>no</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-1" id="keeperNote" hidden>
+          <div>
+            <label>Keeper details if different (optional)</label>
+            <input id="keeperDetail" type="text" placeholder="Name, address or 'unknown'" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Locus Details</h3>
+        <div class="row">
+          <div>
+            <label>Road setting</label>
+            <select id="roadSetting">
+              <option>residential</option>
+              <option>rural</option>
+              <option>urban</option>
+              <option>city centre</option>
+            </select>
+          </div>
+          <div>
+            <label>Speed limit (mph)</label>
+            <input id="speedLimit" type="text" placeholder="30" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Incident date</label>
+            <input id="incidentDate" type="date" />
+          </div>
+          <div>
+            <label>Incident time</label>
+            <input id="incidentTime" type="time" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Light conditions</label>
+            <select id="light">
+              <option>daylight</option>
+              <option>darkness</option>
+            </select>
+          </div>
+          <div>
+            <label>Weather</label>
+            <select id="weather">
+              <option>clear</option>
+              <option>overcast</option>
+              <option>raining</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Road surface</label>
+            <select id="surface">
+              <option>dry</option>
+              <option>wet</option>
+              <option>damp</option>
+            </select>
+          </div>
+          <div>
+            <label>Traffic</label>
+            <select id="traffic">
+              <option>light</option>
+              <option>moderate</option>
+              <option>heavy</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Pedestrian activity</label>
+            <select id="peds">
+              <option>low</option>
+              <option>moderate</option>
+              <option>high</option>
+            </select>
+          </div>
+          <div>
+            <label>Street driven on (repeat)</label>
+            <input id="driveStreet" type="text" placeholder="Lothian Road" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Stop & Checks</h3>
+        <div class="row">
+          <div>
+            <label>Reason for stop</label>
+            <select id="stopReason">
+              <option>routine vehicle check</option>
+              <option>minor road traffic offence observed</option>
+            </select>
+          </div>
+          <div>
+            <label>Detail if minor offence (optional)</label>
+            <input id="stopDetail" type="text" placeholder="e.g., defective brake light" />
+          </div>
+        </div>
+        <div class="pills" id="signalPills">
+          <div class="pill" data-value="blue lights">Blue lights</div>
+          <div class="pill" data-value="siren">Siren</div>
+          <div class="pill" data-value="hand signal">Hand signal</div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Police witness 1 (surname)</label>
+            <input id="pw1" type="text" placeholder="Smith" />
+          </div>
+          <div>
+            <label>Police witness 2 (surname)</label>
+            <input id="pw2" type="text" placeholder="Brown" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>MID check reference or notes (optional)</label>
+            <input id="midRef" type="text" placeholder="e.g., MID checked at 14:35" />
+          </div>
+          <div>
+            <label>Driver explanation (optional)</label>
+            <input id="driverExplain" type="text" placeholder="e.g., believed insured under partner's policy" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Reply at charge</label>
+            <input id="replyCharge" type="text" value="made no reply" />
+          </div>
+          <div>
+            <label>Disposition of vehicle</label>
+            <select id="dispo">
+              <option>seized under Section 165A</option>
+              <option>left parked safely at the roadside</option>
+              <option>released to an insured driver</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-1" id="seizureWrap">
+          <div>
+            <label>CLE2 number</label>
+            <input id="cle2" type="text" placeholder="CLE2/123456" />
+          </div>
+          <div class="row">
+            <div>
+              <label>Recovery company</label>
+              <input id="recoveryCo" type="text" placeholder="e.g., Police Contract Recovery" />
+            </div>
+            <div>
+              <label>Recovery location</label>
+              <input id="recoveryLoc" type="text" placeholder="e.g., XYZ Depot, Sighthill" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Seizure time</label>
+              <input id="seizureTime" type="time" />
+            </div>
+            <div>
+              <label>Storage location (optional)</label>
+              <input id="storageLoc" type="text" placeholder="e.g., ABC Storage Yard" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="copyBtn">Copy report</button>
+        <button class="btn secondary" id="selectBtn">Select all</button>
+        <button class="btn secondary" id="resetBtn">Reset</button>
+      </div>
+      <div class="help">Legal references included: Section 143 RTA 1988 and Section 165A if seized.</div>
+    </aside>
+
+    <!-- RIGHT: OUTPUT -->
+    <main class="card stage">
+      <div class="hdr">
+        <h1 id="title">SPR – No Insurance – [Locus Street, Town/City]</h1>
+        <div class="dim">Live preview</div>
+      </div>
+      <div class="report" id="output" spellcheck="false"></div>
+      <div class="footer-note">Built for quick copy and paste. Updates as you type.</div>
+    </main>
+  </div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const val = id => document.getElementById(id)?.value || '';
+  const fmtDate = d => {
+    if(!d) return '';
+    try{
+      const dt = new Date(d);
+      if(isNaN(dt)) return d;
+      return dt.toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'});
+    }catch{ return d; }
+  };
+  const fmtTime = t => t || '';
+
+  // Pronouns
+  let gender = 'male';
+  const PR = () => gender==='male'
+    ? {subj:'He', obj:'him', poss:'his', refl:'himself', subjLow:'he'}
+    : {subj:'She', obj:'her', poss:'her', refl:'herself', subjLow:'she'};
+
+  // Pills
+  function makeSingleSelectPills(sel, initial){
+    const box = $(sel); if(!box) return {get:()=>initial};
+    let current = initial;
+    [...box.children].forEach(p=>{
+      if(p.dataset.value===initial) p.dataset.active='true';
+      p.addEventListener('click', ()=>{
+        [...box.children].forEach(c=>c.dataset.active='false');
+        p.dataset.active='true'; current = p.dataset.value; render();
+      });
+    });
+    return {get:()=>current};
+  }
+  function makeMultiPills(sel){
+    const box = $(sel); if(!box) return {get:()=>[]};
+    [...box.children].forEach(p=>{
+      p.addEventListener('click', ()=>{
+        p.dataset.active = p.dataset.active==='true' ? 'false' : 'true';
+        render();
+      });
+    });
+    return { get:()=>[...box.children].filter(c=>c.dataset.active==='true').map(c=>c.dataset.value) };
+  }
+
+  const genderCtl = makeSingleSelectPills('#genderPills','male');
+  const signalCtl = makeMultiPills('#signalPills');
+
+  // Conditional UI
+  function toggleSeizureFields(){
+    const show = val('dispo')==='seized under Section 165A';
+    $('#seizureWrap').style.display = show ? 'block' : 'none';
+  }
+  function toggleKeeperDetail(){
+    const show = val('isKeeper')==='no';
+    $('#keeperNote').style.display = show ? 'block' : 'none';
+  }
+  $('#dispo').addEventListener('change', ()=>{ toggleSeizureFields(); render(); });
+  $('#isKeeper').addEventListener('change', ()=>{ toggleKeeperDetail(); render(); });
+  toggleSeizureFields(); toggleKeeperDetail();
+
+  // Convictions detail
+  $('#convictions').addEventListener('change', ()=>{
+    const show = val('convictions')==='previous';
+    $('#convictWrap').hidden = !show; render();
+  });
+
+  // Live render on inputs
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // Actions
+  $('#copyBtn').addEventListener('click', async ()=>{
+    const t = $('#output').innerText;
+    try{ await navigator.clipboard.writeText(t); toast('Report copied'); }
+    catch{ selectOutput(); toast('Selected text — press Cmd/Ctrl+C'); }
+  });
+  $('#selectBtn').addEventListener('click', selectOutput);
+  $('#resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('#controls input').forEach(i=>i.value='');
+    document.querySelectorAll('#controls select').forEach(s=>s.selectedIndex=0);
+    [...$('#genderPills').children].forEach((c,i)=>c.dataset.active = i===0?'true':'false');
+    [...$('#signalPills').children].forEach(c=>c.dataset.active='false');
+    $('#convictWrap').hidden = true;
+    gender='male';
+    toggleSeizureFields(); toggleKeeperDetail();
+    render();
+  });
+
+  function selectOutput(){
+    const el = $('#output');
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const s = window.getSelection();
+    s.removeAllRanges(); s.addRange(r);
+  }
+
+  function toast(msg){
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style,{
+      position:'fixed',left:'50%',top:'18px',transform:'translateX(-50%)',
+      padding:'8px 12px',border:'1px solid var(--stroke)',
+      background:'linear-gradient(135deg, rgba(122,162,255,.25), rgba(95,245,248,.22))',
+      borderRadius:'999px',zIndex:9999,boxShadow:'var(--shadow)'
+    });
+    document.body.appendChild(t); setTimeout(()=>t.remove(),1300);
+  }
+
+  function render(){
+    gender = genderCtl.get();
+    const pr = PR();
+
+    const locusStreet = val('locusStreet') || '[Locus Street]';
+    const town = val('town') || '[Town/City]';
+    $('#title').textContent = `SPR – No Insurance – ${locusStreet}, ${town}`;
+
+    const vehColour = val('vehColour') || '[vehicle colour]';
+    const vehMake   = val('vehMake')   || '[vehicle make]';
+    const vehModel  = val('vehModel')  || '[vehicle model]';
+    const vehReg    = val('vehReg')    || '[registration mark]';
+    const isKeeper  = val('isKeeper')==='yes';
+    const keeperDetail = val('keeperDetail');
+
+    const known = val('knownToPolice') || 'known';
+    const convictions = val('convictions') || 'no';
+    const convictDetail = val('convictDetail');
+    const convictionsText = convictions==='previous'
+      ? `previous convictions${convictDetail?` for ${convictDetail}`:''}`
+      : `no convictions`;
+    const licence = val('licence') || 'full UK driving licence';
+    const points  = val('points')  || 'no';
+
+    const roadSetting = val('roadSetting') || 'residential';
+    const speedLimit  = val('speedLimit')  || '[speed limit]';
+    const incidentDate= val('incidentDate');
+    const incidentTime= val('incidentTime');
+    const light       = val('light') || 'daylight';
+    const weather     = val('weather') || 'clear';
+    const surface     = val('surface') || 'dry';
+    const traffic     = val('traffic') || 'light';
+    const peds        = val('peds') || 'low';
+    const driveStreet = val('driveStreet') || locusStreet;
+
+    const pw1 = val('pw1') || '[surname 1]';
+    const pw2 = val('pw2') || '[surname 2]';
+    const accusedName = val('accusedName') || '[full name]';
+    const accusedDOB  = val('accusedDOB')  || '[date of birth]';
+
+    const stopReason  = val('stopReason') || 'routine vehicle check';
+    const stopDetail  = val('stopDetail');
+    const signalsSel  = signalCtl.get();
+    const signalsText = signalsSel.length ? signalsSel.join(' / ') : '[blue lights / siren / hand signal]';
+
+    const midRef      = val('midRef');
+    const driverExplain = val('driverExplain');
+    const replyCharge = val('replyCharge') || 'made no reply';
+
+    const dispo       = val('dispo') || 'seized under Section 165A';
+    const cle2        = val('cle2');
+    const recoveryCo  = val('recoveryCo');
+    const recoveryLoc = val('recoveryLoc');
+    const seizureTime = val('seizureTime');
+    const storageLoc  = val('storageLoc');
+
+    const header = `SPR – No Insurance – ${locusStreet}, ${town}\n\n⸻`;
+
+    const keeperLine = isKeeper
+      ? `The accused is the owner and registered keeper of a`
+      : `The vehicle involved is a`;
+
+    const keeperTail = isKeeper ? `` : keeperDetail ? ` The registered keeper is recorded as ${keeperDetail}.` : ``;
+
+    const antecedents =
+`Antecedents ;
+
+${keeperLine} ${vehColour} ${vehMake} ${vehModel}, registration mark ${vehReg}.${keeperTail} ${pr.subj} is ${known} to police and has ${convictionsText}. The accused is the holder of a ${licence} with ${points} penalty points.`;
+
+    const locus =
+`\n⸻
+
+Locus ;
+
+The locus is ${locusStreet}, ${town}. It is a ${roadSetting} road with a ${speedLimit} mph limit. The incident occurred about ${fmtTime(incidentTime)||'[time]'} on ${fmtDate(incidentDate)||'[date]'} in ${light} hours. The weather was ${weather} and the road surface was ${surface}. There was ${traffic} traffic and ${peds} pedestrian activity.`;
+
+    const stopLine = stopReason==='minor road traffic offence observed' && stopDetail
+      ? ` due to a minor road traffic offence, namely ${stopDetail}`
+      : ` as part of a ${stopReason}`;
+
+    const midLine = midRef ? ` These checks were recorded as ${midRef}.` : ``;
+    const explainLine = driverExplain ? ` When asked, the accused stated that ${driverExplain}.` : ``;
+
+    const events =
+`\n⸻
+
+Events ;
+
+About ${fmtTime(incidentTime)||'[time of offence]'} on ${fmtDate(incidentDate)||'[date]'}, police witness ${pw1} and police witness ${pw2} were on routine mobile patrol, both in full uniform, when they observed a ${vehColour} ${vehMake} ${vehModel}, registration mark ${vehReg}, being driven on ${driveStreet}, ${town}.
+
+The vehicle was stopped${stopLine}. It was signalled to stop using ${signalsText}, and the police witnesses approached the driver. The driver identified ${pr.refl} as the now accused, ${accusedName}, ${accusedDOB}.
+
+Police witness ${pw1} conducted checks on the Police National Computer and the Motor Insurance Database. These checks confirmed that there was no valid insurance policy in force for the vehicle at the time of driving.${midLine}${explainLine}
+
+The accused was thereafter cautioned and charged by police witness ${pw1}, in the presence of police witness ${pw2}, with using a motor vehicle on a road or other public place without there being in force a valid policy of insurance covering such use. The accused confirmed ${pr.subjLow} understood and ${replyCharge}.
+
+Contrary to Section 143 of the Road Traffic Act 1988.`;
+
+    let dispoBlock = '';
+    if(dispo==='seized under Section 165A'){
+      const seizeTimeTxt = seizureTime ? ` at ${fmtTime(seizureTime)}` : '';
+      const recTxt = recoveryCo || recoveryLoc ? ` The vehicle was uplifted by ${recoveryCo||'the contracted recovery operator'} to ${recoveryLoc||'the designated recovery yard'}.` : '';
+      const cle2Txt = cle2 ? ` A CLE2 seizure form (${cle2}) was completed and issued to the accused.` : ` A CLE2 seizure form was completed and issued to the accused.`;
+      const storeTxt = storageLoc ? ` Storage location recorded as ${storageLoc}.` : '';
+      dispoBlock =
+`\n\nThe vehicle was seized under Section 165A of the Road Traffic Act 1988${seizeTimeTxt}.${recTxt} ${cle2Txt}${storeTxt}`;
+    } else if(dispo==='released to an insured driver'){
+      dispoBlock = `\n\nThe vehicle was released at the scene to an insured driver after checks confirmed valid insurance for that driver.`;
+    } else {
+      dispoBlock = `\n\nThe vehicle was left parked safely at the roadside.`;
+    }
+
+    const remarks =
+`\n⸻
+
+Remarks ;
+
+In the opinion of police witness ${pw1}, the accused was ${ (driverExplain||'cooperative').split(' ')[0] || 'cooperative' } during the interaction. The accused was advised of ${pr.poss} responsibilities and the requirement to hold valid motor insurance prior to driving on a public road.`;
+
+    $('#output').textContent = `${header}\n\n${antecedents}${locus}${events}${dispoBlock}\n\n${remarks}`;
+  }
+
+  // Initial render and listeners
+  function init(){
+    render();
+  }
+  function selectOutput(){
+    const el = $('#output');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+  function toast(msg){
+    const t=document.createElement('div');
+    t.textContent=msg;
+    t.style.position='fixed'; t.style.left='50%'; t.style.top='18px'; t.style.transform='translateX(-50%)';
+    t.style.padding='8px 12px'; t.style.border='1px solid var(--stroke)';
+    t.style.background='linear-gradient(135deg, rgba(122,162,255,.25), rgba(95,245,248,.22))';
+    t.style.borderRadius='999px'; t.style.zIndex='9999'; t.style.boxShadow='var(--shadow)';
+    document.body.appendChild(t); setTimeout(()=>t.remove(),1300);
+  }
+
+  // Bind buttons
+  $('#copyBtn').addEventListener('click', async ()=>{
+    const text = $('#output').innerText;
+    try{ await navigator.clipboard.writeText(text); toast('Report copied'); }
+    catch{ selectOutput(); toast('Selected text — press Cmd/Ctrl+C'); }
+  });
+  $('#selectBtn').addEventListener('click', selectOutput);
+  $('#resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('#controls input').forEach(i=>i.value='');
+    document.querySelectorAll('#controls select').forEach(s=>s.selectedIndex=0);
+    [...$('#genderPills').children].forEach((c,i)=>c.dataset.active = i===0?'true':'false');
+    [...$('#signalPills').children].forEach(c=>c.dataset.active='false');
+    $('#convictWrap').hidden = true;
+    gender='male';
+    render();
+  });
+
+  // Gender pill selection
+  document.querySelectorAll('#genderPills .pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      document.querySelectorAll('#genderPills .pill').forEach(c=>c.dataset.active='false');
+      p.dataset.active='true'; gender = p.dataset.value; render();
+    });
+  });
+
+  // Signal pills toggles
+  document.querySelectorAll('#signalPills .pill').forEach(p=>{
+    p.addEventListener('click', ()=>{ p.dataset.active = p.dataset.active==='true'?'false':'true'; render(); });
+  });
+
+  // Change listeners
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

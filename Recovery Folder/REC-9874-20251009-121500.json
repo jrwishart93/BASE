@@ -1,0 +1,21 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-9874-20251009-121500",
+  "datetime": "2025-10-09T11:15:00.000Z",
+  "incidentNumber": "9874",
+  "division": "E",
+  "location": "Princes Street, Edinburgh",
+  "officers": [
+    "PC Harding and Lewis"
+  ],
+  "enquiryOfficer": "PC Lewis",
+  "type": "Counterfeit Goods",
+  "details": {
+    "description": "40 designer handbags",
+    "quantity": 40,
+    "estimatedValueGBP": 400
+  },
+  "remarks": "Fake Handbags recovered from vehicle.",
+  "createdAt": "2025-10-31T12:24:10.463Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}

@@ -1,0 +1,497 @@
+<!doctype html>
+<!-- nav update: 2025-02-14 – unified site header -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forms — B.A.S.E.</title>
+
+  <link rel="icon" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="preload" as="image" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="stylesheet" href="./styles/base.css">
+
+  <script defer src="./Applications/JSON/app-registry.js"></script>
+  <script defer src="./scripts/briefings.js"></script>
+  <script defer src="./scripts/data.js"></script>
+  <script defer src="./scripts/apps.js"></script>
+  <script defer src="./scripts/main.js"></script>
+  <script defer src="./scripts/nav.js"></script>
+  <style id="forms-modernise">
+  body.forms-page{
+    background: radial-gradient(1200px 700px at 20% -10%, rgba(122,162,255,.10) 0%, rgba(0,0,0,0) 60%),
+                radial-gradient(1000px 600px at 90% 110%, rgba(95,245,248,.08) 0%, rgba(0,0,0,0) 60%),
+                linear-gradient(180deg,#040915 0%, #0b1732 100%);
+  }
+  </style>
+    <style id="forms-page-extras">
+  .forms-toolbar{ display:flex; justify-content:flex-end; margin:18px 0; }
+  #forms-search{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:999px;
+    color:#E9EEFB;
+    padding:10px 16px;
+    width:260px;
+    backdrop-filter:blur(12px);
+  }
+  #forms-search::placeholder{ color:rgba(233,238,251,0.6); }
+  #forms-search:focus{
+    outline:none;
+    border-color:rgba(122,162,255,0.45);
+    box-shadow:0 0 12px rgba(122,162,255,0.3);
+  }
+  .forms-empty{
+    display:none;
+    text-align:center;
+    color:rgba(233,238,251,.75);
+    border:1px dashed rgba(255,255,255,.16);
+    border-radius:14px;
+    padding:16px;
+    margin-top:18px;
+  }
+  .icon-desc{
+    display:block;
+    margin-top:6px;
+    color:rgba(233,238,251,0.65);
+    font-size:13px;
+    line-height:1.35;
+    max-width:260px;
+  }
+  #reports-modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1000; backdrop-filter:blur(12px) saturate(140%); background:rgba(6,10,25,0.55); }
+  #reports-modal[aria-hidden="false"]{ animation:fm-fade-in .25s ease-out; }
+  @keyframes fm-fade-in{ from{opacity:0;} to{opacity:1;} }
+  #reports-modal .dialog{
+    position:relative;
+    width:92%;
+    max-width:560px;
+    padding:28px 24px 26px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(180deg, rgba(18,24,40,.88), rgba(10,14,28,.88));
+    box-shadow:0 12px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.10) inset;
+    backdrop-filter:blur(18px);
+    color:#E9EEFB;
+    transform-origin:50% 42%;
+    animation:fm-zoom .22s ease-out both;
+  }
+  @keyframes fm-zoom{ from{transform:scale(.98);opacity:0;} to{transform:scale(1);opacity:1;} }
+  #reports-title{ margin:0; font-size:22px; letter-spacing:.3px; color:#fff; }
+  #reports-desc{ margin:6px 0 16px; opacity:.88; }
+  #reports-close{
+    position:absolute;
+    top:12px;
+    right:16px;
+    border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.12);
+    color:#E9EEFB;
+    border-radius:999px;
+    padding:6px 12px;
+    cursor:pointer;
+    transition:background .2s, transform .2s;
+  }
+  #reports-close:hover{ background:rgba(122,162,255,.25); transform:translateY(-1px); }
+  #reports-modal .options{
+    --min:180px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(var(--min), 1fr));
+    gap:12px;
+  }
+  #reports-modal .options a.card{
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06);
+    text-align:center;
+    padding:14px;
+    color:#CFD6EA;
+    text-decoration:none;
+    transition:background .2s ease, transform .2s ease, box-shadow .2s ease, color .2s ease;
+  }
+  #reports-modal .options a.card:hover,
+  #reports-modal .options a.card:focus-visible{
+    background:rgba(255,255,255,.14);
+    transform:translateY(-3px);
+    box-shadow:0 0 14px rgba(122,162,255,.25);
+    color:#fff;
+    outline:2px solid rgba(122,162,255,.45);
+    outline-offset:2px;
+  }
+  @media (max-width:700px){
+    .forms-toolbar{ justify-content:flex-start; }
+    #forms-search{ width:100%; }
+  }
+  </style>
+
+</head>
+<body class="forms-page">
+
+  <!-- Primary Navigation (GlassNav v2.1) -->
+  <nav class="glassnav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a class="nav-logo" href="./index.html" aria-label="BASE home">
+        <img src="./lib/assets/images/logos/base-logo.png" alt="BASE" height="44" width="44" loading="lazy">
+      </a>
+
+      <ul class="nav-list">
+        <li>
+          <a class="nav-link" data-page="home" href="./index.html">
+            <span class="label">Home</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="briefing" href="./briefing.html">
+            <span class="label">Briefing</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="applications" href="./applications.html">
+            <span class="label">Applications</span>
+            <svg class="underline" viewBox="0 0 140 14" preserveAspectRatio="none">
+              <path d="M6,10 Q70,2 134,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link is-active" data-page="forms" href="./forms.html" aria-current="page">
+            <span class="label">Forms</span>
+            <svg class="underline" viewBox="0 0 90 14" preserveAspectRatio="none">
+              <path d="M6,10 Q45,2 84,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="recoveries" href="./recoveries.html">
+            <span class="label">Recoveries</span>
+            <svg class="underline" viewBox="0 0 130 14" preserveAspectRatio="none">
+              <path d="M6,10 Q65,2 124,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="directory" href="./directory.html">
+            <span class="label">Directory</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="settings" href="./settings.html">
+            <span class="label">Settings</span>
+            <svg class="underline" viewBox="0 0 105 14" preserveAspectRatio="none">
+              <path d="M6,10 Q52,2 99,10" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="card home-hero">
+      <h1 class="home-title">Forms &amp; Tools</h1>
+      <p class="home-desc">Launch offline report templates and form builders.</p>
+    </section>
+
+    <div class="forms-toolbar">
+      <input id="forms-search" type="search" placeholder="Search forms…" aria-label="Search forms and tools" autocomplete="off">
+    </div>
+
+    <div id="forms-error" class="notice" hidden></div>
+
+    <section class="icon-grid" id="forms-grid" role="grid" aria-label="Forms and tools">
+        <a href="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/locus.html"
+           data-href-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/locus.html"
+           data-href-rel="./lib/assets/forms/locus.html"
+           data-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/locus.html"
+           data-rel="./lib/assets/forms/locus.html"
+           class="icon-btn"
+           data-form-id="locus-static"
+           data-form-link
+           role="gridcell">
+          <span class="icon-ring"><img src="./lib/assets/images/icons/icon-locus.png" alt="" class="icon-img" loading="lazy" decoding="async"></span>
+          <span class="icon-label">Locus Builder</span>
+          <span class="icon-desc">Interactive sentence builder for locus descriptions.</span>
+        </a>
+
+        <a href="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/antecedents.html"
+           data-href-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/antecedents.html"
+           data-href-rel="./lib/assets/forms/antecedents.html"
+           data-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/antecedents.html"
+           data-rel="./lib/assets/forms/antecedents.html"
+           class="icon-btn"
+           data-form-id="antecedents-static"
+           data-form-link
+           role="gridcell">
+          <span class="icon-ring"><img src="./lib/assets/images/icons/icon-antecedence.png" alt="" class="icon-img" loading="lazy" decoding="async"></span>
+          <span class="icon-label">Antecedents Generator</span>
+          <span class="icon-desc">Produce antecedents text in the standard SPR format.</span>
+        </a>
+
+        <a href="#" id="reports-launch" class="icon-btn" role="gridcell">
+          <span class="icon-ring"><img src="./lib/assets/images/icons/icon-reports.png" alt="" class="icon-img" loading="lazy" decoding="async"></span>
+          <span class="icon-label">Reports</span>
+          <span class="icon-desc">Open a report builder (Drug Driving, No Insurance, No MOT).</span>
+        </a>
+      </section>
+      <p id="forms-empty" class="forms-empty" role="status" aria-live="polite" hidden>No matching items.</p>
+    <p class="muted forms-notice" style="text-align:center;margin-top:30px;" hidden>
+      Notice: Could not load forms registry. Check the file is available locally.
+    </p>
+  </main>
+
+  <!-- Reports modal -->
+  <div id="reports-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reports-title" aria-describedby="reports-desc">
+    <div class="dialog">
+      <button id="reports-close" type="button" aria-label="Close">Close</button>
+
+      <h2 id="reports-title">Choose a Report</h2>
+      <p id="reports-desc" class="muted">Select a report to open its stand-alone builder.</p>
+
+      <div class="options">
+        <a class="card" tabindex="0"
+           href="./lib/assets/forms/drug-driving.html"
+           data-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/drug-driving.html"
+           data-rel="./lib/assets/forms/drug-driving.html">
+          <h3 style="margin:6px 0 4px;">Drug Driving (S5)</h3>
+          <p class="muted" style="margin:0;">Open builder</p>
+        </a>
+
+        <a class="card" tabindex="0"
+           href="./lib/assets/forms/insurance.html"
+           data-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/insurance.html"
+           data-rel="./lib/assets/forms/insurance.html">
+          <h3 style="margin:6px 0 4px;">No Insurance</h3>
+          <p class="muted" style="margin:0;">Open builder</p>
+        </a>
+
+        <a class="card" tabindex="0"
+           href="./lib/assets/forms/mot.html"
+           data-abs="/Users/macbookair/Desktop/BASE/Desktop/lib/assets/forms/mot.html"
+           data-rel="./lib/assets/forms/mot.html">
+          <h3 style="margin:6px 0 4px;">No MOT</h3>
+          <p class="muted" style="margin:0;">Open builder</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function openLocal(absPath, relPath){
+    try{
+      if(absPath && absPath.startsWith('/')){
+        const w = window.open('file://' + absPath, '_blank', 'noopener');
+        if(w) return true;
+      }
+    }catch(_){ }
+    if(relPath){
+      try{
+        const w2 = window.open(relPath, '_blank', 'noopener');
+        if(w2) return true;
+      }catch(_){ }
+      return true;
+    }
+    return false;
+  }
+
+  (function(){
+    const launch = document.getElementById('reports-launch');
+    const modal  = document.getElementById('reports-modal');
+    const dialog = modal ? modal.querySelector('.dialog') : null;
+    const closeB = document.getElementById('reports-close');
+    const optionLinks = modal ? Array.from(modal.querySelectorAll('.options a.card')) : [];
+    const grid = document.getElementById('forms-grid');
+    const allTiles = grid ? Array.from(grid.querySelectorAll('.icon-btn')) : [];
+    const localTiles = allTiles.filter(tile => tile.dataset.abs || tile.dataset.rel || tile.dataset.hrefAbs || tile.dataset.hrefRel);
+    const searchInput = document.getElementById('forms-search');
+    const notice = document.querySelector('.forms-notice');
+    if(notice && allTiles.length) notice.hidden = true;
+
+    let lastFocus = null;
+
+    function openModal(e){
+      if(e) e.preventDefault();
+      if(!modal) return;
+      lastFocus = document.activeElement;
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      const first = modal.querySelector('a,button,[tabindex=\"0\"]');
+      if(first) first.focus();
+      document.addEventListener('keydown', escHandler);
+      document.addEventListener('keydown', trapTab);
+      modal.addEventListener('click', backdropClose);
+    }
+
+    function closeModal(){
+      if(!modal) return;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', escHandler);
+      document.removeEventListener('keydown', trapTab);
+      modal.removeEventListener('click', backdropClose);
+      if(lastFocus && typeof lastFocus.focus === 'function'){
+        lastFocus.focus();
+      }
+    }
+
+    function escHandler(ev){
+      if(ev.key === 'Escape') closeModal();
+    }
+
+    function trapTab(ev){
+      if(ev.key !== 'Tab' || !dialog) return;
+      const focusables = dialog.querySelectorAll('a,button,[tabindex=\"0\"]');
+      if(!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if(ev.shiftKey && document.activeElement === first){
+        last.focus();
+        ev.preventDefault();
+      }else if(!ev.shiftKey && document.activeElement === last){
+        first.focus();
+        ev.preventDefault();
+      }
+    }
+
+    function backdropClose(ev){
+      if(ev.target === modal){
+        closeModal();
+      }
+    }
+
+    if(launch) launch.addEventListener('click', openModal);
+    if(closeB) closeB.addEventListener('click', closeModal);
+
+    optionLinks.forEach(link=>{
+      link.addEventListener('click', ev=>{
+        ev.preventDefault();
+        const abs = link.dataset.abs;
+        const rel = link.dataset.rel || link.getAttribute('href');
+        if(openLocal(abs, rel)){
+          closeModal();
+        }else{
+          alert('Unable to open this report. Please confirm the file exists locally.');
+        }
+      });
+    });
+
+    localTiles.forEach(tile=>{
+      tile.addEventListener('click', ev=>{
+        const abs = tile.dataset.abs || tile.dataset.hrefAbs || tile.getAttribute('href');
+        const rel = tile.dataset.rel || tile.dataset.hrefRel || tile.getAttribute('href');
+        if(openLocal(abs, rel)){
+          ev.preventDefault();
+        }else if(abs || rel){
+          ev.preventDefault();
+          alert('Unable to open this form. Please confirm the file exists locally.');
+        }
+      });
+    });
+
+    function applyFilter(){
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      let matches = 0;
+      allTiles.forEach(tile=>{
+        const hay = (tile.innerText || '').toLowerCase();
+        const hit = !query || hay.includes(query);
+        tile.hidden = !hit;
+        if(hit) matches += 1;
+      });
+      return matches;
+    }
+
+    window._formsSearchHandler = applyFilter;
+
+    if(searchInput){
+      searchInput.addEventListener('input', ()=>{
+        if(typeof window._formsSearchHandler === 'function'){
+          window._formsSearchHandler();
+        }else{
+          applyFilter();
+        }
+      });
+    }
+    applyFilter();
+  })();
+  </script>
+
+  <script>
+  /* Reusable launcher: try absolute file:// first, then relative */
+  if (typeof window.openLocal !== 'function') {
+    window.openLocal = function(absPath, relPath){
+      try {
+        if (absPath && absPath.startsWith('/')) {
+          const w = window.open('file://' + absPath, '_blank', 'noopener');
+          if (w) return true;
+        }
+      } catch (_) {}
+      if (relPath) {
+        window.open(relPath, '_blank', 'noopener');
+        return true;
+      }
+      return false;
+    };
+  }
+
+  /* Optional: hook tiles to use openLocal if you prefer explicit fallbacks */
+  (function(){
+    // If you keep plain <a href=...> links, you can skip this.
+    // Example wiring (commented): give any tile data-abs and data-rel to use openLocal:
+    // document.querySelectorAll('.icon-btn[data-abs]').forEach(tile=>{
+    //   tile.addEventListener('click', e=>{
+    //     e.preventDefault();
+    //     openLocal(tile.dataset.abs, tile.dataset.rel);
+    //   });
+    // });
+  })();
+
+  /* Search announce + empty-state toggle */
+  (function(){
+    const grid = document.getElementById('forms-grid');
+    const empty = document.getElementById('forms-empty');
+    const search = document.getElementById('forms-search');
+
+    function updateEmpty(){
+      if(!grid || !empty) return;
+      const visible = grid.querySelectorAll('.icon-btn:not([hidden])').length;
+      if (visible === 0) {
+        empty.hidden = false;
+        empty.style.display = 'block';
+        empty.textContent = search && search.value ? `No results for “${search.value}”` : 'No matching items.';
+      } else {
+        empty.hidden = true;
+        empty.style.display = 'none';
+      }
+    }
+
+    const origHandler = window._formsSearchHandler;
+    if (typeof origHandler === 'function') {
+      window._formsSearchHandler = function(){
+        const result = origHandler();
+        updateEmpty();
+        return result;
+      };
+    } else {
+      search && search.addEventListener('input', ()=>{
+        const q = search.value.trim().toLowerCase();
+        grid.querySelectorAll('.icon-btn').forEach(t=>{
+          const hay = (t.innerText||'').toLowerCase();
+          t.hidden = q && !hay.includes(q);
+        });
+        updateEmpty();
+      });
+    }
+
+    updateEmpty();
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>Drug Driving 5A Report</title>
+
+<style>
+/* ================================
+   TOKENS (as requested)
+   ================================ */
+:root{
+  --bg0:#040915; --bg1:#0b1732; --bg2:#0f1a32;
+  --ink:#e9eefb; --muted:#b8c2da;
+  --cy:#5ff5f8; --cy2:#7aa2ff; --cy3:#9c73ff;
+  --glass: rgba(255,255,255,.06); --glass-2: rgba(255,255,255,.08);
+  --stroke: rgba(255,255,255,.14); --glow: rgba(122,162,255,.25);
+  --radius:20px; --radius-sm:12px;
+  --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* ================================
+   BASE
+   ================================ */
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 600px at 30% -10%, #1a2544 0%, transparent 45%),
+    radial-gradient(900px 700px at 110% 10%, #14345a 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+  background-attachment:fixed;
+  filter:brightness(1); /* JS will clamp 0.9..1.1 */
+}
+::selection{background:rgba(122,162,255,.25)}
+a{color:inherit}
+
+/* ================================
+   BACKGROUND LAYERS (calm & static)
+   ================================ */
+.bg-tartan{
+  position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.08;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 24px, rgba(255,255,255,.05) 24px 26px, transparent 26px 52px),
+    repeating-linear-gradient(-45deg, transparent 0 24px, rgba(122,162,255,.07) 24px 26px, transparent 26px 52px);
+  transition:opacity .25s ease;
+}
+.bg-glow{
+  position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.36;
+  background:
+    radial-gradient(700px 480px at 60% 40%, rgba(122,162,255,.22), transparent 70%),
+    radial-gradient(1000px 700px at 20% 75%, rgba(0,180,255,.16), transparent 70%);
+  filter:blur(42px);
+}
+
+/* ================================
+   FLOATING WORDS (gentle)
+   ================================ */
+.clouds{ position:fixed; inset:0; z-index:3; pointer-events:none }
+.word{
+  position:absolute; opacity:.22; font-weight:700; letter-spacing:.2px; user-select:none;
+  text-shadow:0 1px 0 rgba(0,0,0,.25); white-space:nowrap;
+  animation: floatY var(--fy,14s) ease-in-out infinite, driftX var(--dx,22s) ease-in-out infinite;
+}
+@keyframes floatY{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}
+@keyframes driftX{0%{margin-left:-6px}50%{margin-left:6px}100%{margin-left:-6px}}
+@media (prefers-reduced-motion:reduce){ .word{animation:none; opacity:.35} }
+
+/* ================================
+   LAYOUT
+   ================================ */
+.stage{
+  position:relative; z-index:4; min-height:100svh;
+  display:grid; grid-template-rows:auto 1fr; gap:14px;
+}
+header.app{
+  position:sticky; top:0; z-index:5;
+  display:flex; gap:12px; align-items:center; justify-content:space-between;
+  padding:12px clamp(12px,3vw,24px);
+  background:linear-gradient(180deg, rgba(20,26,42,.88), rgba(20,26,42,.54));
+  border-bottom:1px solid var(--stroke);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+}
+.title{
+  margin:0;
+  font-size:clamp(22px,5vw,34px); line-height:1.2;
+  background:linear-gradient(90deg,var(--cy2),var(--cy),var(--cy3));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  background-size:200% 100%; animation: shimmer 9s linear infinite;
+  cursor:pointer;
+}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+header.app .sub{ margin:2px 0 0; color:var(--muted); font-size:clamp(14px,2.5vw,16px) }
+
+.wrap{
+  display:grid; gap:14px; padding:14px clamp(12px,3vw,24px) 90px;
+  grid-template-columns: 1fr min(720px, 96vw);
+  align-items:start; max-width:1800px; width:100%; margin:0 auto;
+}
+@media (max-width:1100px){ .wrap{ grid-template-columns:1fr } }
+
+/* ================================
+   GLASS CARD + OUTPUT
+   ================================ */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow);
+  backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
+  overflow:clip;
+}
+.card header{ padding:14px 16px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.card header h2{ margin:0; font-size:16px; letter-spacing:.2px; flex:1 }
+.card header p{ margin:0; color:var(--muted); font-size:13px }
+.card main{ padding:12px; display:grid; gap:8px }
+.card footer{ padding:10px 12px; border-top:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); display:flex; gap:8px; flex-wrap:wrap }
+
+.output{
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:12px; position:sticky; top:86px;
+}
+.output header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
+.output h3{ margin:0; font-size:16px }
+.timestamp{ color:var(--muted); font-size:12px }
+.outbox{ margin-top:8px; background:rgba(0,0,0,.35); border:1px solid var(--stroke); border-radius:12px; padding:10px }
+textarea.readonly{
+  width:100%; height:70vh; min-height:360px; resize:vertical;
+  border:0; outline:0; background:transparent; color:var(--ink);
+  font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:14.5px; line-height:1.6; letter-spacing:.2px;
+}
+
+/* ================================
+   FORM CONTROLS
+   ================================ */
+.row{ display:grid; grid-template-columns:1fr 1fr; gap:8px }
+@media (max-width:800px){ .row{ grid-template-columns:1fr } }
+
+.item{ display:grid; grid-template-columns:1fr auto; gap:12px; padding:12px; border-radius:var(--radius-sm); border:1px solid transparent }
+.item:hover{ background:rgba(255,255,255,.04); border-color:var(--stroke) }
+.item.yn-required.warn{ border-color:rgba(255,150,150,.6); background:rgba(255,100,100,.1) }
+.item-label{ font-weight:600; font-size:14px; line-height:1.35 }
+.inline-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.pills{ display:flex; align-items:center; gap:6px; flex-wrap:wrap }
+.pill{
+  background:#16223d; border:1px solid var(--stroke); padding:8px 12px; border-radius:999px; font-size:13px; cursor:pointer; user-select:none
+}
+.pill:hover{ background:#22335a }
+.pill.active{ background:#29406f; border-color:rgba(122,162,255,.7); box-shadow:0 0 0 1px rgba(122,162,255,.25) inset }
+.glass-input, .glass-select, .glass-area{
+  width:100%; padding:12px 14px; border-radius:999px; border:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+  color:var(--ink); box-shadow:var(--shadow); outline:none;
+}
+.glass-area{ border-radius:14px; min-height:84px; resize:vertical; font-family:inherit }
+.glass-input::placeholder, .glass-area::placeholder{ color:rgba(233,238,251,.6) }
+.glass-select{
+  padding-right:42px; appearance:none; position:relative;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="%23e9eefb"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat:no-repeat; background-position:left top, right 14px center; background-size:100% 100%, 22px;
+}
+.remark-toggle{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; padding:6px 8px; border-radius:8px }
+.remark-toggle:hover{ color:var(--ink); background:rgba(255,255,255,.05) }
+.remark{ grid-column:1 / -1; display:none; gap:6px }
+.remark .meta{ display:flex; justify-content:space-between; color:var(--muted); font-size:12px }
+
+/* ================================
+   TOP ACTION BUTTONS
+   ================================ */
+.actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.btn{
+  appearance:none; -webkit-appearance:none;
+  border:1px solid var(--stroke); background:var(--glass); color:var(--ink);
+  border-radius:12px; padding:10px 12px; font-size:14px; cursor:pointer; box-shadow:var(--shadow)
+}
+.btn:hover{ filter:brightness(1.06) }
+.btn:active{ transform:translateY(1px) }
+.btn.primary{ border-color:rgba(122,162,255,.6) }
+.btn.small{ padding:8px 10px; font-size:13px }
+
+/* ================================
+   TOAST
+   ================================ */
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(18px);
+  padding:10px 14px; border-radius:999px; border:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(8,13,28,.85), rgba(8,13,28,.75));
+  box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  color:var(--ink); font-size:14px; z-index:8; opacity:0; pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+
+/* ================================
+   PRINT
+   ================================ */
+@media print{
+  .bg-tartan,.bg-glow,.clouds,.actions,.btn,.remark-toggle{ display:none !important }
+  body{ background:#fff; color:#000 }
+  .wrap{ grid-template-columns:1fr; padding:0 }
+  .card, .output{ border:none; background:#fff; box-shadow:none }
+  textarea.readonly{ height:auto }
+  .title{ color:#000; background:none; -webkit-background-clip:initial; background-clip:initial; animation:none }
+}
+</style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-tartan" id="tartan"></div>
+  <div class="bg-glow"></div>
+
+  <!-- Floating words -->
+  <div class="clouds" aria-hidden="true">
+    <span class="word" style="top:12%; left:10%; --fy:15s; --dx:24s;">Cannabis</span>
+    <span class="word" style="top:22%; right:12%; --fy:18s; --dx:26s;">Cocaine</span>
+    <span class="word" style="top:36%; left:6%; --fy:16s; --dx:22s;">Drugwipe</span>
+    <span class="word" style="top:58%; right:8%; --fy:17s; --dx:23s;">Station Nurse</span>
+    <span class="word" style="top:72%; left:18%; --fy:20s; --dx:27s;">DD4 Form</span>
+    <span class="word" style="top:18%; right:32%; --fy:19s; --dx:25s;">Section 6 Requirement</span>
+    <span class="word" style="top:80%; left:50%; transform:translateX(-50%); --fy:21s; --dx:29s;">“I ARREST YOU”</span>
+  </div>
+
+  <!-- App -->
+  <div class="stage" role="main" aria-label="Drug Driving 5A Report">
+    <header class="app">
+      <div>
+        <h1 class="title" id="copyTitle" title="Tap to copy">Drug Driving 5A Report</h1>
+        <p class="sub">Liquid Glass builder for a Section 5A SPR. Offline. No external assets.</p>
+      </div>
+      <nav class="actions" aria-label="Actions">
+        <button class="btn small" id="toggleTartan" aria-pressed="false">Toggle Tartan</button>
+        <button class="btn small" id="dim">Dim</button>
+        <button class="btn small" id="bright">Brighten</button>
+        <button class="btn small" id="clear">Clear</button>
+        <button class="btn small primary" id="copy">Copy</button>
+        <button class="btn small" id="export">Export .txt</button>
+        <button class="btn small" id="print">Print</button>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- LEFT: Builder -->
+      <div id="formRoot">
+
+        <!-- CASE / LOCUS -->
+        <section class="card" data-sec="case">
+          <header>
+            <h2>Case & Locus</h2>
+            <p>Time, date, street, conditions.</p>
+          </header>
+          <main>
+            <div class="row">
+              <div class="item" data-id="time">
+                <div class="item-label">Time of offence</div>
+                <div class="inline-controls"><input class="glass-input" id="time" type="time" /></div>
+              </div>
+              <div class="item" data-id="date">
+                <div class="item-label">Date</div>
+                <div class="inline-controls"><input class="glass-input" id="date" type="date" /></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="street">
+                <div class="item-label">Locus street</div>
+                <div class="inline-controls"><input class="glass-input" id="street" placeholder="e.g., Telford Road" /></div>
+              </div>
+              <div class="item" data-id="town">
+                <div class="item-label">Town / City</div>
+                <div class="inline-controls"><input class="glass-input" id="town" placeholder="e.g., Edinburgh" /></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="speed">
+                <div class="item-label">Speed limit (mph)</div>
+                <div class="inline-controls"><input class="glass-input" id="speed" type="number" min="5" max="80" inputmode="numeric" placeholder="30" /></div>
+              </div>
+              <div class="item" data-id="surface">
+                <div class="item-label">Road surface</div>
+                <div class="inline-controls">
+                  <div class="pills" data-pills="surface"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="weather">
+                <div class="item-label">Weather</div>
+                <div class="inline-controls"><div class="pills" data-pills="weather"></div></div>
+              </div>
+              <div class="item" data-id="traffic">
+                <div class="item-label">Traffic level</div>
+                <div class="inline-controls"><div class="pills" data-pills="traffic"></div></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="peds">
+                <div class="item-label">Pedestrian activity</div>
+                <div class="inline-controls"><div class="pills" data-pills="peds"></div></div>
+              </div>
+              <div class="item" data-id="lighting">
+                <div class="item-label">Street lighting / visibility</div>
+                <div class="inline-controls"><div class="pills" data-pills="lighting"></div></div>
+              </div>
+            </div>
+          </main>
+          <footer>
+            <button class="btn small" data-unknown="case">Set Unknown</button>
+          </footer>
+        </section>
+
+        <!-- VEHICLE & ACCUSED -->
+        <section class="card" data-sec="va">
+          <header>
+            <h2>Vehicle & Accused</h2>
+            <p>Core identifiers.</p>
+          </header>
+          <main>
+            <div class="row">
+              <div class="item" data-id="vehColour">
+                <div class="item-label">Vehicle colour</div>
+                <div class="inline-controls"><input class="glass-input" id="vehColour" placeholder="e.g., Silver" /></div>
+              </div>
+              <div class="item" data-id="vehMake">
+                <div class="item-label">Vehicle make</div>
+                <div class="inline-controls"><input class="glass-input" id="vehMake" placeholder="e.g., Ford" /></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="item" data-id="vehModel">
+                <div class="item-label">Vehicle model</div>
+                <div class="inline-controls"><input class="glass-input" id="vehModel" placeholder="e.g., Focus" /></div>
+              </div>
+              <div class="item" data-id="reg">
+                <div class="item-label">Registration mark</div>
+                <div class="inline-controls"><input class="glass-input" id="reg" placeholder="e.g., AB12 CDE" /></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="item" data-id="accName">
+                <div class="item-label">Accused full name</div>
+                <div class="inline-controls"><input class="glass-input" id="accName" placeholder="Surname, Forename" /></div>
+              </div>
+              <div class="item" data-id="accDOB">
+                <div class="item-label">Accused date of birth</div>
+                <div class="inline-controls"><input class="glass-input" id="accDOB" type="date" /></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="va">Set Unknown</button></footer>
+        </section>
+
+        <!-- OBSERVATION & STOP -->
+        <section class="card" data-sec="obs">
+          <header>
+            <h2>Observation & Stop</h2>
+            <p>What led to the stop and how it was conducted.</p>
+          </header>
+          <main>
+            <div class="item" data-id="rtOffence">
+              <div class="item-label">Officers observed a road traffic offence?</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="rtOffence"></div>
+                <button class="remark-toggle" data-toggle="rtOffence">Add offence detail</button>
+              </div>
+              <div class="remark" data-remark="rtOffence">
+                <textarea class="glass-area" placeholder="State the specific offence observed… e.g., failing to signal, speeding, defective light."></textarea>
+                <div class="meta"><span class="count"></span><span>Shown only if Yes.</span></div>
+              </div>
+            </div>
+
+            <div class="item" data-id="intelAlert">
+              <div class="item-label">Previously alerted to possible drug impairment?</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="intelAlert"></div>
+                <button class="remark-toggle" data-toggle="intelAlert">Add note</button>
+              </div>
+              <div class="remark" data-remark="intelAlert">
+                <textarea class="glass-area" placeholder="Source or nature of information, if relevant…"></textarea>
+                <div class="meta"><span class="count"></span><span>Optional.</span></div>
+              </div>
+            </div>
+
+            <div class="item" data-id="routineStop">
+              <div class="item-label">Routine stop carried out?</div>
+              <div class="inline-controls"><div class="pills" data-pills="routineStop"></div></div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="signal">
+                <div class="item-label">Signal to stop used</div>
+                <div class="inline-controls"><div class="pills" data-pills="signal"></div></div>
+              </div>
+              <div class="item" data-id="stopLoc">
+                <div class="item-label">Stop location (brief)</div>
+                <div class="inline-controls"><input class="glass-input" id="stopLoc" placeholder="e.g., roadside lay-by near no. 34" /></div>
+              </div>
+            </div>
+
+            <div class="item" data-id="passengers">
+              <div class="item-label">Persons within vehicle</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="passengers"></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="obs">Set Unknown</button></footer>
+        </section>
+
+        <!-- INITIAL SIGNS -->
+        <section class="card" data-sec="signs">
+          <header>
+            <h2>Initial Signs</h2>
+            <p>Select all that apply.</p>
+          </header>
+          <main>
+            <div class="item" data-id="smell">
+              <div class="item-label">Smell of cannabis from vehicle</div>
+              <div class="inline-controls"><div class="pills" data-pills="smell"></div></div>
+            </div>
+            <div class="item" data-id="appearance">
+              <div class="item-label">Accused appeared under the influence</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="appearance"></div>
+                <button class="remark-toggle" data-toggle="appearance">Add specifics</button>
+              </div>
+              <div class="remark" data-remark="appearance">
+                <textarea class="glass-area" placeholder="Talking fast, pinpoint pupils, erratic and fidgety, etc."></textarea>
+                <div class="meta"><span class="count"></span><span>Optional detail.</span></div>
+              </div>
+            </div>
+            <div class="item" data-id="paraphernalia">
+              <div class="item-label">Drug paraphernalia observed</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="paraphernalia"></div>
+                <button class="remark-toggle" data-toggle="paraphernalia">Describe</button>
+              </div>
+              <div class="remark" data-remark="paraphernalia">
+                <textarea class="glass-area" placeholder="E.g., grinder, wraps, straw, foil… and where."></textarea>
+                <div class="meta"><span class="count"></span><span>Optional detail.</span></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="signs">Set Unknown</button></footer>
+        </section>
+
+        <!-- SEARCH -->
+        <section class="card" data-sec="search">
+          <header>
+            <h2>Detention & Search</h2>
+            <p>Section 23 MDA detention and outcomes.</p>
+          </header>
+          <main>
+            <div class="item" data-id="s23">
+              <div class="item-label">Detained under s23 MDA and searched?</div>
+              <div class="inline-controls"><div class="pills" data-pills="s23"></div></div>
+            </div>
+            <div class="item" data-id="searchWho">
+              <div class="item-label">Searched</div>
+              <div class="inline-controls"><div class="pills" data-pills="searchWho"></div></div>
+            </div>
+            <div class="item" data-id="drugsFound">
+              <div class="item-label">Any drugs recovered?</div>
+              <div class="inline-controls">
+                <div class="pills" data-pills="drugsFound"></div>
+                <button class="remark-toggle" data-toggle="drugsFound">Type, quantity & where</button>
+              </div>
+              <div class="remark" data-remark="drugsFound">
+                <textarea class="glass-area" placeholder="State type and quantity, recovered from the accused / vehicle, location in vehicle, etc."></textarea>
+                <div class="meta"><span class="count"></span><span>Shown only if Yes.</span></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="search">Set Unknown</button></footer>
+        </section>
+
+        <!-- TESTS, ARREST & CUSTODY -->
+        <section class="card" data-sec="tests">
+          <header>
+            <h2>Tests, Arrest & Custody</h2>
+            <p>Section 6 requirement, breath, drug wipe, arrest, custody suite, nurse.</p>
+          </header>
+          <main>
+            <div class="row">
+              <div class="item" data-id="s6time">
+                <div class="item-label">Time of s6 requirement</div>
+                <div class="inline-controls"><input class="glass-input" id="s6time" type="time" /></div>
+              </div>
+              <div class="item" data-id="s6reason">
+                <div class="item-label">Reason for requirement</div>
+                <div class="inline-controls"><div class="pills" data-pills="s6reason"></div></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="breath">
+                <div class="item-label">Breath test result</div>
+                <div class="inline-controls"><div class="pills" data-pills="breath"></div></div>
+              </div>
+              <div class="item" data-id="wipe">
+                <div class="item-label">Drug wipe indication</div>
+                <div class="inline-controls"><div class="pills" data-pills="wipe"></div></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="arrestTime">
+                <div class="item-label">Time of arrest</div>
+                <div class="inline-controls"><input class="glass-input" id="arrestTime" type="time" /></div>
+              </div>
+              <div class="item" data-id="custody">
+                <div class="item-label">Custody suite</div>
+                <div class="inline-controls"><input class="glass-input" id="custody" placeholder="e.g., St Leonards" /></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="item" data-id="nurse">
+                <div class="item-label">Station nurse name</div>
+                <div class="inline-controls"><input class="glass-input" id="nurse" placeholder="e.g., Nurse Smith" /></div>
+              </div>
+              <div class="item" data-id="split">
+                <div class="item-label">Split sample taken?</div>
+                <div class="inline-controls"><div class="pills" data-pills="split"></div></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="tests">Set Unknown</button></footer>
+        </section>
+
+        <!-- ANALYSIS RESULT -->
+        <section class="card" data-sec="analysis">
+          <header>
+            <h2>Laboratory Analysis</h2>
+            <p>Notification date, lab, drug and figures.</p>
+          </header>
+          <main>
+            <div class="row">
+              <div class="item" data-id="notifyDate">
+                <div class="item-label">Notification date received</div>
+                <div class="inline-controls"><input class="glass-input" id="notifyDate" type="date" /></div>
+              </div>
+              <div class="item" data-id="lab">
+                <div class="item-label">Laboratory name</div>
+                <div class="inline-controls"><input class="glass-input" id="lab" placeholder="e.g., Forensic Services" /></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="item" data-id="drugName">
+                <div class="item-label">Drug name</div>
+                <div class="inline-controls"><div class="pills" data-pills="drugName"></div></div>
+              </div>
+              <div class="item" data-id="result">
+                <div class="item-label">Result figure (µg/L)</div>
+                <div class="inline-controls"><input class="glass-input" id="result" type="number" step="0.1" min="0" placeholder="e.g., 4.6" /></div>
+              </div>
+            </div>
+            <div class="item" data-id="limit">
+              <div class="item-label">Prescribed limit (µg/L)</div>
+              <div class="inline-controls"><input class="glass-input" id="limit" type="number" step="0.1" min="0" placeholder="e.g., 2.0 (cannabis) / 10.0 (cocaine metabolite), etc." /></div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="analysis">Set Unknown</button></footer>
+        </section>
+
+        <!-- REMARKS -->
+        <section class="card" data-sec="remarks">
+          <header>
+            <h2>Remarks</h2>
+            <p>Officer opinion and demeanour.</p>
+          </header>
+          <main>
+            <div class="item" data-id="demeanour">
+              <div class="item-label">Demeanour</div>
+              <div class="inline-controls"><div class="pills" data-pills="demeanour"></div></div>
+            </div>
+            <div class="item" data-id="remorse">
+              <div class="item-label">Remorse shown?</div>
+              <div class="inline-controls"><div class="pills" data-pills="remorse"></div></div>
+            </div>
+            <div class="item" data-id="remarksFree">
+              <div class="item-label">Additional remarks (optional)</div>
+              <div class="inline-controls"><button class="remark-toggle" data-toggle="remarksFree">Add remarks</button></div>
+              <div class="remark" data-remark="remarksFree">
+                <textarea class="glass-area" placeholder="Any contextual risk, driving manner, roadside interactions, etc."></textarea>
+                <div class="meta"><span class="count"></span><span>Optional.</span></div>
+              </div>
+            </div>
+          </main>
+          <footer><button class="btn small" data-unknown="remarks">Set Unknown</button></footer>
+        </section>
+
+      </div>
+
+      <!-- RIGHT: Output -->
+      <aside class="output" aria-label="SPR Text Output">
+        <header>
+          <h3>SPR Text</h3><span class="timestamp" id="timestamp">Last update: —</span>
+        </header>
+        <div class="outbox"><textarea id="out" class="readonly" readonly></textarea></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true"></div>
+
+<script>
+/* ============================================================
+   Small, vanilla JS — offline, no deps
+   ============================================================ */
+(() => {
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const toastEl = $('#toast');
+  const outEl = $('#out');
+  const tsEl = $('#timestamp');
+
+  /* ----- State + persistence ----- */
+  const STORAGE = 's5a_report_builder_v1';
+  const defaults = () => ({
+    // case/locus
+    time:'', date:'', street:'', town:'', speed:'',
+    surface:'Unknown', weather:'Unknown', traffic:'Unknown', peds:'Unknown', lighting:'Unknown',
+    // vehicle/accused
+    vehColour:'', vehMake:'', vehModel:'', reg:'', accName:'', accDOB:'',
+    // observation/stop
+    rtOffence:'Unknown', rtOffenceNote:'',
+    intelAlert:'Unknown', intelAlertNote:'',
+    routineStop:'Unknown', signal:'Blue lights',
+    stopLoc:'', passengers:'No other persons',
+    // initial signs
+    smell:'Unknown', appearance:'Unknown', appearanceNote:'', paraphernalia:'Unknown', paraphernaliaNote:'',
+    // search
+    s23:'Unknown', searchWho:'Accused & vehicle', drugsFound:'Unknown', drugsFoundNote:'',
+    // tests/arrest/custody
+    s6time:'', s6reason:'Belief under influence', breath:'Passed (no alcohol)', wipe:'Cannabis',
+    arrestTime:'', custody:'', nurse:'', split:'Elected to retain one',
+    // analysis
+    notifyDate:'', lab:'', drugName:'Cannabis', result:'', limit:'',
+    // remarks
+    demeanour:'Cooperative', remorse:'Did not show remorse', remarksFree:'',
+    // brightness & tartan
+    brightness:1, tartan:true
+  });
+  let state = load();
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE);
+      if(!raw) return defaults();
+      const s = {...defaults(), ...JSON.parse(raw)};
+      return s;
+    }catch{ return defaults(); }
+  }
+  function save(){ localStorage.setItem(STORAGE, JSON.stringify(state)); }
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.setAttribute('aria-hidden','false');
+    toastEl.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>{ toastEl.classList.remove('show'); toastEl.setAttribute('aria-hidden','true'); }, 1200);
+  }
+
+  /* ----- Option sets for pills ----- */
+  const options = {
+    surface:['Dry','Wet','Damp'],
+    weather:['Clear','Overcast','Raining','Foggy'],
+    traffic:['Light','Moderate','Heavy'],
+    peds:['Low','Moderate','High'],
+    lighting:['Present & adequate','Present but poor','Absent'],
+    rtOffence:['Yes','No','Unknown'],
+    intelAlert:['Yes','No','Unknown'],
+    routineStop:['Yes','No','Unknown'],
+    signal:['Blue lights','Siren','Hand signal'],
+    passengers:['No other persons','1 passenger','2 passengers','3+ passengers'],
+    smell:['Yes','No','Unknown'],
+    appearance:['Yes','No','Unknown'],
+    paraphernalia:['Yes','No','Unknown'],
+    s23:['Yes','No','Unknown'],
+    searchWho:['Accused & vehicle','Accused only','Vehicle only'],
+    drugsFound:['Yes','No'],
+    s6reason:['Observed offence','Belief under influence','Both'],
+    breath:['Passed (no alcohol)','Failed','Refused/Unable'],
+    wipe:['Cannabis','Cocaine','Cannabis & Cocaine','Negative/Invalid'],
+    split:['Elected to retain one','Refused to retain one'],
+    drugName:['Cannabis','Cocaine','Other'],
+    demeanour:['Cooperative','Compliant','Evasive','Argumentative'],
+    remorse:['Showed remorse','Did not show remorse','Unknown']
+  };
+
+  /* ----- Build pills ----- */
+  Object.keys(options).forEach(key=>{
+    const host = document.querySelector(`[data-pills="${key}"]`);
+    if(!host) return;
+    host.innerHTML = '';
+    options[key].forEach(opt=>{
+      const b = document.createElement('button');
+      b.type='button'; b.className='pill'; b.textContent=opt; b.dataset.opt=opt;
+      if(state[key]===opt) b.classList.add('active');
+      b.addEventListener('click', ()=>{
+        state[key]=opt; save();
+        $$(`.pills[data-pills="${key}"] .pill`).forEach(p=>p.classList.toggle('active', p.dataset.opt===opt));
+        update();
+      });
+      host.appendChild(b);
+    });
+  });
+
+  /* ----- Text inputs ----- */
+  const binds = [
+    'time','date','street','town','speed',
+    'vehColour','vehMake','vehModel','reg','accName','accDOB',
+    'stopLoc','s6time','arrestTime','custody','nurse',
+    'notifyDate','lab','result','limit'
+  ];
+  binds.forEach(id=>{
+    const el = $('#'+id);
+    if(!el) return;
+    el.value = state[id] || '';
+    el.addEventListener('input', ()=>{ state[id]=el.value; save(); update(); });
+  });
+
+  /* ----- Remark toggles + areas ----- */
+  const remarkPairs = [
+    ['rtOffence','rtOffenceNote'],
+    ['intelAlert','intelAlertNote'],
+    ['appearance','appearanceNote'],
+    ['paraphernalia','paraphernaliaNote'],
+    ['drugsFound','drugsFoundNote'],
+    ['remarksFree','remarksFree']
+  ];
+  remarkPairs.forEach(([key, noteKey])=>{
+    const toggle = document.querySelector(`[data-toggle="${key}"]`);
+    const block  = document.querySelector(`[data-remark="${key}"]`);
+    if(!block) return;
+    const ta = block.querySelector('textarea');
+    const count = block.querySelector('.count');
+    ta.value = state[noteKey] || '';
+    count.textContent = `${ta.value.length} chars`;
+    if(ta.value) block.style.display='grid';
+    toggle?.addEventListener('click', ()=>{ block.style.display = (block.style.display==='grid') ? 'none' : 'grid'; ta.focus(); });
+    ta.addEventListener('input', ()=>{ state[noteKey]=ta.value; count.textContent=`${ta.value.length} chars`; save(); update(); });
+  });
+
+  /* ----- Title copy + top actions ----- */
+  const title = $('#copyTitle');
+  title.setAttribute('tabindex','0');
+  title.addEventListener('click', async ()=>{
+    await copyText('Drug Driving 5A Report');
+    showToast('Title copied');
+  });
+  title.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); title.click(); } });
+
+  $('#toggleTartan').addEventListener('click', ()=>{
+    state.tartan = !state.tartan; save();
+    $('#tartan').style.opacity = state.tartan ? '.08' : '0';
+    $('#toggleTartan').setAttribute('aria-pressed', String(state.tartan));
+  });
+  $('#dim').addEventListener('click', ()=>{ adjustBrightness(-0.04); });
+  $('#bright').addEventListener('click', ()=>{ adjustBrightness(+0.04); });
+  $('#clear').addEventListener('click', ()=>{
+    if(!confirm('Clear all fields?')) return;
+    state = defaults(); save(); location.reload();
+  });
+  $('#copy').addEventListener('click', async ()=>{
+    await copyText(outEl.value);
+    showToast('SPR text copied');
+  });
+  $('#export').addEventListener('click', ()=>{
+    const blob = new Blob([outEl.value], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='S5A_Report.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+  $('#print').addEventListener('click', ()=>{ window.print(); });
+
+  function copyText(txt){
+    return (navigator.clipboard?.writeText(txt)) || new Promise(res=>{
+      const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.left='-9999px';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); res();
+    });
+  }
+
+  function adjustBrightness(delta){
+    state.brightness = Math.max(0.9, Math.min(1.1, (state.brightness||1) + delta));
+    document.body.style.filter = `brightness(${state.brightness.toFixed(2)})`;
+    save();
+  }
+
+  // Apply persisted brightness & tartan
+  document.body.style.filter = `brightness(${(state.brightness||1).toFixed(2)})`;
+  $('#tartan').style.opacity = state.tartan ? '.08' : '0';
+  $('#toggleTartan').setAttribute('aria-pressed', String(state.tartan));
+
+  /* ----- Section unknown shortcuts ----- */
+  $$('.card footer [data-unknown]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const sec = btn.getAttribute('data-unknown');
+      setUnknown(sec); update(); showToast('Section set to Unknown');
+    });
+  });
+
+  function setUnknown(sec){
+    const set = (k,v)=>{ state[k]=v; };
+    if(sec==='case'){ set('time',''); set('date',''); set('street',''); set('town',''); set('speed','');
+      set('surface','Unknown'); set('weather','Unknown'); set('traffic','Unknown'); set('peds','Unknown'); set('lighting','Unknown'); }
+    if(sec==='va'){ set('vehColour',''); set('vehMake',''); set('vehModel',''); set('reg',''); set('accName',''); set('accDOB',''); }
+    if(sec==='obs'){ set('rtOffence','Unknown'); set('rtOffenceNote',''); set('intelAlert','Unknown'); set('intelAlertNote','');
+      set('routineStop','Unknown'); set('signal','Blue lights'); set('stopLoc',''); set('passengers','No other persons'); }
+    if(sec==='signs'){ set('smell','Unknown'); set('appearance','Unknown'); set('appearanceNote',''); set('paraphernalia','Unknown'); set('paraphernaliaNote',''); }
+    if(sec==='search'){ set('s23','Unknown'); set('searchWho','Accused & vehicle'); set('drugsFound','Unknown'); set('drugsFoundNote',''); }
+    if(sec==='tests'){ set('s6time',''); set('s6reason','Belief under influence'); set('breath','Passed (no alcohol)'); set('wipe','Cannabis'); set('arrestTime',''); set('custody',''); set('nurse',''); set('split','Elected to retain one'); }
+    if(sec==='analysis'){ set('notifyDate',''); set('lab',''); set('drugName','Cannabis'); set('result',''); set('limit',''); }
+    if(sec==='remarks'){ set('demeanour','Cooperative'); set('remorse','Did not show remorse'); set('remarksFree',''); }
+    save();
+  }
+
+  /* ----- Builder → SPR text ----- */
+  function fmtDate(d){
+    if(!d) return '';
+    try{ const dt=new Date(d); if(isNaN(dt)) return ''; return dt.toLocaleDateString(); }catch{return ''}
+  }
+  function pick(v, unk='Unknown'){ return v ? v : unk; }
+
+  function buildSPR(){
+    const lines = [];
+    const locus = `${pick(state.street,'[street name]')}, ${pick(state.town,'[town/city]')}`;
+    lines.push('SPR – Section 5A RTA – ' + locus, '', '⸻', '', 'Antecedents ;', '',
+`The accused is the owner and registered keeper of a ${pick(state.vehColour,'[vehicle colour]')} ${pick(state.vehMake,'[vehicle make]')} ${pick(state.vehModel,'[vehicle model]')}, registration mark ${pick(state.reg,'[registration mark]')}. He/she is [known/unknown] to police and has [no/previous] convictions [for specify offences if known]. The accused is the holder of a full UK driving licence with [no/current] penalty points.`,
+'', '⸻', '', 'Locus ;', '',
+`The locus is ${pick(state.street,'[street name]')}, ${pick(state.town,'[town/city]')} — a [residential/rural/urban/city centre] road with a ${pick(state.speed,'[speed limit]')} mph speed limit. The road surface was ${state.surface.toLowerCase()}, and weather conditions were ${state.weather.toLowerCase()}. There was ${state.traffic.toLowerCase()} traffic and ${state.peds.toLowerCase()} pedestrian activity at the time. Street lighting was ${mapLighting(state.lighting)}, and visibility was [good/moderate/restricted].`,
+'', '⸻', '', 'Events ;', '');
+
+    // Events — patrol & observation
+    lines.push(
+`About ${pick(state.time,'[time of offence]')} on ${fmtDate(state.date)||'[date]'}, police witness [surname 1] and police witness [surname 2] were on routine mobile patrol, both in full uniform, when they observed a ${pick(state.vehColour,'[vehicle colour]')} ${pick(state.vehMake,'[vehicle make]')} ${pick(state.vehModel,'[vehicle model]')} driving along ${pick(state.street,'[locus street]')}.`
+    );
+
+    if(state.rtOffence==='Yes'){
+      lines.push(
+`The officers observed the vehicle committing a road traffic offence, namely ${state.rtOffenceNote || '[state the specific offence observed — e.g., failing to maintain proper lane discipline, excessive speed, failing to signal, defective light, etc.]'}.`
+      );
+    }
+
+    if(state.intelAlert==='Yes'){
+      lines.push(`Prior to the stop, police witnesses had been alerted to the vehicle following information received that the driver was possibly under the influence of drugs${state.intelAlertNote ? ` (${state.intelAlertNote}).` : '.'}`);
+    }
+
+    if(state.routineStop==='Yes'){ lines.push(`The officers carried out a routine stop of the vehicle as part of their mobile patrol duties.`); }
+
+    lines.push(
+`The vehicle was signalled to stop using ${state.signal.toLowerCase()}, and came to a halt at ${pick(state.stopLoc,'[brief stop location]')}. The police witnesses approached the driver, who provided their details as the now accused, ${pick(state.accName,'[full name and date of birth]')}${state.accDOB?` (DOB ${fmtDate(state.accDOB)})`:''}.`,
+`There were ${mapPassengers(state.passengers)} within the vehicle at the time.`,
+`Upon speaking with the accused, the police witnesses could:`
+    );
+
+    // Bullet-like indicators as sentences
+    if(state.smell==='Yes') lines.push(`• Detect the smell of cannabis emanating from the vehicle.`);
+    if(state.appearance==='Yes') lines.push(`• See that the accused appeared to be under the influence, ${state.appearanceNote || 'as he/she was talking fast, had pinpoint pupils, and was behaving erratically and fidgety, indicative of being under the influence of some kind of stimulant which the police witnesses felt might have been a controlled drug'}.`);
+    if(state.paraphernalia==='Yes') lines.push(`• Observe drug paraphernalia within the vehicle${state.paraphernaliaNote?`: ${state.paraphernaliaNote}.`:`.`}`);
+    if(state.smell!=='Yes' && state.appearance!=='Yes' && state.paraphernalia!=='Yes') lines.push('• No specific indicators were noted.');
+
+    // Search
+    if(state.s23==='Yes'){
+      lines.push(
+`The accused and any occupants were detained under Section 23 of the Misuse of Drugs Act 1971, and both the accused and the vehicle were searched.`
+      );
+      if(state.drugsFound==='Yes'){
+        lines.push(`During the search, police witnesses recovered ${state.drugsFoundNote || '[state type and quantity of drugs]'} from ${mapSearchWho(state.searchWho,true)}.`);
+      }else{
+        lines.push(`The accused and vehicle were searched, but no illicit items were found.`);
+      }
+    }else if(state.s23==='No'){
+      lines.push(`No detention or search under Section 23 of the Misuse of Drugs Act 1971 was carried out.`);
+    }
+
+    // s6 requirement & tests
+    lines.push(
+`At ${pick(state.s6time,'[time of s6 requirement]')}, due to ${mapS6Reason(state.s6reason)}, the accused was requested to provide a specimen of breath for an alcohol test and a specimen of saliva for a roadside drug wipe test.`,
+mapBreath(state.breath),
+mapWipe(state.wipe)
+    );
+
+    // Arrest & custody
+    lines.push(
+`As such, at ${pick(state.arrestTime,'[time of arrest]')}, police witness [surname 1] informed the accused that he/she was under arrest, using the words:`,
+`“I ARREST YOU.”`,
+`The accused was cautioned, intimating they understood and made no reply.`,
+`He/she was conveyed to ${pick(state.custody,'[name of custody suite]')} and placed in police custody.`,
+`Upon arrival, custody procedures were carried out and recorded on the relevant DD5 form. The accused was asked and agreed to provide a specimen of blood for analysis. This was obtained by the station nurse, ${pick(state.nurse,'[nurse name]')}, and split into two parts.`,
+`A certificate authenticating the blood being obtained was completed by the nurse.`,
+`The accused ${mapSplit(state.split)} of the split blood samples.`,
+`The accused was informed that the blood sample would be submitted to the laboratory for analysis and that, if found to be over the prescribed limit, he/she would be reported for consideration of prosecution. The accused was thereafter released from police custody pending further analysis.`,
+'', `In ${mapMonth(state.notifyDate)||'[month]'}, police witness [surname 1] received notification that the blood sample taken from the accused had been analysed by ${pick(state.lab,'[name of laboratory]')}. The result indicated that the accused was over the prescribed limit for ${pick(state.drugName,'[drug name]')}.`,
+`The analysis showed a result of ${pick(state.result,'[result figure]')} micrograms per litre of blood, which exceeds the prescribed limit of ${pick(state.limit,'[limit figure]')} micrograms per litre.`,
+'', `As such, this report has been submitted.`,
+`Contrary to Section 5A(1)(b) and (2) of the Road Traffic Act 1988.`,
+'', '⸻', '', 'Remarks ;', '',
+`In the opinion of police witness [surname 1], the accused appeared under the influence of drugs while in control of a motor vehicle, presenting a clear risk to the safety of themselves and other road users. The accused was ${state.demeanour.toLowerCase()} throughout and ${mapRemorse(state.remorse)}.`,
+state.remarksFree ? state.remarksFree : ''
+    );
+
+    return lines.join('\n');
+  }
+
+  function mapLighting(v){
+    if(v==='Present & adequate') return 'present and adequate';
+    if(v==='Present but poor') return 'present but poor';
+    if(v==='Absent') return 'absent';
+    return 'unknown';
+    }
+  function mapPassengers(v){
+    if(v==='No other persons') return 'no other persons';
+    if(v==='1 passenger') return '1 passenger';
+    if(v==='2 passengers') return '2 passengers';
+    return '3 or more persons';
+  }
+  function mapSearchWho(v, possessive){
+    if(v==='Accused only') return possessive?'the accused':'the accused';
+    if(v==='Vehicle only') return possessive?'the vehicle':'the vehicle';
+    return possessive?'the accused and the vehicle':'the accused and the vehicle';
+  }
+  function mapS6Reason(v){
+    if(v==='Observed offence') return 'the accused committing a road traffic offence';
+    if(v==='Belief under influence') return 'the police witnesses being of the belief that the accused might be under the influence of some kind of drug';
+    return 'the accused committing a road traffic offence and the police witnesses being of the belief that he/she might be under the influence of some kind of drug';
+  }
+  function mapBreath(v){
+    if(v==='Failed') return 'The accused failed the breath test.';
+    if(v==='Refused/Unable') return 'The accused refused or was unable to provide a specimen of breath.';
+    return 'The accused passed the breath test, showing no alcohol in his/her system.';
+  }
+  function mapWipe(v){
+    if(v==='Cannabis') return 'The accused gave a positive indication for cannabis on the drug wipe device.';
+    if(v==='Cocaine') return 'The accused gave a positive indication for cocaine on the drug wipe device.';
+    if(v==='Cannabis & Cocaine') return 'The accused gave a positive indication for cannabis and cocaine on the drug wipe device.';
+    return 'The drug wipe result was negative/invalid.';
+  }
+  function mapSplit(v){
+    if(v==='Refused to retain one') return 'refused to take one';
+    return 'elected to take one';
+  }
+  function mapMonth(d){
+    if(!d) return '';
+    const dt=new Date(d); if(isNaN(dt)) return '';
+    return dt.toLocaleString(undefined,{month:'long', year:'numeric'});
+  }
+  function mapRemorse(v){
+    if(v==='Showed remorse') return 'did show remorse for their actions';
+    if(v==='Unknown') return 'did not express a clear position on remorse';
+    return 'did not show remorse for their actions';
+  }
+
+  function update(){
+    outEl.value = buildSPR();
+    tsEl.textContent = 'Last update: ' + new Date().toLocaleString();
+  }
+  update();
+
+  /* ----- Accessibility niceties ----- */
+  $$('.remark-toggle').forEach(btn=>{
+    btn.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); } });
+  });
+
+})();
+</script>
+</body>
+</html>

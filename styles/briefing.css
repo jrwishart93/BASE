@@ -1,0 +1,72 @@
+/* Intel feed layout */
+#intel-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.intel-card {
+  display: flex;
+  gap: 12px;
+  border-radius: 16px;
+  border: 1px solid #243355;
+  background: #111a2e;
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.intel-thumb {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  background: #0e1730;
+  border-radius: 10px;
+}
+
+.intel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intel-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.intel-sub {
+  color: #9fb0d0;
+  font-size: 12px;
+}
+
+.intel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.intel-chips .chip {
+  background: #1b2a48;
+  border: 1px solid #2a3a60;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+
+.intel-text {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.intel-foot {
+  margin-top: auto;
+  font-size: 12px;
+  color: #9fb0d0;
+}
+
+.intel-empty {
+  color: #9fb0d0;
+  padding: 24px;
+}

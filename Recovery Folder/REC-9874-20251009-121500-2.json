@@ -1,0 +1,21 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-9874-20251009-121500",
+  "datetime": "2025-10-09T11:15:00.000Z",
+  "incidentNumber": "9874",
+  "division": "J",
+  "location": "High Street, Loanhead",
+  "officers": [
+    "PC Smith and McDonald"
+  ],
+  "enquiryOfficer": "PC Smith",
+  "type": "Stolen Property",
+  "details": {
+    "description": "Power Tools",
+    "quantity": 3,
+    "estimatedValueGBP": 120
+  },
+  "remarks": "Power tools  recovered from vehicle.",
+  "createdAt": "2025-10-31T12:25:24.962Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}

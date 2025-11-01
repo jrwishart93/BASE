@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="color-scheme" content="dark" />
+<title>Locus</title>
+<style>
+  :root{
+    --bg0:#040915; --bg1:#0b1732; --bg2:#0f1a32; --ink:#e9eefb;
+    --cy:#5ff5f8; --cy2:#7aa2ff; --cy3:#9c73ff;
+    --glass: rgba(255,255,255,.06); --glass-2: rgba(255,255,255,.08);
+    --stroke: rgba(255,255,255,.14);
+    --glow: rgba(122,162,255,.25);
+    --muted:#b8c2da; --accent:#7aa2ff; --danger:#ff6b6b;
+    --pill:#16223d; --pill-hover:#22335a; --pill-active:#29406f;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    --radius:18px; --radius-sm:12px;
+    --warn-bg: rgba(255,107,107,0.12); --warn-bd: rgba(255,107,107,0.55);
+    --dur: 5200ms; --morph: 560ms ease;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 30% -10%, #1a2544 0%, transparent 45%),
+      radial-gradient(900px 700px at 110% 10%, #14345a 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg0),var(--bg1));
+    overflow:hidden; /* enabled after intro */
+  }
+  /* INTRO */
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+    background:repeating-radial-gradient(circle at 30% 30%, rgba(255,255,255,.08) 0 1px, transparent 1px 2px);
+    filter:blur(1px); z-index:2}
+  #intro{position:fixed; inset:0; z-index:3}
+  .stage{position:relative;width:100%;height:100%}
+  .clouds{position:absolute;inset:0;z-index:1;filter:saturate(115%)}
+  .hero{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+    width:min(460px,90vw);min-height:64px;border-radius:999px;
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.03));
+    border:1px solid var(--stroke);
+    box-shadow:inset 0 0 20px rgba(255,255,255,.14), 0 6px 24px rgba(0,0,0,.35), 0 0 30px var(--glow);
+    backdrop-filter:blur(12px) saturate(130%);
+    display:flex;align-items:center;justify-content:center;padding:10px 18px;z-index:10;
+    animation:breathe 2.6s ease-in-out infinite;
+  }
+  @keyframes breathe{50%{transform:translate(-50%,-50%) scale(1.02)}}
+  .title{
+    font-weight:800;font-size:clamp(24px,6vw,38px);letter-spacing:.03em;white-space:nowrap;
+    background:linear-gradient(90deg,var(--cy),var(--cy2),var(--cy3));
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 12px var(--glow);
+    animation:shimmer 7s ease infinite;
+  }
+  @keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .bubble{
+    position:absolute;will-change:transform;pointer-events:none;
+    color:rgba(220,235,255,.9);font-weight:600;font-size:12px;letter-spacing:.01em;
+    padding:6px 10px;border-radius:999px;white-space:nowrap;opacity:0;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid rgba(122,162,255,.14);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.08), 0 2px 15px rgba(0,0,0,.3), 0 0 18px rgba(122,162,255,.08);
+    backdrop-filter:blur(5px);
+    animation:bubbleIn 900ms ease forwards, bubblePulse 8s ease-in-out 700ms infinite;
+  }
+  @keyframes bubbleIn{to{opacity:.28}}
+  @keyframes bubblePulse{50%{opacity:.34}}
+  .loader-wrap{position:fixed;left:50%;bottom:10vh;transform:translateX(-50%);width:min(360px,86vw);text-align:center;z-index:10}
+  .loader-label{font-size:clamp(.9rem,2.5vw,1rem);color:rgba(255,255,255,.76);margin-bottom:10px;text-shadow:0 0 10px var(--glow)}
+  .loader{
+    position:relative;height:10px;border-radius:6px;overflow:hidden;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.1), 0 0 22px var(--glow);
+    backdrop-filter:blur(8px);
+    transition:width var(--morph), height var(--morph), border-radius var(--morph), padding var(--morph), box-shadow var(--morph), transform var(--morph);
+    margin:0 auto;
+  }
+  .bar{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;
+    background:linear-gradient(90deg,var(--cy),var(--cy2),var(--cy3));
+    box-shadow:0 0 14px var(--cy), inset 0 0 10px rgba(255,255,255,.22);
+    animation:grow var(--dur) cubic-bezier(.4,0,.2,1) forwards, ripple 1.2s ease infinite;}
+  .shine{content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent); mix-blend-mode:overlay; animation:shine 2s linear infinite;}
+  @keyframes grow{to{width:100%}} @keyframes ripple{50%{box-shadow:0 0 26px var(--cy), inset 0 0 16px rgba(255,255,255,.3)}} @keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+  .loader.toBtn{height:48px; border-radius:14px; padding:0 18px; box-shadow:0 14px 36px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18);
+    background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));}
+  .loader.toBtn .bar, .loader.toBtn .shine{opacity:0}
+  .cta{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; letter-spacing:.22em; text-transform:uppercase; font-size:13px; opacity:0; transition:opacity var(--morph); color:var(--ink)}
+  .loader.toBtn .cta{opacity:1}
+  .skip{position:fixed; right:2vw; bottom:2vh; z-index:10; padding:7px 11px; font-weight:700; font-size:.9rem; color:var(--ink); background:var(--glass); border:1px solid rgba(255,255,255,.15); border-radius:9px; box-shadow:0 0 10px var(--glow); cursor:pointer; opacity:.8}
+  .skip:hover{opacity:1}
+  .fade-out{animation:fade .52s ease forwards} @keyframes fade{to{opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .bubble,.bar,.shine{animation:none !important} }
+
+  /* APP */
+  #app{opacity:0; pointer-events:none; transition:opacity .6s ease}
+  #app.ready{opacity:1; pointer-events:auto}
+  body.app-scroll{overflow:auto}
+  header.app-head{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:12px; padding:14px 18px;
+    background:linear-gradient(180deg, rgba(20,26,42,0.85), rgba(20,26,42,0.55));
+    backdrop-filter: blur(14px); border-bottom:1px solid var(--stroke);
+  }
+  header.app-head h1{ margin:0; font-size:18px; letter-spacing:0.3px }
+  .wrap{
+    display:grid; grid-template-columns: 1fr 620px; gap:18px;
+    padding:18px; max-width:1600px; margin:0 auto;
+  }
+  .right{ position:sticky; top:12px; align-self:flex-start; display:flex; gap:12px; align-items:flex-start }
+  .output{
+    flex:1 1 auto;
+    background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+    border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:12px; min-width:420px;
+  }
+  .output header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
+  .output h3{ margin:0; font-size:16px }
+  .timestamp{ color:var(--muted); font-size:12px }
+  .outbox{ margin-top:8px; background:rgba(0,0,0,0.35); border:1px solid var(--stroke); border-radius:12px; padding:10px }
+  textarea.readonly{
+    width:100%; height:720px;
+    border:0; outline:0; background:transparent; color:var(--ink);
+    font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:14.5px; line-height:1.6; letter-spacing:.2px; resize:vertical
+  }
+  .controls{ position:sticky; top:12px; display:flex; flex-direction:column; gap:8px; min-width:170px }
+  .btn{ border:1px solid var(--stroke); background:var(--glass); padding:10px 12px; border-radius:12px; color:var(--ink); font-size:14px; line-height:1; cursor:pointer; box-shadow:var(--shadow) }
+  .btn:hover{ background:var(--glass-2) }
+  .btn.primary{ border-color: rgba(122,162,255,0.6) }
+  .btn.danger{ border-color: rgba(255,107,107,0.6) }
+  .btn.small{ padding:8px 10px; font-size:13px }
+
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); overflow:clip; margin-bottom:16px }
+  .card header{ background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-bottom:1px solid var(--stroke); padding:14px 16px; display:flex; gap:12px; align-items:center }
+  .card h2{ margin:0; font-size:16px; letter-spacing:0.2px; flex:1 }
+  .card p.desc{ margin:0; color:var(--muted); font-size:13px }
+  .card main{ padding:12px 12px 6px 12px }
+  .card footer{ padding:10px 12px; display:flex; gap:8px; border-top:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)) }
+
+  .item{ display:grid; grid-template-columns: 1fr auto; gap:12px; padding:12px; border:1px solid transparent; border-radius:var(--radius-sm) }
+  .item:hover{ background:rgba(255,255,255,0.04); border-color:var(--stroke) }
+  .item-label{ font-weight:600; font-size:14px; line-height:1.3 }
+  .inline-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+  .pills{ display:flex; gap:6px; align-items:center; flex-wrap:wrap }
+  .pill{ background:var(--pill); border:1px solid var(--stroke); padding:8px 10px; border-radius:999px; font-size:13px; cursor:pointer; user-select:none }
+  .pill:hover{ background:var(--pill-hover) }
+  .pill.active{ background:var(--pill-active); border-color: rgba(122,162,255,0.7); box-shadow:0 0 0 1px rgba(122,162,255,0.25) inset }
+
+  .twocol{ display:grid; grid-template-columns: 1fr 1fr; gap:10px }
+  .twothird{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px }
+
+  @media (max-width:1100px){
+    .wrap{ grid-template-columns:1fr }
+    .right{ position:static; top:auto; flex-direction:column }
+    .controls{
+      position:fixed; left:0; right:0; bottom:0; top:auto;
+      background:linear-gradient(180deg, rgba(20,26,42,0.92), rgba(20,26,42,0.92));
+      border-top:1px solid var(--stroke);
+      padding:10px; flex-direction:row; justify-content:center; gap:10px; z-index:50;
+    }
+    textarea.readonly{ height:340px }
+    body.app-scroll{ padding-bottom:76px }
+  }
+  @media print{
+    #intro, .grain, .controls, .card footer, .btn{ display:none !important }
+    .wrap{ grid-template-columns:1fr }
+    .output{ page-break-before:always }
+    textarea.readonly{ height:auto }
+  }
+</style>
+</head>
+<body class="intro">
+
+<!-- INTRO -->
+<div class="grain" aria-hidden="true"></div>
+<div id="intro" aria-label="Locus intro">
+  <div class="stage" id="stage">
+    <div class="clouds" id="clouds" aria-hidden="true"></div>
+    <div class="hero" id="hero"><div class="title">Locus</div></div>
+    <div class="loader-wrap">
+      <div class="loader-label" id="loaderLabel" aria-live="polite">Loading<span id="dots">...</span></div>
+      <div class="loader" id="loader" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="bar" id="bar"></div>
+        <div class="shine"></div>
+        <span class="cta" id="cta" aria-hidden="true">Start</span>
+      </div>
+    </div>
+  </div>
+  <button class="skip" id="skip">Skip</button>
+</div>
+
+<!-- APP -->
+<div id="app" aria-hidden="true">
+  <header class="app-head"><h1>Locus</h1></header>
+
+  <div class="wrap">
+    <div id="formRoot" aria-live="polite"></div>
+
+    <div class="right">
+      <aside class="output" aria-label="Locus text area">
+        <header>
+          <h3>Locus Text</h3>
+          <span class="timestamp" id="timestamp">Last update: —</span>
+        </header>
+        <div class="outbox"><textarea id="outputBox" class="readonly" readonly></textarea></div>
+      </aside>
+
+      <nav class="controls" aria-label="Actions">
+        <button class="btn small" id="shareBtn">Share</button>
+        <button class="btn small primary" id="copyBtn">Copy</button>
+        <button class="btn small" id="exportBtn">Export .txt</button>
+        <button class="btn small danger" id="resetBtn">Clear</button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+/* INTRO — adapted words for Locus */
+(function intro(){
+  const WORDS = [
+    "Road Conditions","Weather","Speed","Time","Daylight","Darkness","Visibility",
+    "Pedestrian Activity","Traffic Flow","Junction","Crossing","Direction",
+    "Carriageway","Lane Count","Central Reservation","Reserved Lanes",
+    "Street Lighting","Surface","Roadworks","Obstructions","Restrictions",
+    "Special Sites","CCTV","Arterial Route","Urban Area","Residential","Industrial"
+  ];
+  const intro = document.getElementById('intro');
+  const clouds = document.getElementById('clouds');
+  const loader = document.getElementById('loader');
+  const label  = document.getElementById('loaderLabel');
+  const dots   = document.getElementById('dots');
+  const skip   = document.getElementById('skip');
+  const app = document.getElementById('app');
+  const DURATION = getComputedStyle(document.documentElement).getPropertyValue('--dur').trim();
+  const D_MS = parseInt(DURATION,10) || 5200;
+  const COUNT = 22;
+  let raf;
+  function makeBubble(text, idx){
+    const s = document.createElement('span'); s.className = 'bubble'; s.textContent = text; clouds.appendChild(s);
+    const W = window.innerWidth, H = window.innerHeight;
+    const startX = Math.random()*W, startY = Math.random()*H;
+    const angle = Math.random()*Math.PI*2; const speed = 0.3 + Math.random()*0.5;
+    const vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
+    const driftX = (Math.random()*0.3 - 0.15), driftY = (Math.random()*0.3 - 0.15);
+    s.style.transform = `translate(${startX}px, ${startY}px)`; s.style.animationDelay = (Math.random()*800) + 'ms';
+    s.style.fontSize = (11 + Math.random()*3.5) + 'px'; s.style.filter = `blur(${(Math.random()*1.2 + .2).toFixed(1)}px)`;
+    bubbles[idx] = {el:s, x:startX, y:startY, vx, vy, driftX, driftY};
+  }
+  const bubbles = [];
+  function tick(){
+    const W = window.innerWidth, H = window.innerHeight;
+    for(const b of bubbles){
+      b.vx += b.driftX*0.01; b.vy += b.driftY*0.01;
+      const max = 1.2; const sp = Math.hypot(b.vx,b.vy);
+      if(sp>max){ b.vx = b.vx/sp*max; b.vy = b.vy/sp*max; }
+      b.x += b.vx; b.y += b.vy;
+      const m = 100; if(b.x<-m) b.x=W+m; if(b.x>W+m) b.x=-m; if(b.y<-m) b.y=H+m; if(b.y>H+m) b.y=-m;
+      b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function initBubbles(){ clouds.innerHTML=''; for(let i=0;i<COUNT;i++) makeBubble(WORDS[i%WORDS.length], i); if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }
+  initBubbles(); window.addEventListener('resize', ()=>{ if(raf) cancelAnimationFrame(raf); initBubbles(); });
+
+  let d=0; const dotsTimer = setInterval(()=>{ d=(d+1)%4; dots.textContent='.'.repeat(d); }, 300);
+  let progress = 0; const progTimer = setInterval(()=>{ progress = Math.min(100, progress + 5); loader.setAttribute('aria-valuenow', String(progress)); }, D_MS/20);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const morphAt = reduce ? 400 : D_MS;
+  setTimeout(()=>{ morphToButton(); }, morphAt);
+
+  function morphToButton(){
+    clearInterval(dotsTimer); clearInterval(progTimer);
+    loader.classList.add('toBtn');
+    loader.setAttribute('role','button'); loader.setAttribute('tabindex','0'); loader.setAttribute('aria-label','Start locus');
+    const go = ()=>{
+      intro.classList.add('fade-out');
+      setTimeout(()=>{
+        intro.style.display='none';
+        document.body.classList.add('app-scroll');
+        app.setAttribute('aria-hidden','false');
+        app.classList.add('ready');
+      }, 520);
+    };
+    loader.addEventListener('click', go, {once:true});
+    loader.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
+    label.textContent = 'Ready';
+  }
+  skip.addEventListener('click', ()=>{
+    if(raf) cancelAnimationFrame(raf);
+    intro.classList.add('fade-out');
+    setTimeout(()=>{
+      intro.style.display='none';
+      document.body.classList.add('app-scroll');
+      app.setAttribute('aria-hidden','false');
+      app.classList.add('ready');
+    }, 280);
+  });
+})();
+
+/* ====== Locus builder (modeled on your Antecedents app patterns) ====== */
+const formRoot = document.getElementById('formRoot');
+const outBox = document.getElementById('outputBox');
+const tsEl = document.getElementById('timestamp');
+
+/* CHIP LIBS */
+const CHIPS = {
+  areaType: ["residential area","city centre","urban built-up","suburban","industrial estate","retail park","rural"],
+  position: ["on carriageway","in bus lane","in cycle lane","on central reservation","on footway/pavement","in lay-by","in loading bay","at parking bay","at bus stop"],
+  carriageway: ["single carriageway","dual carriageway","one-way"],
+  alignment: ["straight","left-hand bend","right-hand bend","S-bend","crest/hill","dip","adverse camber"],
+  reserved: ["bus lane","cycle lane (mandatory)","cycle lane (advisory)","tram lane","shared-use path"],
+  junction: ["(none)","T-junction","crossroads","staggered crossroads","roundabout (mini)","roundabout (standard)","filter lane","private access/entrance","signal-controlled junction","priority junction","slip road/merge/diverge"],
+  controls: ["traffic signals","temporary signals","zebra crossing","pelican crossing","puffin crossing","toucan crossing","school crossing patrol","stop sign","give-way"],
+  time: ["hours of daylight","twilight","darkness","sunrise","sunset"],
+  lighting: ["street lighting present","well lit","poorly lit","no lighting","lighting defective/out"],
+  visibility: ["good sightlines","restricted by parked vehicles","restricted by bend/crest","restricted by vegetation","restricted by structures/hoardings","restricted by weather"],
+  weather: ["clear/dry","drizzle","raining","heavy rain","sleet","hail","snowfall","high winds","fog/mist"],
+  surface: ["dry surface","damp surface","wet surface","standing water","snow","ice/frost","grit/salt present","loose gravel","mud/debris","diesel/oil spillage","leaves","potholes"],
+  works: ["roadworks present","lane closure","contraflow","temporary speed limit","traffic management barriers","diversion signage","parked/stationary vehicles","fallen tree","skips/scaffolding"],
+  traffic: ["light traffic","moderate traffic","heavy traffic","stop–start congestion"],
+  restrict: ["20mph zone","school street","bus gate","weight limit","one-way enforcement"],
+  special: ["near school entrance","near hospital entrance","outside licensed premises","outside stadium/venue","near rail/tram stop","bridge/viaduct","tunnel"],
+  cctvRoad: ["CCTV present","CCTV not present/unknown","Parks/Council CCTV","private security camera","dashcam present","body-worn video","doorbell camera present"],
+
+  // GENERAL
+  inout: ["Indoors","Outdoors"],
+  pubpriv: ["public space","private premises"],
+  outSubtype: ["street/footway","public square","park/greenspace","car park (surface)","car park (multi-storey)","retail park","industrial yard/compound","transport hub (bus/rail/tram stop)","harbour/quayside","campus grounds"],
+  outLight: ["well lit","poorly lit","no lighting","temporary lighting"],
+  outSurface: ["tarmac","concrete","block paving","gravel","grass/soil","standing water","ice/snow"],
+  inDwelling: ["detached house","semi-detached","terraced","end-terrace","cottage","bungalow","flat/apartment","HMO","student accommodation","care home"],
+  inNonDom: ["office","warehouse","factory","retail shop","supermarket","restaurant","café","takeaway","pub","bar","nightclub","hotel","B&B/guesthouse","hospital/clinic/GP","pharmacy","school","college","university","leisure centre","gym","police station","courts","prison","community centre","library","museum","cinema","theatre"],
+  inAccess: ["main entrance","side entrance","rear entrance","communal door","intercom access","fire exit","roller shutter","loading bay","service corridor"],
+  inLight: ["good artificial light","poor/dim","emergency lighting","lights off/faulty"],
+  inSecurity: ["CCTV present","alarm system","security shutters","access control/FOB","security guard present"],
+  inCond: ["tidy","cluttered","wet floor","spillage","construction/renovation","dust/smoke","strong odour","temperature extreme"],
+  inSignage: ["private property","no trespass","age restricted","licensed premises","no smoking/vaping","no alcohol","dogs prohibited","opening hours signage","permit holders only"]
+};
+
+/* UTIL */
+const norm = s => (s||"").replace(/\s+/g," ").trim();
+const sentenceCap = s => { s = norm(s); return s ? s[0].toUpperCase()+s.slice(1) : ""; };
+const endStop = s => { s = norm(s); return s && /[.!?]"?$/.test(s) ? s : (s ? s + "." : ""); };
+const joinList = (list, conj="and")=>{
+  const a = (list||[]).filter(Boolean);
+  if(!a.length) return "";
+  if(a.length===1) return a[0];
+  if(a.length===2) return `${a[0]} ${conj} ${a[1]}`;
+  return `${a.slice(0,-1).join(", ")}, ${conj} ${a[a.length-1]}`;
+};
+
+/* STATE */
+let S = {
+  type: "road",
+  road: "", town: "", precision: "", // shared basics
+
+  // ROAD
+  areaType: [], position: [], carriageway: "", lanes: "", dirFrom: "", dirTo: "",
+  alignment: [], reserved: [], junction: "", controls: [],
+  time: [], lighting: [], visibility: [], weather: [], surface: [], works: [],
+  traffic: "", speed: "", restrict: [], special: [], eventCtx: "", cctvRoad: [],
+
+  // GENERAL
+  inout: "Outdoors", pubpriv: "public space",
+  outSubtype: [], outLight: [], outSurface: [], carpark: "",
+  inDwelling: "", inNonDom: "", inAccess: [], floor: "", room: "", inLight: [], inSecurity: [], inCond: [], inSignage: [],
+  genEvent: "", notable: ""
+};
+
+/* DOM BUILDERS — sections/cards in Antecedents style */
+function card(title, desc, bodyCb){
+  const sec = document.createElement("section"); sec.className="card";
+  const head = document.createElement("header");
+  const h2 = document.createElement("h2"); h2.textContent = title;
+  const p = document.createElement("p"); p.className="desc"; p.textContent = desc||"";
+  head.append(h2,p);
+  const main = document.createElement("main");
+  bodyCb(main);
+  const foot = document.createElement("footer");
+  sec.append(head, main, foot);
+  return sec;
+}
+function pillsRow(label, options, valueGetter, valueSetter, multi=false){
+  const row = document.createElement("div"); row.className="item";
+  const lab = document.createElement("div"); lab.className="item-label"; lab.textContent = label;
+  const controls = document.createElement("div"); controls.className="inline-controls";
+  const wrap = document.createElement("div"); wrap.className="pills";
+
+  const current = (multi? new Set(valueGetter()) : valueGetter());
+  options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="pill"; b.textContent = opt;
+    const active = multi ? current.has(opt) : current===opt;
+    if(active) b.classList.add("active");
+    b.addEventListener("click", ()=>{
+      if(multi){
+        const set = new Set(valueGetter());
+        if(set.has(opt)) set.delete(opt); else set.add(opt);
+        valueSetter([...set]);
+      }else{
+        valueSetter(opt);
+      }
+      updateOutput();
+      refresh();
+    });
+    wrap.appendChild(b);
+  });
+  controls.appendChild(wrap);
+  row.append(lab, controls);
+  return row;
+}
+function textRow(label, placeholder, value, setter){
+  const row = document.createElement("div"); row.className="item";
+  const lab = document.createElement("div"); lab.className="item-label"; lab.textContent = label;
+  const controls = document.createElement("div"); controls.className="inline-controls";
+  const input = document.createElement("input");
+  input.type="text"; input.placeholder = placeholder||""; input.value = value||"";
+  input.addEventListener("input", ()=>{ setter(input.value); updateOutput(); });
+  input.style.minWidth = "280px";
+  controls.appendChild(input);
+  row.append(lab, controls);
+  return row;
+}
+function selectRow(label, options, value, setter){
+  const row = document.createElement("div"); row.className="item";
+  const lab = document.createElement("div"); lab.className="item-label"; lab.textContent = label;
+  const controls = document.createElement("div"); controls.className="inline-controls";
+  const sel = document.createElement("select");
+  sel.innerHTML = `<option value="">(not specified)</option>` + options.map(o=>`<option>${o}</option>`).join("");
+  sel.value = value||"";
+  sel.addEventListener("change", ()=>{ setter(sel.value); updateOutput(); });
+  controls.appendChild(sel);
+  row.append(lab, controls);
+  return row;
+}
+
+/* PAGE FORM */
+function render(){
+  formRoot.innerHTML = "";
+
+  // Top basics
+  formRoot.appendChild(card("Basics","Give us the core location.",
+    main=>{
+      main.append(
+        textRow("Road / Place","e.g., Calder Road / Ocean Terminal Car Park", S.road, v=>S.road=norm(v)),
+        textRow("Town / City","e.g., Edinburgh", S.town, v=>S.town=norm(v)),
+        textRow("Precision (optional)","e.g., at junction with Bankhead Avenue / outside No. 16", S.precision, v=>S.precision=norm(v)),
+      );
+      // locus type
+      const typeRow = pillsRow("Locus Type", ["Road","General"],
+        ()=> S.type==="road"?"Road":"General",
+        v=> S.type = (v==="Road"?"road":"general"));
+      main.append(typeRow);
+    }
+  ));
+
+  if(S.type==="road"){
+    // ROAD: Identity & structure
+    formRoot.appendChild(card("Road identity & structure","Road class, position, layout, junctions.",
+      main=>{
+        main.append(
+          selectRow("Carriageway type", CHIPS.carriageway, S.carriageway, v=>S.carriageway=v),
+          textRow("Lane count","e.g., 2", S.lanes, v=>S.lanes=norm(v)),
+        );
+        const dirWrap = document.createElement("div"); dirWrap.className="item";
+        const lab = document.createElement("div"); lab.className="item-label"; lab.textContent="Direction of travel (optional)";
+        const controls = document.createElement("div"); controls.className="inline-controls twocol";
+        const fromSel = document.createElement("select");
+        const toSel = document.createElement("select");
+        const dirs = ["","N","NE","E","SE","S","SW","W","NW"];
+        fromSel.innerHTML = dirs.map(d=>`<option value="${d}">${d?("from "+d):"(from …)"}</option>`).join("");
+        toSel.innerHTML = dirs.map(d=>`<option value="${d}">${d?("towards "+d):"(towards …)"}</option>`).join("");
+        fromSel.value = S.dirFrom||"";
+        toSel.value = S.dirTo||"";
+        fromSel.addEventListener("change",()=>{ S.dirFrom = fromSel.value; updateOutput(); });
+        toSel.addEventListener("change",()=>{ S.dirTo = toSel.value; updateOutput(); });
+        controls.append(fromSel,toSel); dirWrap.append(lab,controls); main.append(dirWrap);
+
+        main.append(
+          pillsRow("Area type", CHIPS.areaType, ()=>S.areaType, v=>S.areaType=v, true),
+          pillsRow("Position", CHIPS.position, ()=>S.position, v=>S.position=v, true),
+          pillsRow("Alignment", CHIPS.alignment, ()=>S.alignment, v=>S.alignment=v, true),
+          pillsRow("Reserved facilities", CHIPS.reserved, ()=>S.reserved, v=>S.reserved=v, true),
+          pillsRow("Junction context", CHIPS.junction, ()=>S.junction||"(none)", v=>S.junction=(v==="(none)"?"":v)),
+          pillsRow("Controls", CHIPS.controls, ()=>S.controls, v=>S.controls=v, true)
+        );
+      }
+    ));
+
+    // ROAD: Conditions
+    formRoot.appendChild(card("Conditions","Time, lighting, visibility, weather and surface.",
+      main=>{
+        main.append(
+          pillsRow("Time of day", CHIPS.time, ()=>S.time, v=>S.time=v, true),
+          pillsRow("Street lighting", CHIPS.lighting, ()=>S.lighting, v=>S.lighting=v, true),
+          pillsRow("Visibility", CHIPS.visibility, ()=>S.visibility, v=>S.visibility=v, true),
+          pillsRow("Weather (current)", CHIPS.weather, ()=>S.weather, v=>S.weather=v, true),
+          pillsRow("Surface / defects", CHIPS.surface, ()=>S.surface, v=>S.surface=v, true),
+          pillsRow("Roadworks / obstructions", CHIPS.works, ()=>S.works, v=>S.works=v, true),
+        );
+      }
+    ));
+
+    // ROAD: Flow & context
+    formRoot.appendChild(card("Flow & context","Traffic, speed, restrictions, special sites, CCTV.",
+      main=>{
+        main.append(
+          selectRow("Traffic flow", CHIPS.traffic, S.traffic, v=>S.traffic=v),
+          selectRow("Speed limit (mph / variable/temporary)", ["20","30","40","50","60","70","variable","temporary"], S.speed, v=>S.speed=v),
+          pillsRow("Restriction areas", CHIPS.restrict, ()=>S.restrict, v=>S.restrict=v, true),
+          pillsRow("Special sites", CHIPS.special, ()=>S.special, v=>S.special=v, true),
+          textRow("Event context (optional)","e.g., match day at …", S.eventCtx, v=>S.eventCtx=norm(v)),
+          pillsRow("CCTV / recording", CHIPS.cctvRoad, ()=>S.cctvRoad, v=>S.cctvRoad=v, true)
+        );
+      }
+    ));
+  }else{
+    // GENERAL
+    formRoot.appendChild(card("Setting","Where the incident took place (indoors/outdoors, public/private).",
+      main=>{
+        main.append(
+          pillsRow("Indoors / Outdoors", CHIPS.inout, ()=>S.inout, v=>S.inout=v),
+          pillsRow("Public / Private", CHIPS.pubpriv, ()=>S.pubpriv, v=>S.pubpriv=v),
+          textRow("Place name (optional if using Road/Place above)","e.g., Ocean Terminal, Reception Lobby", S.road, v=>S.road=norm(v))
+        );
+      }
+    ));
+    formRoot.appendChild(card("Outdoors (if applicable)","Subtype, surface, lighting, notes.",
+      main=>{
+        main.append(
+          pillsRow("Outdoors subtype", CHIPS.outSubtype, ()=>S.outSubtype, v=>S.outSubtype=v, true),
+          textRow("Car park details (if relevant)","e.g., Level 3, Bay 142, near lift lobby", S.carpark, v=>S.carpark=norm(v)),
+          pillsRow("Surface", CHIPS.outSurface, ()=>S.outSurface, v=>S.outSurface=v, true),
+          pillsRow("Lighting", CHIPS.outLight, ()=>S.outLight, v=>S.outLight=v, true),
+          pillsRow("CCTV / security (outdoors)", ["CCTV present","CCTV not present/unknown","Parks/Council CCTV","private security camera"], ()=>S.cctvRoad, v=>S.cctvRoad=v, true)
+        );
+      }
+    ));
+    formRoot.appendChild(card("Indoors (if applicable)","Type, access, floor/room, lighting, security, condition.",
+      main=>{
+        main.append(
+          pillsRow("Dwelling type", CHIPS.inDwelling, ()=>S.inDwelling, v=>S.inDwelling=v),
+          pillsRow("Non-domestic type", CHIPS.inNonDom, ()=>S.inNonDom, v=>S.inNonDom=v),
+          pillsRow("Access", CHIPS.inAccess, ()=>S.inAccess, v=>S.inAccess=v, true),
+          textRow("Floor / level","e.g., basement / ground / 1st", S.floor, v=>S.floor=norm(v)),
+          textRow("Room / area","e.g., hallway / reception / store room", S.room, v=>S.room=norm(v)),
+          pillsRow("Indoor lighting", CHIPS.inLight, ()=>S.inLight, v=>S.inLight=v, true),
+          pillsRow("Security", CHIPS.inSecurity, ()=>S.inSecurity, v=>S.inSecurity=v, true),
+          pillsRow("Condition / environment", CHIPS.inCond, ()=>S.inCond, v=>S.inCond=v, true),
+          pillsRow("Signage / restrictions", CHIPS.inSignage, ()=>S.inSignage, v=>S.inSignage=v, true),
+        );
+      }
+    ));
+    formRoot.appendChild(card("Extras","Events / notable features.",
+      main=>{
+        main.append(
+          textRow("Event context (optional)","e.g., Bonfire Night period, school pickup time", S.genEvent, v=>S.genEvent=norm(v)),
+          textRow("Nearby notable features","e.g., adjacent to Bay 27, opposite No.14", S.notable, v=>S.notable=norm(v))
+        );
+      }
+    ));
+  }
+}
+
+/* REFRESH ACTIVE STATES */
+function refresh(){
+  // re-render pills active states quickly without rebuilding whole tree
+  document.querySelectorAll(".item").forEach(row=>{
+    const label = row.querySelector(".item-label")?.textContent || "";
+    const pills = row.querySelectorAll(".pill");
+    if(!pills.length) return;
+
+    const getFor = ()=>{
+      // map label to state getter
+      const L = label.toLowerCase();
+      const map = [
+        ["locus type", ()=>S.type==="road"?"Road":"General"],
+        ["carriageway type", ()=>S.carriageway||""],
+        ["lane count", ()=>S.lanes||""],
+        ["area type", ()=>S.areaType],
+        ["position", ()=>S.position],
+        ["alignment", ()=>S.alignment],
+        ["reserved facilities", ()=>S.reserved],
+        ["junction context", ()=>S.junction||"(none)"],
+        ["controls", ()=>S.controls],
+        ["time of day", ()=>S.time],
+        ["street lighting", ()=>S.lighting],
+        ["visibility", ()=>S.visibility],
+        ["weather (current)", ()=>S.weather],
+        ["surface / defects", ()=>S.surface],
+        ["roadworks / obstructions", ()=>S.works],
+        ["restriction areas", ()=>S.restrict],
+        ["special sites", ()=>S.special],
+        ["cctv / recording", ()=>S.cctvRoad],
+        ["indoors / outdoors", ()=>S.inout],
+        ["public / private", ()=>S.pubpriv],
+        ["outdoors subtype", ()=>S.outSubtype],
+        ["lighting", ()=> (S.type==='general' && S.inout==='Outdoors') ? S.outLight : S.inLight ],
+        ["surface", ()=>S.outSurface],
+        ["dwelling type", ()=>S.inDwelling],
+        ["non-domestic type", ()=>S.inNonDom],
+        ["access", ()=>S.inAccess],
+        ["security", ()=>S.inSecurity],
+        ["condition / environment", ()=>S.inCond],
+        ["signage / restrictions", ()=>S.inSignage],
+      ];
+      for(const [k,fn] of map){ if(L.includes(k)) return fn(); }
+      return "";
+    };
+    const current = getFor();
+    pills.forEach(p=>{
+      const val = p.textContent;
+      let on = false;
+      if(Array.isArray(current)) on = current.includes(val);
+      else on = current===val;
+      p.classList.toggle("active", on);
+    });
+  });
+}
+
+/* SENTENCE HELPERS */
+function detectRainingNow(){ return S.weather.some(w => /raining|drizzle|heavy rain|sleet|hail|snow/i.test(w)); }
+function composeWeatherSurface(){
+  const raining = detectRainingNow();
+  const wetLike = S.surface.some(s => /wet surface|damp surface|standing water|ice|frost|snow/i.test(s));
+  if(raining && wetLike) return "At the time of the incident, it was raining and the road surface was wet.";
+  if(raining && !wetLike) return "At the time of the incident, it was raining.";
+  if(!raining && wetLike) return "Although no rain was falling, the carriageway was damp/wet consistent with earlier rainfall.";
+  return "";
+}
+function cctvClause(){
+  const a = S.cctvRoad.map(s=>s.toLowerCase());
+  if(!a.length) return "";
+  const present = a.includes("cctv present");
+  const absent  = a.includes("cctv not present/unknown");
+  const council = a.includes("parks/council cctv") || a.includes("council cctv");
+  const priv    = a.includes("private security camera");
+  const dashcam = a.includes("dashcam present");
+  const bwv     = a.includes("body-worn video");
+  const door    = a.includes("doorbell camera present");
+  const bits = [];
+  if(present && !absent){
+    const mods = [];
+    if(council) mods.push("council CCTV");
+    if(priv)    mods.push("private CCTV");
+    if(door)    mods.push("doorbell camera");
+    if(dashcam) mods.push("dashcam");
+    if(bwv)     mods.push("body-worn video");
+    bits.push(`CCTV coverage was present${mods.length?` via ${joinList(mods)}`:""}.`);
+  }else if(!present && absent){
+    bits.push("There was no apparent CCTV coverage.");
+    const inc = [];
+    if(door) inc.push("doorbell camera");
+    if(dashcam) inc.push("dashcam");
+    if(bwv) inc.push("body-worn video");
+    if(inc.length) bits.push(`However, incidental recordings may exist (${joinList(inc)}).`);
+  }else if(present && absent){
+    bits.push("CCTV coverage was present, although completeness is uncertain.");
+  }
+  return bits.join(" ");
+}
+
+/* BUILDERS */
+function buildRoad(){
+  const P = [];
+
+  // Paragraph 1 — identity & structure
+  const bits1 = [];
+  if(S.road || S.town){
+    let lead = `The locus is ${S.road ? S.road : ""}${S.town ? (S.road ? ", " : "") + S.town : ""}`;
+    if(S.precision) lead += `, ${S.precision}`;
+    lead = endStop(lead);
+    // Junction phrasing
+    if(S.junction){
+      const ctrl = S.controls.length ? ` controlled by ${joinList(S.controls)}` : "";
+      const j = S.junction.toLowerCase().includes("junction") || S.junction.includes("(") ? S.junction : `${S.junction}`;
+      lead = lead.replace(/\.$/, "") + ` at its ${j}${ctrl}.`;
+    }
+    bits1.push(lead);
+  }
+  if(S.carriageway || S.lanes || S.reserved.length || S.position.length){
+    const lanesNum = Number(S.lanes)||0;
+    const lanesText = lanesNum ? `${lanesNum} lane${lanesNum===1?"":"s"} in each direction` : "";
+    const central = (S.carriageway||"").toLowerCase().includes("dual") ? "separated by a central reservation" : "";
+    const reserved = S.reserved.length ? `with ${joinList(S.reserved)}` : "";
+    const pos = S.position.length ? joinList(S.position) : "";
+    const struct = [S.carriageway?`It comprises a ${S.carriageway}`:"", central, lanesText, reserved || pos].filter(Boolean).join(", ");
+    if(struct) bits1.push(endStop(sentenceCap(struct)));
+  }
+  // Direction & speed
+  const dir = (S.dirFrom && S.dirTo) ? `The section runs in a ${S.dirFrom}–${S.dirTo} direction` : "";
+  const speed = S.speed ? `and is subject to a ${/^\d+$/.test(S.speed)?S.speed+"mph":S.speed} speed limit` : "";
+  if(dir || speed) bits1.push(endStop(sentenceCap([dir, speed].filter(Boolean).join(" "))));
+
+  // Surface/markings neutral line
+  bits1.push("The carriageway surface is tarmac and standard road markings are present and clearly visible.");
+  P.push(bits1.join(" "));
+
+  // Paragraph 2 — area & conditions
+  const bits2 = [];
+  if(S.areaType.length){
+    bits2.push(endStop(`The surrounding area is ${S.areaType[0].match(/residential|urban|suburban|industrial|retail/i)?'predominantly ':''}${joinList(S.areaType)}`));
+  }
+  // Time/lighting/visibility
+  const tlvLeft = [joinList(S.time, "and"), joinList(S.lighting, "and")].filter(Boolean).join(", ");
+  const tlvRight = S.visibility.length ? `visibility was ${joinList(S.visibility)}` : "";
+  const tlv = [tlvLeft?`It was ${tlvLeft}`:"", tlvRight].filter(Boolean).join("; ");
+  if(tlv) bits2.push(endStop(tlv));
+  const wx = composeWeatherSurface(); if(wx) bits2.push(endStop(wx));
+  if(S.works.length) bits2.push(endStop(`Temporary arrangements/obstructions noted: ${joinList(S.works)}`));
+  if(S.traffic){
+    let t = `Traffic flow was ${S.traffic}`;
+    if(S.speed) t += `, and the posted limit was ${/^\d+$/.test(S.speed)?S.speed+"mph":S.speed}`;
+    bits2.push(endStop(t));
+  }
+  P.push(bits2.join(" "));
+
+  // Paragraph 3 — restrictions / specials / events / CCTV
+  const bits3 = [];
+  const extras = [];
+  if(S.restrict.length) extras.push(joinList(S.restrict));
+  if(S.special.length)  extras.push(joinList(S.special));
+  if(S.eventCtx)        extras.push(`during ${S.eventCtx}`);
+  if(extras.length) bits3.push(endStop(sentenceCap(extras.join("; "))));
+  const cctv = cctvClause(); if(cctv) bits3.push(cctv);
+  if(bits3.length) P.push(bits3.join(" "));
+
+  // Minimal fallback
+  if(!P.join("").trim() && (S.road||S.town)){
+    return endStop(`The locus of the incident occurred on ${S.road||""}${S.road&&S.town?", ":""}${S.town||""}`);
+  }
+  return P.filter(Boolean).join("\n\n").replace(/\s+\./g,".").trim();
+}
+
+function buildGeneral(){
+  const P = [];
+
+  // Paragraph 1 — where & what
+  const bits1 = [];
+  let base = "";
+  if(S.road){ base = `The locus was at ${S.road}${S.town?`, ${S.town}`:""}`; }
+  else if(S.town){ base = `The locus was in ${S.town}`; }
+  else { base = `The locus was recorded`; }
+  if(S.precision) base += `, ${S.precision}`;
+  bits1.push(endStop(base));
+
+  const descs = [];
+  if(S.inout) descs.push(S.inout.toLowerCase());
+  if(S.pubpriv) descs.push(`within a ${S.pubpriv}`);
+  let type = "";
+  if(S.inout==="Outdoors" && S.outSubtype.length) type = joinList(S.outSubtype);
+  else if(S.inout==="Indoors") type = S.inDwelling || S.inNonDom;
+  if(type) descs.push(`namely ${type}`);
+  if(descs.length) bits1.push(endStop(`It is ${descs.join(", ")}`));
+  P.push(bits1.join(" "));
+
+  // Paragraph 2 — detail
+  const bits2 = [];
+  if(S.inout==="Outdoors"){
+    if(S.carpark) bits2.push(endStop(`Car park details include ${S.carpark}`));
+    if(S.outSurface.length) bits2.push(endStop(`The surface was ${joinList(S.outSurface)}`));
+    if(S.outLight.length) bits2.push(endStop(`Lighting was ${joinList(S.outLight)}`));
+  }else{
+    const loc = [];
+    if(S.inAccess.length) loc.push(`accessed via ${joinList(S.inAccess)}`);
+    if(S.floor) loc.push(`located on ${S.floor}`);
+    if(S.room)  loc.push(`within ${S.room}`);
+    if(loc.length) bits2.push(endStop(loc.join(", ")));
+    if(S.inLight.length) bits2.push(endStop(`Lighting was ${joinList(S.inLight)}`));
+    const sec = [];
+    if(S.inSecurity.length) sec.push(`security features included ${joinList(S.inSecurity)}`);
+    if(S.inCond.length) sec.push(`conditions included ${joinList(S.inCond)}`);
+    if(sec.length) bits2.push(endStop(sec.join("; ")));
+  }
+  // Events / signage / notes
+  if(S.inSignage.length) bits2.push(endStop(`Signage indicated ${joinList(S.inSignage)}`));
+  if(S.genEvent) bits2.push(endStop(`During ${S.genEvent}`));
+  if(S.notable) bits2.push(endStop(`Notable features included ${S.notable}`));
+  const cctv = cctvClause(); if(cctv) bits2.push(cctv);
+  if(bits2.length) P.push(bits2.join(" "));
+
+  // Minimal fallback
+  if(!P.join("").trim() && (S.road||S.town)){
+    return endStop(`The locus of the incident occurred on ${S.road||""}${S.road&&S.town?", ":""}${S.town||""}`);
+  }
+  return P.filter(Boolean).join("\n\n").replace(/\s+\./g,".").trim();
+}
+
+/* OUTPUT */
+function updateOutput(){
+  const text = (S.type==="road") ? buildRoad() : buildGeneral();
+  outBox.value = text;
+  tsEl.textContent = "Last update: " + new Date().toLocaleString();
+}
+render();
+updateOutput();
+
+/* Buttons */
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  const txt=outBox.value.trim(); if(!txt){ alert("Nothing to copy."); return; }
+  try{ await navigator.clipboard.writeText(txt); toast("Copied."); }
+  catch(_){ outBox.select(); document.execCommand("copy"); toast("Copied (fallback)."); }
+});
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const txt=outBox.value.trim(); if(!txt){ alert("Nothing to export."); return; }
+  const blob=new Blob([txt],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url; a.download=`Locus-${new Date().toISOString().slice(0,10)}.txt`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Clear all selections?")) return;
+  const keep = { type:S.type, road:S.road, town:S.town, precision:S.precision };
+  S = Object.assign({}, keep, {
+    // reset others
+    areaType:[], position:[], carriageway:"", lanes:"", dirFrom:"", dirTo:"",
+    alignment:[], reserved:[], junction:"", controls:[],
+    time:[], lighting:[], visibility:[], weather:[], surface:[], works:[],
+    traffic:"", speed:"", restrict:[], special:[], eventCtx:"", cctvRoad:[],
+    inout:"Outdoors", pubpriv:"public space", outSubtype:[], outLight:[], outSurface:[], carpark:"",
+    inDwelling:"", inNonDom:"", inAccess:[], floor:"", room:"", inLight:[], inSecurity:[], inCond:[], inSignage:[],
+    genEvent:"", notable:""
+  });
+  render(); updateOutput();
+});
+document.getElementById("shareBtn").addEventListener("click", async ()=>{
+  const text = outBox.value.trim(); if(!text){ alert("Build the locus text first."); return; }
+  const filename = `Locus-${new Date().toISOString().slice(0,10)}.txt`;
+  const file = new File([text], filename, { type: 'text/plain' });
+  try{
+    if(navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({ files:[file], title:"Locus note" });
+      return;
+    }
+  }catch(_){}
+  if(navigator.share){
+    try{ await navigator.share({ title:"Locus note", text }); }
+    catch(e){ if(!String(e).includes("AbortError")) alert("Sharing failed on this device."); }
+  }else{
+    alert("Share not supported on this browser.");
+  }
+});
+
+/* Toast */
+function toast(msg){
+  const t=document.createElement("div");
+  t.textContent=msg;
+  t.style.position="fixed"; t.style.bottom="16px"; t.style.right="16px";
+  t.style.background="rgba(0,0,0,0.7)"; t.style.color="white";
+  t.style.padding="10px 12px"; t.style.borderRadius="10px"; t.style.fontSize="13px";
+  t.style.zIndex=9999; t.style.border="1px solid rgba(255,255,255,0.15)";
+  document.body.appendChild(t); setTimeout(()=>t.remove(),1700);
+}
+
+/* After every re-render, refresh pill active states */
+const observer = new MutationObserver(()=> refresh());
+observer.observe(formRoot, {childList:true, subtree:true});
+
+</script>
+</body>
+</html>

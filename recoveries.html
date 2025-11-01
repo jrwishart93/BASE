@@ -1,0 +1,3504 @@
+<!doctype html>
+<!-- nav update: 2025-02-14 – unified site header -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recoveries — B.A.S.E.</title>
+
+  <link rel="icon" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="preload" as="image" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="stylesheet" href="./styles/base.css">
+
+  <script defer src="./Applications/JSON/app-registry.js"></script>
+  <script defer src="./scripts/briefings.js"></script>
+  <script defer src="./scripts/data.js"></script>
+  <script defer src="./scripts/apps.js"></script>
+  <script defer src="./scripts/main.js"></script>
+  <script defer src="./scripts/nav.js"></script>
+</head>
+<body>
+
+  <!-- Primary Navigation (GlassNav v2.1) -->
+  <nav class="glassnav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a class="nav-logo" href="./index.html" aria-label="BASE home">
+        <img src="./lib/assets/images/logos/base-logo.png" alt="BASE" height="44" width="44" loading="lazy">
+      </a>
+
+      <ul class="nav-list">
+        <li>
+          <a class="nav-link" data-page="home" href="./index.html">
+            <span class="label">Home</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="briefing" href="./briefing.html">
+            <span class="label">Briefing</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="applications" href="./applications.html">
+            <span class="label">Applications</span>
+            <svg class="underline" viewBox="0 0 140 14" preserveAspectRatio="none">
+              <path d="M6,10 Q70,2 134,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="forms" href="./forms.html">
+            <span class="label">Forms</span>
+            <svg class="underline" viewBox="0 0 90 14" preserveAspectRatio="none">
+              <path d="M6,10 Q45,2 84,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link is-active" data-page="recoveries" href="./recoveries.html" aria-current="page">
+            <span class="label">Recoveries</span>
+            <svg class="underline" viewBox="0 0 130 14" preserveAspectRatio="none">
+              <path d="M6,10 Q65,2 124,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="directory" href="./directory.html">
+            <span class="label">Directory</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="settings" href="./settings.html">
+            <span class="label">Settings</span>
+            <svg class="underline" viewBox="0 0 105 14" preserveAspectRatio="none">
+              <path d="M6,10 Q52,2 99,10" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container recoveries-layout">
+    <div class="recoveries-stack">
+      <section class="card instructions-card">
+        <details class="accordion" data-instructions>
+          <summary class="accordion-summary">
+            <span class="summary-icon" aria-hidden="true">
+              <svg class="icon icon--small" viewBox="0 0 24 24">
+                <path d="M12 17v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              </svg>
+            </span>
+            <span>Instructions</span>
+            <span class="summary-caret" aria-hidden="true">›</span>
+          </summary>
+          <div class="accordion-body">
+            <ol class="instruction-list">
+              <li>Complete the core incident details and confirm every required field.</li>
+              <li>Select the seizure type to reveal its additional detail fields.</li>
+              <li>Provide the extra information requested for the chosen seizure type.</li>
+              <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
+              <li>Use <strong>Save seizure (JSON)</strong> to export, or <strong>Reset form</strong> to clear the page.</li>
+            </ol>
+          </div>
+        </details>
+      </section>
+
+      <form id="recovery-form" class="recoveries-form" novalidate>
+        <section class="card recover-card" data-card="incident">
+          <header class="card-head">
+            <h2>Core Incident Details</h2>
+          </header>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="field-datetime" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 10h16" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 13v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M10 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Date and time
+              </label>
+              <div class="field-control field-control--with-action">
+                <input id="field-datetime" name="datetime" type="datetime-local" required>
+                <button type="button" id="btn-now" class="btn ghost no-caret btn-compact">Set current time</button>
+              </div>
+              <small class="field-error" data-error-for="field-datetime" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-incident" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 12h16M4 18h16M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Incident number
+              </label>
+              <input id="field-incident" name="incidentNumber" type="text" required>
+              <small class="field-error" data-error-for="field-incident" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-division" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                Division
+              </label>
+              <select id="field-division" name="division" required>
+                <option value="">Select division…</option>
+                <option value="E">E</option>
+                <option value="J">J</option>
+                <option value="C">C</option>
+                <option value="P">P</option>
+                <option value="Other">Other</option>
+              </select>
+              <small class="field-error" data-error-for="field-division" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-location" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 21s6-5.373 6-11a6 6 0 1 0-12 0c0 5.627 6 11 6 11z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </span>
+                Location
+              </label>
+              <input id="field-location" name="location" type="text" required>
+              <small class="field-error" data-error-for="field-location" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-officers" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M8 11a4 4 0 1 1 8 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M5 19a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </span>
+                Officers involved
+              </label>
+              <textarea id="field-officers" name="officers" rows="2" placeholder="PC Smith, Sgt Jones"></textarea>
+              <small class="field-note">Comma-separated</small>
+              <small class="field-error" data-error-for="field-officers" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-enquiry" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 12a4 4 0 1 0-4-4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M6 19a6 6 0 0 1 12 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </span>
+                Enquiry officer
+              </label>
+              <input id="field-enquiry" name="enquiryOfficer" type="text">
+              <small class="field-error" data-error-for="field-enquiry" hidden></small>
+            </div>
+            <div class="form-field form-field--full">
+              <label for="field-remarks" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Remarks
+              </label>
+              <textarea id="field-remarks" name="remarks" rows="3" placeholder="Additional context, evidence, next steps…"></textarea>
+              <small class="field-error" data-error-for="field-remarks" hidden></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="card recover-card" data-card="type">
+          <header class="card-head">
+            <h2>Type of Seizure</h2>
+          </header>
+          <div class="seizure-tiles" role="radiogroup" aria-label="Type of seizure">
+            <div class="seizure-tile">
+              <input class="visually-hidden" type="radio" id="type-vehicle" name="seizure-type" value="Vehicle" required data-type-radio="Vehicle" aria-label="Vehicle">
+              <button type="button" class="tile" data-type-tile="Vehicle" role="radio" aria-checked="false">
+                <span class="tile-icon" aria-hidden="true">
+                  <img class="neon-icon" src="./lib/assets/images/icons/icon-vehicles.png" width="64" height="64" alt="">
+                </span>
+                <span class="tile-title">Vehicle</span>
+              </button>
+            </div>
+            <div class="seizure-tile">
+              <input class="visually-hidden" type="radio" id="type-drug" name="seizure-type" value="Drug" required data-type-radio="Drug" aria-label="Drug">
+              <button type="button" class="tile" data-type-tile="Drug" role="radio" aria-checked="false">
+                <span class="tile-icon" aria-hidden="true">
+                  <img class="neon-icon" src="./lib/assets/images/icons/icon-drugs.png" width="64" height="64" alt="">
+                </span>
+                <span class="tile-title">Drug</span>
+              </button>
+            </div>
+            <div class="seizure-tile">
+              <input class="visually-hidden" type="radio" id="type-cash" name="seizure-type" value="Cash" required data-type-radio="Cash" aria-label="Cash">
+              <button type="button" class="tile" data-type-tile="Cash" role="radio" aria-checked="false">
+                <span class="tile-icon" aria-hidden="true">
+                  <img class="neon-icon" src="./lib/assets/images/icons/icon-cash.png" width="64" height="64" alt="">
+                </span>
+                <span class="tile-title">Cash</span>
+              </button>
+            </div>
+            <div class="seizure-tile">
+              <input class="visually-hidden" type="radio" id="type-counterfeit" name="seizure-type" value="Counterfeit Goods" required data-type-radio="Counterfeit Goods" aria-label="Counterfeit Goods">
+              <button type="button" class="tile" data-type-tile="Counterfeit Goods" role="radio" aria-checked="false">
+                <span class="tile-icon" aria-hidden="true">
+                  <img class="neon-icon" src="./lib/assets/images/icons/icon-counterfeit.png" width="64" height="64" alt="">
+                </span>
+                <span class="tile-title">Counterfeit Goods</span>
+              </button>
+            </div>
+            <div class="seizure-tile">
+              <input class="visually-hidden" type="radio" id="type-stolen" name="seizure-type" value="Stolen Property" required data-type-radio="Stolen Property" aria-label="Stolen Property">
+              <button type="button" class="tile" data-type-tile="Stolen Property" role="radio" aria-checked="false">
+                <span class="tile-icon" aria-hidden="true">
+                  <img class="neon-icon" src="./lib/assets/images/icons/icon-stolenproperty.png" width="64" height="64" alt="">
+                </span>
+                <span class="tile-title">Stolen Property</span>
+              </button>
+            </div>
+          </div>
+          <small class="field-error" data-error-for="seizure-type" hidden></small>
+        </section>
+
+        <section class="card recover-card" data-card="details">
+          <header class="card-head">
+            <h2>Additional Details</h2>
+          </header>
+          <p class="muted fine-print">Only the fields relevant to the chosen seizure type are shown.</p>
+          <div class="type-panels">
+            <section class="type-panel" data-type-panel="Vehicle" hidden>
+              <h3 class="type-panel-title">Vehicle seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-vehicle-reason" class="field-label">Reason</label>
+                  <select id="field-vehicle-reason">
+                    <option value="">Select reason…</option>
+                    <option value="Seized Stolen">Seized Stolen</option>
+                    <option value="Seized Document offences">Seized Document offences</option>
+                    <option value="Seized Proceeds of crime">Seized Proceeds of crime</option>
+                    <option value="Seized as production">Seized as production</option>
+                    <option value="Seized (other)">Seized (other)</option>
+                  </select>
+                  <small class="field-error" data-error-for="field-vehicle-reason" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-colour" class="field-label">Colour</label>
+                  <input id="field-vehicle-colour" type="text" placeholder="e.g. Silver">
+                  <small class="field-error" data-error-for="field-vehicle-colour" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-make" class="field-label">Make</label>
+                  <input id="field-vehicle-make" type="text" placeholder="e.g. Ford">
+                  <small class="field-error" data-error-for="field-vehicle-make" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-model" class="field-label">Model</label>
+                  <input id="field-vehicle-model" type="text" placeholder="e.g. Fiesta">
+                  <small class="field-error" data-error-for="field-vehicle-model" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-vrm" class="field-label">VRM</label>
+                  <input id="field-vehicle-vrm" type="text" placeholder="e.g. AB12 CDE">
+                  <small class="field-error" data-error-for="field-vehicle-vrm" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-vehicle-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-vehicle-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Drug" hidden>
+              <h3 class="type-panel-title">Drug seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-drug-type" class="field-label">Drug type</label>
+                  <select id="field-drug-type">
+                    <option value="">Select drug…</option>
+                    <option value="Cannabis">Cannabis</option>
+                    <option value="Cocaine">Cocaine</option>
+                    <option value="Heroin">Heroin</option>
+                    <option value="Ketamine">Ketamine</option>
+                    <option value="MDMA">MDMA</option>
+                    <option value="Amphetamine">Amphetamine</option>
+                    <option value="Tablets">Tablets</option>
+                    <option value="Nitrous Oxide">Nitrous Oxide</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <small class="field-error" data-error-for="field-drug-type" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-drug-qty" class="field-label">Quantity / weight</label>
+                  <input id="field-drug-qty" type="text" placeholder="e.g. 250 g, 30 wraps">
+                  <small class="field-error" data-error-for="field-drug-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-drug-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-drug-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-drug-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Cash" hidden>
+              <h3 class="type-panel-title">Cash seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-cash-amount" class="field-label">Amount (GBP)</label>
+                  <input id="field-cash-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-cash-amount" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Counterfeit Goods" hidden>
+              <h3 class="type-panel-title">Counterfeit goods</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-counterfeit-desc" class="field-label">Description</label>
+                  <textarea id="field-counterfeit-desc" rows="2" placeholder="e.g. 40 counterfeit designer handbags"></textarea>
+                  <small class="field-error" data-error-for="field-counterfeit-desc" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-counterfeit-qty" class="field-label">Quantity</label>
+                  <input id="field-counterfeit-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+                  <small class="field-error" data-error-for="field-counterfeit-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-counterfeit-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-counterfeit-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-counterfeit-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Stolen Property" hidden>
+              <h3 class="type-panel-title">Stolen property</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-stolen-desc" class="field-label">Description</label>
+                  <input id="field-stolen-desc" type="text" placeholder="e.g. Power tools with serial numbers">
+                  <small class="field-error" data-error-for="field-stolen-desc" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-stolen-qty" class="field-label">Quantity</label>
+                  <input id="field-stolen-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+                  <small class="field-error" data-error-for="field-stolen-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-stolen-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-stolen-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-stolen-value" hidden></small>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="card recover-card" data-card="actions">
+          <header class="card-head">
+            <h2>Save &amp; Export</h2>
+          </header>
+          <p id="fs-support-note" class="muted fine-print" hidden>Folder saving is not available in this browser. The JSON will download instead.</p>
+          <div class="action-bar">
+            <button type="button" id="btn-set-folder" class="btn ghost no-caret">Set Save Folder</button>
+            <button type="button" id="btn-save" class="btn primary">Save seizure (JSON)</button>
+            <button type="reset" class="btn">Reset form</button>
+          </div>
+          <div class="action-messages">
+            <span id="folder-status" class="muted" aria-live="polite">No folder permission. Use 'Grant access to Recovery Folder' to enable direct saving; downloads will be used.</span>
+            <span id="save-status" class="muted" aria-live="polite"></span>
+          </div>
+          <span id="validation-status" class="sr-only" role="status" aria-live="polite"></span>
+        </section>
+      </form>
+
+      <section class="card recover-card" data-card="analytics">
+        <header class="card-head">
+          <div>
+            <h2>Analytics</h2>
+            <p class="fine-print">Data loads automatically from the Recovery Folder.</p>
+          </div>
+          <div class="analytics-controls">
+            <button type="button" class="btn ghost no-caret" id="btn-grant-recovery-folder">Grant access to Recovery Folder</button>
+            <button type="button" class="btn ghost no-caret" id="btn-grant-legacy-folder">Add legacy folder</button>
+            <button type="button" class="btn ghost no-caret" id="btn-reload-data">Reload</button>
+            <button type="button" class="btn ghost no-caret" id="btn-export-dashboard">Save dashboard as PNG</button>
+            <label class="analytics-fy">
+              <span class="sr-only">Financial year</span>
+              <select id="analytics-fy" disabled></select>
+            </label>
+            <span id="legacy-status-chip" class="chip muted" hidden>Legacy folder connected</span>
+          </div>
+        </header>
+        <p id="analytics-status" class="analytics-status muted">Permission needed. Click 'Grant access to Recovery Folder'.</p>
+        <div class="analytics-overview" id="analytics-overview" hidden>
+          <div class="analytics-overview-grid">
+            <section class="ytd-card" aria-labelledby="analytics-ytd-title">
+              <header class="ytd-card-head">
+                <h3 id="analytics-ytd-title">Total Recovered (YTD)</h3>
+                <p class="fine-print" id="analytics-ytd-label"></p>
+              </header>
+              <div class="ytd-amount" id="analytics-ytd-amount">£0</div>
+              <div class="ytd-comparison" id="analytics-ytd-compare" hidden>
+                <div class="ytd-delta" id="analytics-ytd-delta"></div>
+                <div class="ytd-delta-note" id="analytics-ytd-delta-note"></div>
+              </div>
+              <div class="ytd-chart" id="analytics-ytd-chart" role="img" aria-live="polite" aria-label="Total recovered this financial year: £0">
+                <div class="ytd-chart-track">
+                  <div class="ytd-chart-fill" id="analytics-ytd-bar" data-fill="0"></div>
+                </div>
+                <div class="ytd-chart-track prev" id="analytics-prev-track" hidden>
+                  <div class="ytd-chart-fill prev" id="analytics-prev-bar" data-fill="0"></div>
+                  <span class="ytd-prev-label" id="analytics-prev-label">Prev FY</span>
+                </div>
+              </div>
+            </section>
+            <section class="overview-right">
+              <section class="quick-tiles" id="analytics-quick-tiles" aria-label="Recovered totals by type"></section>
+              <section class="sparkline-card" aria-label="Monthly recovery counts">
+                <header class="sparkline-head">
+                  <h3>Monthly trend</h3>
+                  <p class="fine-print" id="sparkline-label">Apr&nbsp;–&nbsp;Mar</p>
+                </header>
+                <div class="sparkline-wrapper" id="sparkline-wrapper"></div>
+              </section>
+            </section>
+          </div>
+        </div>
+        <div class="analytics-tabs">
+          <nav class="tabs-nav" role="tablist" aria-label="Analytics detail tabs">
+            <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-division" id="tab-btn-division">By Division</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-type" id="tab-btn-type">By Type</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-month" id="tab-btn-month">By Month</button>
+          </nav>
+          <section class="tab-panel is-active" id="tab-division" role="tabpanel" aria-labelledby="tab-btn-division">
+            <header class="tab-controls">
+              <label class="tab-control">
+                <span>Division</span>
+                <select id="division-filter">
+                  <option value="ALL">All divisions</option>
+                  <option value="E">Division E</option>
+                  <option value="J">Division J</option>
+                  <option value="C">Division C</option>
+                  <option value="P">Division P</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+              <label class="tab-control">
+                <span>Financial year</span>
+                <select id="division-fy"></select>
+              </label>
+            </header>
+            <section class="chart-card" aria-label="Monthly recovery counts by division">
+              <header class="chart-card-head">
+                <h3>Monthly counts</h3>
+                <p class="fine-print" id="division-chart-label">Apr–Mar</p>
+              </header>
+              <div class="chart-wrapper" id="division-chart"></div>
+            </section>
+            <section class="chart-card" aria-label="Monthly recovery value by division">
+              <header class="chart-card-head">
+                <h3>Monthly value (£)</h3>
+                <p class="fine-print" id="division-value-label">Apr–Mar</p>
+              </header>
+              <div class="chart-wrapper" id="division-value-chart"></div>
+            </section>
+          </section>
+          <section class="tab-panel" id="tab-type" role="tabpanel" aria-labelledby="tab-btn-type" hidden>
+            <header class="tab-controls">
+              <label class="tab-control">
+                <span>Type</span>
+                <select id="type-filter">
+                  <option value="ALL">All types</option>
+                  <option value="Vehicle">Vehicle</option>
+                  <option value="Drug">Drug</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Counterfeit Goods">Counterfeit Goods</option>
+                  <option value="Stolen Property">Stolen Property</option>
+                </select>
+              </label>
+              <label class="tab-control">
+                <span>Financial year</span>
+                <select id="type-fy"></select>
+              </label>
+            </header>
+            <section class="chart-card" aria-label="Monthly recovery counts by type">
+              <header class="chart-card-head">
+                <h3>Monthly counts</h3>
+                <p class="fine-print" id="type-count-label">Apr–Mar</p>
+              </header>
+              <div class="chart-wrapper" id="type-count-chart"></div>
+            </section>
+            <section class="chart-card" aria-label="Monthly recovery value by type">
+              <header class="chart-card-head">
+                <h3>Monthly value (£)</h3>
+                <p class="fine-print" id="type-value-label">Apr–Mar</p>
+              </header>
+              <div class="chart-wrapper" id="type-value-chart"></div>
+            </section>
+            <section class="chart-card" aria-label="Financial year share by type">
+              <header class="chart-card-head">
+                <h3>FY share by type</h3>
+                <p class="fine-print" id="type-doughnut-label">Current FY share</p>
+              </header>
+              <div class="doughnut-wrapper" id="type-doughnut"></div>
+              <ul class="doughnut-legend" id="type-legend"></ul>
+            </section>
+          </section>
+          <section class="tab-panel" id="tab-month" role="tabpanel" aria-labelledby="tab-btn-month" hidden>
+            <header class="tab-controls">
+              <label class="tab-control">
+                <span>Month</span>
+                <select id="month-filter">
+                  <option value="0">April</option>
+                  <option value="1">May</option>
+                  <option value="2">June</option>
+                  <option value="3">July</option>
+                  <option value="4">August</option>
+                  <option value="5">September</option>
+                  <option value="6">October</option>
+                  <option value="7">November</option>
+                  <option value="8">December</option>
+                  <option value="9">January</option>
+                  <option value="10">February</option>
+                  <option value="11">March</option>
+                </select>
+              </label>
+              <label class="tab-control">
+                <span>Financial year</span>
+                <select id="month-fy"></select>
+              </label>
+            </header>
+            <section class="chart-card" aria-label="Selected month recovery split by type">
+              <header class="chart-card-head">
+                <h3 id="month-stacked-title">Month breakdown</h3>
+                <p class="fine-print" id="month-stacked-label">Counts and value</p>
+              </header>
+              <div class="chart-wrapper stacked-wrapper" id="month-stacked-chart"></div>
+              <ul class="stacked-legend" id="month-stacked-legend"></ul>
+            </section>
+            <section class="chart-card" aria-label="Top seizure types for the month">
+              <header class="chart-card-head">
+                <h3>Top 3 types</h3>
+                <p class="fine-print" id="month-top3-label">Ranked by count</p>
+              </header>
+              <div class="top3-wrapper" id="month-top3"></div>
+            </section>
+            <section class="chart-card" aria-label="Seizures captured this month">
+              <header class="chart-card-head">
+                <h3>Seizure log</h3>
+                <p class="fine-print" id="month-table-label">Incident details</p>
+              </header>
+              <div class="table-wrap">
+                <table class="table table-compact" id="month-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Incident</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Division</th>
+                      <th scope="col">Value (£)</th>
+                      <th scope="col">Location</th>
+                    </tr>
+                  </thead>
+                  <tbody id="month-table-body"></tbody>
+                </table>
+                <p class="fine-print" id="month-table-empty" hidden>No seizures recorded for this period.</p>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+  <div id="save-toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="download-reminder" class="modal-reminder" hidden>
+    <div class="modal-reminder__dialog" role="alertdialog" aria-modal="true" aria-labelledby="download-reminder-title" aria-describedby="download-reminder-message" tabindex="-1">
+      <h3 id="download-reminder-title">Move the saved file</h3>
+      <p id="download-reminder-message">
+        Move <span class="modal-reminder__file" id="download-reminder-file"></span> from your Downloads folder into
+        <code>/Users/macbookair/Desktop/BASE/Desktop/Recovery Folder</code> so it appears in future searches.
+      </p>
+      <div class="modal-reminder__actions">
+        <button type="button" class="btn primary" id="download-reminder-close">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const form = document.getElementById('recovery-form');
+    if (!form) return;
+
+    const inputs = {
+      datetime: document.getElementById('field-datetime'),
+      incident: document.getElementById('field-incident'),
+      division: document.getElementById('field-division'),
+      location: document.getElementById('field-location'),
+      officers: document.getElementById('field-officers'),
+      enquiry: document.getElementById('field-enquiry'),
+      remarks: document.getElementById('field-remarks'),
+      drugType: document.getElementById('field-drug-type'),
+      drugQty: document.getElementById('field-drug-qty'),
+      drugValue: document.getElementById('field-drug-value'),
+      cashAmount: document.getElementById('field-cash-amount'),
+      vehicleReason: document.getElementById('field-vehicle-reason'),
+      vehicleColour: document.getElementById('field-vehicle-colour'),
+      vehicleMake: document.getElementById('field-vehicle-make'),
+      vehicleModel: document.getElementById('field-vehicle-model'),
+      vehicleVRM: document.getElementById('field-vehicle-vrm'),
+      vehicleValue: document.getElementById('field-vehicle-value'),
+      stolenDesc: document.getElementById('field-stolen-desc'),
+      stolenQty: document.getElementById('field-stolen-qty'),
+      stolenValue: document.getElementById('field-stolen-value'),
+      counterfeitDesc: document.getElementById('field-counterfeit-desc'),
+      counterfeitQty: document.getElementById('field-counterfeit-qty'),
+      counterfeitValue: document.getElementById('field-counterfeit-value')
+    };
+
+    const typeRadios = Array.from(form.querySelectorAll('input[name="seizure-type"]'));
+    const typeTiles = Array.from(form.querySelectorAll('[data-type-tile]'));
+    const typePanels = Array.from(form.querySelectorAll('.type-panel'));
+    const tileGroup = form.querySelector('.seizure-tiles');
+
+    const folderButton = document.getElementById('btn-set-folder');
+    const saveButton = document.getElementById('btn-save');
+    const setNowButton = document.getElementById('btn-now');
+    const folderStatus = document.getElementById('folder-status');
+    const saveStatus = document.getElementById('save-status');
+    const validationStatus = document.getElementById('validation-status');
+    const fsSupportNote = document.getElementById('fs-support-note');
+    const toast = (typeof window !== 'undefined' && typeof window.toast !== 'undefined')
+      ? window.toast
+      : document.getElementById('save-toast');
+    if (typeof window !== 'undefined') {
+      window.toast = toast;
+    }
+    const downloadReminder = document.getElementById('download-reminder');
+    const downloadReminderFile = document.getElementById('download-reminder-file');
+    const downloadReminderClose = document.getElementById('download-reminder-close');
+    const grantPrimaryButton = document.getElementById('btn-grant-recovery-folder');
+    const reloadDataButton = document.getElementById('btn-reload-data');
+    const grantLegacyButton = document.getElementById('btn-grant-legacy-folder');
+    const exportButton = document.getElementById('btn-export-dashboard');
+    const analyticsStatusEl = document.getElementById('analytics-status');
+    const fySelect = document.getElementById('analytics-fy');
+    const overviewSection = document.getElementById('analytics-overview');
+    const ytdAmountEl = document.getElementById('analytics-ytd-amount');
+    const ytdLabelEl = document.getElementById('analytics-ytd-label');
+    const ytdChartEl = document.getElementById('analytics-ytd-chart');
+    const ytdBarEl = document.getElementById('analytics-ytd-bar');
+    const quickTilesEl = document.getElementById('analytics-quick-tiles');
+    const sparklineWrapper = document.getElementById('sparkline-wrapper');
+    const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
+    const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
+    const sparklineLabelEl = document.getElementById('sparkline-label');
+    const divisionFilter = document.getElementById('division-filter');
+    const divisionFYSelect = document.getElementById('division-fy');
+    const divisionChartEl = document.getElementById('division-chart');
+    const divisionChartLabelEl = document.getElementById('division-chart-label');
+    const divisionValueChartEl = document.getElementById('division-value-chart');
+    const divisionValueLabelEl = document.getElementById('division-value-label');
+    const typeFilter = document.getElementById('type-filter');
+    const typeFYSelect = document.getElementById('type-fy');
+    const typeCountChartEl = document.getElementById('type-count-chart');
+    const typeValueChartEl = document.getElementById('type-value-chart');
+    const typeCountLabelEl = document.getElementById('type-count-label');
+    const typeValueLabelEl = document.getElementById('type-value-label');
+    const typeDoughnutEl = document.getElementById('type-doughnut');
+    const typeDoughnutLabelEl = document.getElementById('type-doughnut-label');
+    const typeLegendEl = document.getElementById('type-legend');
+    const monthFilter = document.getElementById('month-filter');
+    const monthFYSelect = document.getElementById('month-fy');
+    const monthStackedChartEl = document.getElementById('month-stacked-chart');
+    const monthStackedLabelEl = document.getElementById('month-stacked-label');
+    const monthStackedTitleEl = document.getElementById('month-stacked-title');
+    const monthLegendEl = document.getElementById('month-stacked-legend');
+    const monthTop3El = document.getElementById('month-top3');
+    const monthTop3LabelEl = document.getElementById('month-top3-label');
+    const monthTableLabelEl = document.getElementById('month-table-label');
+    const monthTableBodyEl = document.getElementById('month-table-body');
+    const monthTableEmptyEl = document.getElementById('month-table-empty');
+    const legacyStatusChip = document.getElementById('legacy-status-chip');
+    const prevTrackEl = document.getElementById('analytics-prev-track');
+    const prevBarEl = document.getElementById('analytics-prev-bar');
+    const prevLabelEl = document.getElementById('analytics-prev-label');
+    const deltaEl = document.getElementById('analytics-ytd-delta');
+    const deltaNoteEl = document.getElementById('analytics-ytd-delta-note');
+    const compareEl = document.getElementById('analytics-ytd-compare');
+
+    const errorMap = new Map(Array.from(form.querySelectorAll('[data-error-for]')).map((node) => [node.dataset.errorFor, node]));
+
+    const supportsDirectoryPicker = typeof window.showDirectoryPicker === 'function';
+    if (!supportsDirectoryPicker) {
+      if (fsSupportNote) fsSupportNote.hidden = false;
+      setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
+      if (grantPrimaryButton) grantPrimaryButton.disabled = true;
+      if (reloadDataButton) reloadDataButton.disabled = true;
+    }
+
+    const supportsIndexedDB = 'indexedDB' in window;
+
+    const fyControls = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect].filter(Boolean);
+
+    function syncFYControls() {
+      fyControls.forEach((select) => {
+        if (!select) return;
+        if (![...select.options].some((opt) => opt.value === state.fy)) {
+          select.innerHTML = `<option value="${state.fy}">${state.fy}</option>`;
+        }
+        select.value = state.fy;
+        select.setAttribute('title', state.fy);
+      });
+    }
+
+    function updateFYSelection(newLabel) {
+      if (!newLabel) {
+        syncFYControls();
+        renderAnalytics();
+        return;
+      }
+      const resolved = resolveFY(newLabel);
+      state.fy = resolved ? resolved.fyLabel : newLabel;
+      syncFYControls();
+      renderAnalytics();
+    }
+
+    syncFYControls();
+
+    if (fySelect) {
+      fySelect.addEventListener('change', (event) => {
+        updateFYSelection(event.target.value);
+      });
+    }
+
+    if (divisionFYSelect) {
+      divisionFYSelect.addEventListener('change', (event) => {
+        updateFYSelection(event.target.value);
+      });
+    }
+    if (divisionFilter) {
+      divisionFilter.value = state.division === 'All' ? 'ALL' : state.division;
+      divisionFilter.addEventListener('change', (event) => {
+        const value = event.target.value;
+        state.division = value === 'ALL' ? 'All' : value;
+        renderDivisionChart();
+      });
+    }
+
+    if (typeFYSelect) {
+      typeFYSelect.addEventListener('change', (event) => {
+        updateFYSelection(event.target.value);
+      });
+    }
+    if (typeFilter) {
+      typeFilter.value = state.type === 'All' ? 'ALL' : state.type;
+      typeFilter.addEventListener('change', (event) => {
+        const value = event.target.value;
+        state.type = value === 'ALL' ? 'All' : value;
+        renderTypeTab();
+      });
+    }
+
+    if (monthFYSelect) {
+      monthFYSelect.addEventListener('change', (event) => {
+        updateFYSelection(event.target.value);
+      });
+    }
+    if (monthFilter) {
+      const today = new Date();
+      const idx = monthIndexAprMar(today);
+      const defaultIdx = idx != null ? idx : 0;
+      monthFilter.value = String(defaultIdx);
+      state.monthIdx = defaultIdx;
+      monthFilter.addEventListener('change', (event) => {
+        state.monthIdx = Number(event.target.value);
+        renderMonthTab();
+      });
+    }
+
+    if (tabButtons.length) {
+      tabButtons.forEach((btn, idx) => {
+        const isActive = idx === 0;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+        btn.addEventListener('click', () => activateTab(btn));
+      });
+      tabPanels.forEach((panel, idx) => {
+        const isActive = idx === 0;
+        panel.classList.toggle('is-active', isActive);
+        panel.hidden = !isActive;
+      });
+    }
+
+    let directoryHandle = null;
+    let toastTimer = (typeof window !== 'undefined' && typeof window.toastTimer !== 'undefined')
+      ? window.toastTimer
+      : null;
+    if (typeof window !== 'undefined') {
+      window.toastTimer = toastTimer;
+    }
+    let reminderLastFocus = null;
+    let primaryDirectoryHandle = null;
+    let primaryHasReadAccess = false;
+    let legacyDirectoryHandle = null;
+    let legacyHasReadAccess = false;
+    window.__REC_DATA = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+    window.__REC_INVALID = typeof window.__REC_INVALID === 'number' ? window.__REC_INVALID : 0;
+
+    const TYPE_CONFIG = [
+      { key: 'Vehicle', label: 'Vehicle', icon: './lib/assets/images/icons/icon-vehicles.png' },
+      { key: 'Drug', label: 'Drug', icon: './lib/assets/images/icons/icon-drugs.png' },
+      { key: 'Cash', label: 'Cash', icon: './lib/assets/images/icons/icon-cash.png' },
+      { key: 'Counterfeit Goods', label: 'Counterfeit Goods', icon: './lib/assets/images/icons/icon-counterfeit.png' },
+      { key: 'Stolen Property', label: 'Stolen Property', icon: './lib/assets/images/icons/icon-stolenproperty.png' }
+    ];
+
+    const TYPE_ALIAS = {
+      vehicle: 'Vehicle', vehicles: 'Vehicle',
+      drug: 'Drug', drugs: 'Drug', 'drug seizure': 'Drug',
+      cash: 'Cash', money: 'Cash',
+      'counterfeit goods': 'Counterfeit Goods', counterfeit: 'Counterfeit Goods',
+      'stolen property': 'Stolen Property', stolen: 'Stolen Property',
+      'vehicle seizure': 'Vehicle'
+    };
+
+    const DOUGHNUT_COLORS = ['#7cc7ff', '#5ff5f8', '#8b6dfb', '#ffcf66', '#48d597'];
+
+    const FY_MONTHS = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+
+    const FY_CACHE = new Map();
+    const currentFY = getCurrentFY(new Date());
+    cacheFY(currentFY);
+
+    const state = {
+      fy: currentFY.fyLabel,
+      division: 'All',
+      type: 'All',
+      monthIdx: null
+    };
+
+    const reduceMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    let reduceMotionEnabled = reduceMotionQuery ? reduceMotionQuery.matches : false;
+    if (reduceMotionQuery) {
+      if (typeof reduceMotionQuery.addEventListener === 'function') {
+        reduceMotionQuery.addEventListener('change', (event) => {
+          reduceMotionEnabled = event.matches;
+        });
+      } else if (typeof reduceMotionQuery.addListener === 'function') {
+        reduceMotionQuery.addListener((event) => {
+          reduceMotionEnabled = event.matches;
+        });
+      }
+    }
+    function isReducedMotion() {
+      if (typeof reduceMotionEnabled === 'boolean') {
+        return reduceMotionEnabled;
+      }
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    typeTiles.forEach((tile) => {
+      tile.addEventListener('click', () => activateType(tile.dataset.typeTile));
+      tile.addEventListener('keydown', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') {
+          event.preventDefault();
+          activateType(tile.dataset.typeTile);
+        }
+      });
+    });
+
+    typeRadios.forEach((radio) => {
+      radio.addEventListener('change', () => {
+        syncTiles();
+        showSectionForType();
+        clearTypeSpecificErrors();
+        clearFieldError('seizure-type');
+        setValidationMessage('');
+      });
+    });
+
+    if (setNowButton) {
+      setNowButton.addEventListener('click', () => {
+        inputs.datetime.value = formatLocalDateTime(new Date());
+        inputs.datetime.dispatchEvent(new Event('input', { bubbles: true }));
+        inputs.datetime.focus();
+      });
+    }
+
+    form.addEventListener('reset', () => {
+      window.requestAnimationFrame(() => {
+        clearErrors();
+        typePanels.forEach((panel) => {
+          panel.classList.remove('is-active');
+          panel.hidden = true;
+        });
+        typeRadios.forEach((radio) => { radio.checked = false; });
+        syncTiles();
+        showSectionForType();
+        setSaveMessage('');
+        setValidationMessage('');
+      });
+    });
+
+    if (supportsDirectoryPicker && supportsIndexedDB) {
+      if (grantPrimaryButton) {
+        grantPrimaryButton.addEventListener('click', pickPrimaryDirectory);
+      }
+      if (grantLegacyButton) {
+        grantLegacyButton.addEventListener('click', pickLegacyDirectory);
+      }
+      if (reloadDataButton) {
+        reloadDataButton.addEventListener('click', async () => {
+          await loadRecoveriesFromPrimary();
+        });
+      }
+      initRecoveryData();
+    } else {
+      if (analyticsStatusEl) {
+        setAnalyticsStatus('File System Access or IndexedDB is not supported in this browser.');
+      }
+      if (grantLegacyButton) {
+        grantLegacyButton.disabled = true;
+      }
+    }
+    refreshLegacyUI();
+
+    if (exportButton) {
+      exportButton.addEventListener('click', async () => {
+        if (exportButton.disabled) return;
+        const previousStatus = analyticsStatusEl ? analyticsStatusEl.textContent : '';
+        exportButton.disabled = true;
+        try {
+          if (analyticsStatusEl) setAnalyticsStatus('Exporting dashboard…');
+          await exportCurrentPanelAsPNG();
+          if (analyticsStatusEl) setAnalyticsStatus(previousStatus);
+        } catch (err) {
+          console.error('Dashboard export failed', err);
+          if (analyticsStatusEl) setAnalyticsStatus('Unable to export dashboard. Try again.');
+        } finally {
+          exportButton.disabled = false;
+        }
+      });
+    }
+
+    if (folderButton) {
+      folderButton.addEventListener('click', async () => {
+        if (!supportsDirectoryPicker) {
+          setFolderStatus('Folder picker unavailable. Downloads will be used.');
+          return;
+        }
+        try {
+          const handle = await window.showDirectoryPicker();
+          if (!handle) return;
+          const granted = await ensurePermission(handle);
+          if (!granted) {
+            setFolderStatus('Permission denied. Downloads will be used.');
+            return;
+          }
+          directoryHandle = handle;
+          setFolderStatus(`Folder: ${handle.name}`);
+          setSaveMessage('');
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+          console.error('Folder selection failed', err);
+          setFolderStatus('Unable to access folder. Downloads will be used.');
+        }
+      });
+    }
+
+    if (saveButton) {
+      saveButton.addEventListener('click', async () => {
+        clearErrors();
+        setSaveMessage('');
+        setValidationMessage('');
+
+        if (!validate()) return;
+
+        const datetimeValue = inputs.datetime.value;
+        const datetime = new Date(datetimeValue);
+        if (Number.isNaN(datetime.getTime())) {
+          const message = 'Provide a valid date and time.';
+          setFieldError('field-datetime', message);
+          setValidationMessage(message);
+          inputs.datetime.focus();
+          return;
+        }
+
+        const { payload, filename } = buildPayload(datetime);
+        const json = JSON.stringify(payload, null, 2);
+
+        saveButton.disabled = true;
+        try {
+          let savedToPrimary = false;
+          let primaryResult = null;
+          if (supportsIndexedDB) {
+            primaryResult = await writeToPrimaryFolder(filename, json);
+            if (primaryResult && primaryResult.ok) {
+              savedToPrimary = true;
+              const message = `Saved to Recovery Folder: ${filename}`;
+              setSaveMessage(message);
+              showToast(message);
+            }
+          }
+
+          if (!savedToPrimary) {
+            if (primaryResult && primaryResult.error) {
+              console.warn('Primary folder save failed', primaryResult.error);
+            }
+            const method = await saveJson(filename, json);
+            if (method === 'download') {
+              const message = `Downloaded: ${filename}. To save directly, click 'Grant access to Recovery Folder'.`;
+              setSaveMessage(message);
+              showToast(message);
+              showDownloadReminder(filename);
+            } else if (method === 'folder') {
+              const message = `Saved ${filename} to ${directoryHandle ? directoryHandle.name : 'selected folder'}.`;
+              setSaveMessage(message);
+              showToast(message);
+            }
+          }
+
+          form.reset();
+          syncTiles();
+          showSectionForType();
+          setValidationMessage('');
+
+          if (typeof loadRecoveriesFromPrimary === 'function' && primaryHasReadAccess) {
+            await loadRecoveriesFromPrimary();
+          } else {
+            renderAnalytics();
+          }
+        } catch (err) {
+          console.error('Save failed', err);
+          setSaveMessage('Error: saving failed. Check permissions and try again.');
+        } finally {
+          saveButton.disabled = false;
+        }
+      });
+    }
+
+    if (downloadReminder && downloadReminderClose) {
+      downloadReminderClose.addEventListener('click', hideDownloadReminder);
+      downloadReminder.addEventListener('click', (event) => {
+        if (event.target === downloadReminder) {
+          hideDownloadReminder();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !downloadReminder.hidden) {
+          hideDownloadReminder();
+        }
+      });
+    }
+
+    syncTiles();
+    showSectionForType();
+
+    function getSelectedType() {
+      const selected = typeRadios.find((radio) => radio.checked);
+      return selected ? selected.value : '';
+    }
+
+    function activateType(type) {
+      if (!type) return;
+      const radio = typeRadios.find((r) => r.dataset.typeRadio === type);
+      const tile = typeTiles.find((t) => t.dataset.typeTile === type);
+      if (radio) {
+        if (!radio.checked) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+          syncTiles();
+          showSectionForType();
+        }
+      }
+      clearFieldError('seizure-type');
+      if (tile) tile.focus();
+    }
+
+    function syncTiles() {
+      const selected = getSelectedType();
+      typeTiles.forEach((tile) => {
+        const active = tile.dataset.typeTile === selected;
+        tile.classList.toggle('is-active', active);
+        tile.setAttribute('aria-checked', active ? 'true' : 'false');
+      });
+    }
+
+    function showSectionForType() {
+      const selected = getSelectedType();
+      typePanels.forEach((panel) => {
+        const matches = panel.dataset.typePanel === selected;
+        if (matches) {
+          panel.hidden = false;
+          panel.classList.add('is-active');
+        } else {
+          panel.classList.remove('is-active');
+          panel.hidden = true;
+        }
+      });
+    }
+
+    function clearErrors() {
+      errorMap.forEach((_, id) => clearFieldError(id));
+    }
+
+    function clearFieldError(id) {
+      const node = errorMap.get(id);
+      if (node) {
+        node.hidden = true;
+        node.textContent = '';
+      }
+      if (id === 'seizure-type' && tileGroup) {
+        tileGroup.classList.remove('has-error');
+      }
+      const field = document.getElementById(id);
+      if (field) {
+        field.classList.remove('is-invalid');
+        field.removeAttribute('aria-invalid');
+      }
+    }
+
+    function clearTypeSpecificErrors() {
+      ['field-vehicle-reason', 'field-vehicle-vrm', 'field-cash-amount', 'field-drug-type', 'field-stolen-desc', 'seizure-type']
+        .forEach(clearFieldError);
+    }
+
+    function setFieldError(id, message) {
+      const node = errorMap.get(id);
+      if (node) {
+        node.hidden = false;
+        node.textContent = message;
+      }
+      if (id === 'seizure-type' && tileGroup) {
+        tileGroup.classList.add('has-error');
+      }
+      const field = document.getElementById(id);
+      if (field) {
+        field.classList.add('is-invalid');
+        field.setAttribute('aria-invalid', 'true');
+      }
+    }
+
+    function pushError(collection, id, message) {
+      setFieldError(id, message);
+      collection.push({ id, message });
+    }
+
+    function validate() {
+      const issues = [];
+      if (!inputs.datetime.value) pushError(issues, 'field-datetime', 'Enter the date and time.');
+      if (!inputs.incident.value.trim()) pushError(issues, 'field-incident', 'Provide the incident number.');
+      if (!inputs.division.value) pushError(issues, 'field-division', 'Select the division.');
+      if (!inputs.location.value.trim()) pushError(issues, 'field-location', 'Provide the location.');
+
+      const type = getSelectedType();
+      if (!type) {
+        pushError(issues, 'seizure-type', 'Choose the type of seizure.');
+      } else {
+        if (type === 'Vehicle') {
+          if (!inputs.vehicleReason.value) pushError(issues, 'field-vehicle-reason', 'Select the vehicle seizure reason.');
+          if (!inputs.vehicleVRM.value.trim()) pushError(issues, 'field-vehicle-vrm', 'Vehicle VRM is required.');
+        } else if (type === 'Cash') {
+          const rawAmount = inputs.cashAmount.value.trim();
+          if (!rawAmount) {
+            pushError(issues, 'field-cash-amount', 'Enter the amount of cash seized.');
+          } else if (toNumber(inputs.cashAmount) === null) {
+            pushError(issues, 'field-cash-amount', 'Provide a valid cash amount.');
+          }
+        } else if (type === 'Drug') {
+          if (!inputs.drugType.value) {
+            pushError(issues, 'field-drug-type', 'Select the drug type.');
+          }
+        } else if (type === 'Stolen Property') {
+          if (!inputs.stolenDesc.value.trim()) pushError(issues, 'field-stolen-desc', 'Describe the stolen property.');
+        }
+      }
+
+      if (issues.length) {
+        const first = issues[0];
+        setValidationMessage(first.message);
+        const target = document.getElementById(first.id);
+        if (target && typeof target.focus === 'function') {
+          target.focus();
+        } else if (first.id === 'seizure-type' && tileGroup) {
+          const activeTile = typeTiles.find((tile) => tile.classList.contains('is-active')) || typeTiles[0];
+          if (activeTile) activeTile.focus();
+        }
+        return false;
+      }
+
+      setValidationMessage('');
+      return true;
+    }
+
+    function setFolderStatus(message) {
+      if (folderStatus) folderStatus.textContent = message;
+    }
+
+    function setSaveMessage(message) {
+      if (saveStatus) saveStatus.textContent = message;
+    }
+
+    function setValidationMessage(message) {
+      if (validationStatus) validationStatus.textContent = message || '';
+    }
+
+    function refreshLegacyUI() {
+      if (!grantLegacyButton || !legacyStatusChip) return;
+      if (!supportsDirectoryPicker || !supportsIndexedDB) {
+        grantLegacyButton.disabled = true;
+        grantLegacyButton.hidden = true;
+        legacyStatusChip.hidden = true;
+        return;
+      }
+      const hasLegacy = Boolean(legacyDirectoryHandle && legacyHasReadAccess);
+      grantLegacyButton.disabled = false;
+      grantLegacyButton.hidden = hasLegacy;
+      legacyStatusChip.hidden = !hasLegacy;
+      if (hasLegacy) {
+        const legacyName = legacyDirectoryHandle && legacyDirectoryHandle.name ? legacyDirectoryHandle.name : 'Legacy folder';
+        legacyStatusChip.textContent = `Legacy folder connected (${legacyName})`;
+      } else {
+        legacyStatusChip.textContent = 'Legacy folder connected';
+      }
+    }
+
+    function buildPayload(datetime) {
+      const type = getSelectedType();
+      const filename = buildRecoveryFilename(inputs.incident.value, datetime);
+      const fileId = filename.replace(/\.json$/i, '');
+
+      const payload = {
+        schema: 'base.recovery.v1',
+        id: fileId,
+        datetime: datetime.toISOString(),
+        incidentNumber: inputs.incident.value.trim(),
+        division: inputs.division.value,
+        location: inputs.location.value.trim(),
+        officers: inputs.officers.value
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        enquiryOfficer: inputs.enquiry.value.trim(),
+        type,
+        details: buildDetails(type),
+        remarks: inputs.remarks.value.trim(),
+        createdAt: new Date().toISOString(),
+        createdBy: 'BASE recoveries.html v1.0'
+      };
+
+      return { payload, filename };
+    }
+
+    function buildDetails(type) {
+      switch (type) {
+        case 'Vehicle':
+          return {
+            reason: inputs.vehicleReason.value,
+            colour: inputs.vehicleColour.value.trim(),
+            make: inputs.vehicleMake.value.trim(),
+            model: inputs.vehicleModel.value.trim(),
+            vrm: inputs.vehicleVRM.value.trim(),
+            estimatedValueGBP: toNumber(inputs.vehicleValue)
+          };
+        case 'Drug':
+          return {
+            drugType: inputs.drugType.value,
+            quantityOrWeight: inputs.drugQty.value.trim(),
+            estimatedValueGBP: toNumber(inputs.drugValue)
+          };
+        case 'Cash':
+          return {
+            amountGBP: toNumber(inputs.cashAmount)
+          };
+        case 'Stolen Property':
+          return {
+            description: inputs.stolenDesc.value.trim(),
+            quantity: toNumber(inputs.stolenQty),
+            estimatedValueGBP: toNumber(inputs.stolenValue)
+          };
+        case 'Counterfeit Goods':
+          return {
+            description: inputs.counterfeitDesc.value.trim(),
+            quantity: toNumber(inputs.counterfeitQty),
+            estimatedValueGBP: toNumber(inputs.counterfeitValue)
+          };
+        default:
+          return {};
+      }
+    }
+
+    function toNumber(input) {
+      if (!input) return null;
+      const value = input.value.trim();
+      if (value === '') return null;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function sanitize(value) {
+      const safe = value
+        .trim()
+        .replace(/[^A-Za-z0-9_-]+/g, '-')
+        .replace(/-{2,}/g, '-')
+        .replace(/_+/g, (match) => (match.length > 1 ? '_' : match))
+        .replace(/^-+|-+$/g, '');
+      return safe || 'INCIDENT';
+    }
+
+    function buildRecoveryFilename(incidentRaw, datetime = new Date()) {
+      const cleanedIncident = sanitize(String(incidentRaw || ''));
+      const stamp = formatStamp(datetime);
+      return `REC-${cleanedIncident}-${stamp}.json`;
+    }
+
+    function formatStamp(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}-${hh}${min}${ss}`;
+    }
+
+    function formatLocalDateTime(date) {
+      const offset = date.getTimezoneOffset();
+      const local = new Date(date.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 16);
+    }
+
+    async function saveJson(filename, contents) {
+      if (directoryHandle) {
+        try {
+          const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(contents);
+          await writable.close();
+          return 'folder';
+        } catch (err) {
+          console.error('Failed to write to folder, falling back to download', err);
+          if (err && err.name === 'NotAllowedError') {
+            directoryHandle = null;
+            setFolderStatus('Folder access revoked. Downloads will be used.');
+          }
+        }
+      }
+      downloadJson(filename, contents);
+      return 'download';
+    }
+
+    async function writeToPrimaryFolder(filename, contents) {
+      if (!supportsDirectoryPicker) return { error: 'unsupported' };
+      try {
+        if (!primaryDirectoryHandle && supportsIndexedDB) {
+          const stored = await getStoredHandle('primary');
+          if (stored) {
+            let hasRead = await ensurePermission(stored, 'read', false);
+            if (!hasRead) {
+              hasRead = await ensurePermission(stored, 'read', true);
+            }
+            if (hasRead) {
+              primaryDirectoryHandle = stored;
+              primaryHasReadAccess = true;
+            }
+          }
+        }
+        if (!primaryDirectoryHandle) {
+          return { error: 'no-handle' };
+        }
+        const hasWrite = await ensurePermission(primaryDirectoryHandle, 'readwrite', true);
+        if (!hasWrite) {
+          primaryHasReadAccess = false;
+          primaryDirectoryHandle = null;
+          refreshLegacyUI();
+          setFolderStatus('Recovery Folder access lost. Downloads will be used until permission is granted again.');
+          return { error: 'no-permission' };
+        }
+        const fileHandle = await primaryDirectoryHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(contents);
+        await writable.close();
+        directoryHandle = primaryDirectoryHandle;
+        primaryHasReadAccess = true;
+        setFolderStatus('Saving directly to Recovery Folder.');
+        return { ok: true };
+      } catch (error) {
+        console.error('writeToPrimaryFolder failed', error);
+        return { error };
+      }
+    }
+
+    function downloadJson(filename, contents) {
+      const blob = new Blob([contents], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.rel = 'noopener';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function ensurePermission(handle, mode = 'readwrite', allowRequest = true) {
+      if (!handle) return false;
+      const opts = { mode };
+      try {
+        if (handle.queryPermission) {
+          const query = await handle.queryPermission(opts);
+          if (query === 'granted') return true;
+          if (query === 'denied' && !allowRequest) return false;
+        }
+        if (allowRequest && handle.requestPermission) {
+          const request = await handle.requestPermission(opts);
+          return request === 'granted';
+        }
+      } catch (err) {
+        console.error('Permission check failed', err);
+      }
+      return false;
+    }
+
+    function setAnalyticsStatus(message) {
+      if (!analyticsStatusEl) return;
+      analyticsStatusEl.textContent = message;
+    }
+
+    function getCurrentFY(date = new Date()) {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const startYear = month >= 3 ? year : year - 1;
+      const endYear = startYear + 1;
+      const start = new Date(startYear, 3, 1);
+      const end = new Date(endYear, 2, 31, 23, 59, 59, 999);
+      const fyLabel = `FY ${startYear}/${String(endYear).slice(-2)}`;
+      const range = { fyLabel, start, end, startYear, endYear, value: `${startYear}-${endYear}` };
+      cacheFY(range);
+      return range;
+    }
+
+    function cacheFY(range) {
+      if (!range || !range.fyLabel) return;
+      FY_CACHE.set(range.fyLabel, range);
+      if (range.value) FY_CACHE.set(range.value, range);
+    }
+
+    function resolveFY(label) {
+      if (!label) return getCurrentFY();
+      if (typeof label === 'object' && label.start instanceof Date && label.end instanceof Date) {
+        cacheFY(label);
+        return label;
+      }
+      if (FY_CACHE.has(label)) return FY_CACHE.get(label);
+      if (/^\d{4}-\d{4}$/.test(label)) {
+        const [startYear, endYear] = label.split('-').map((part) => Number(part));
+        if (!Number.isNaN(startYear) && !Number.isNaN(endYear)) {
+          const start = new Date(startYear, 3, 1);
+          const end = new Date(endYear, 2, 31, 23, 59, 59, 999);
+          const fyLabel = `FY ${startYear}/${String(endYear).slice(-2)}`;
+          const range = { fyLabel, start, end, startYear, endYear, value: label };
+          cacheFY(range);
+          return range;
+        }
+      }
+      const match = /FY\s+(\d{4})\/(\d{2})/.exec(String(label));
+      if (match) {
+        const startYear = Number(match[1]);
+        const endYear = startYear + 1;
+        const start = new Date(startYear, 3, 1);
+        const end = new Date(endYear, 2, 31, 23, 59, 59, 999);
+        const fyLabel = `FY ${startYear}/${String(endYear).slice(-2)}`;
+        const range = { fyLabel, start, end, startYear, endYear, value: `${startYear}-${endYear}` };
+        cacheFY(range);
+        return range;
+      }
+      return getCurrentFY();
+    }
+
+    function getPreviousFY(range) {
+      const info = resolveFY(range);
+      if (!info) return null;
+      const startYear = info.startYear - 1;
+      const endYear = info.endYear - 1;
+      const start = new Date(startYear, 3, 1);
+      const end = new Date(endYear, 2, 31, 23, 59, 59, 999);
+      const fyLabel = `FY ${startYear}/${String(endYear).slice(-2)}`;
+      const previous = { fyLabel, start, end, startYear, endYear, value: `${startYear}-${endYear}` };
+      cacheFY(previous);
+      return previous;
+    }
+
+    function monthIndexAprMar(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
+      const month = date.getMonth();
+      return month >= 3 ? month - 3 : month + 9;
+    }
+
+    function zeroBuckets() {
+      return {
+        counts: Array(12).fill(0),
+        values: Array(12).fill(0)
+      };
+    }
+
+    function normalizeType(type) {
+      if (!type && type !== 0) return null;
+      const base = String(type).trim().toLowerCase();
+      if (!base) return null;
+      const normalized = base.replace(/\s+/g, ' ');
+      if (TYPE_ALIAS[normalized]) return TYPE_ALIAS[normalized];
+      if (TYPE_ALIAS[normalized.replace(/s$/, '')]) return TYPE_ALIAS[normalized.replace(/s$/, '')];
+      for (const cfg of TYPE_CONFIG) {
+        if (cfg.key.toLowerCase() === normalized) return cfg.key;
+      }
+      return null;
+    }
+
+    function normalizeDivision(value) {
+      if (value == null) return 'OTHER';
+      const upper = String(value).trim().toUpperCase();
+      return upper || 'OTHER';
+    }
+
+    function valueOf(record, typeOverride) {
+      const details = record?.details || {};
+      const typeKey = typeOverride || normalizeType(record?.type);
+      let raw = 0;
+      switch (typeKey) {
+        case 'Vehicle':
+        case 'Drug':
+        case 'Stolen Property':
+        case 'Counterfeit Goods':
+          raw = details.estimatedValueGBP;
+          break;
+        case 'Cash':
+          raw = details.amountGBP != null ? details.amountGBP : details.estimatedValueGBP;
+          break;
+        default:
+          raw = 0;
+      }
+      const num = Number(raw);
+      return Number.isFinite(num) ? Math.max(num, 0) : 0;
+    }
+
+    function bucketByMonthFY(records, { division = 'All', type = 'All' } = {}, fyRange) {
+      const buckets = zeroBuckets();
+      const normalizedDivision = division ? String(division).toUpperCase() : 'ALL';
+      const normalizedType = type === 'All' ? 'All' : type;
+      const range = resolveFY(fyRange || state.fy);
+
+      records.forEach((record) => {
+        const dtValue = record?.datetime || record?.createdAt || record?.updatedAt;
+        if (!dtValue) return;
+        const dt = new Date(dtValue);
+        if (Number.isNaN(dt.getTime())) return;
+        if (range && (dt < range.start || dt > range.end)) return;
+        const idx = monthIndexAprMar(dt);
+        if (idx == null || idx < 0 || idx > 11) return;
+
+        const typeKey = normalizeType(record?.type);
+        if (normalizedType !== 'All' && typeKey !== normalizedType) return;
+        const divisionKey = normalizeDivision(record?.division);
+        if (normalizedDivision !== 'ALL' && divisionKey !== normalizedDivision) return;
+
+        buckets.counts[idx] += 1;
+        buckets.values[idx] += valueOf(record, typeKey);
+      });
+
+      return {
+        counts: buckets.counts,
+        values: buckets.values,
+        months: FY_MONTHS.map((label, index) => ({
+          label,
+          index,
+          count: buckets.counts[index],
+          value: buckets.values[index]
+        }))
+      };
+    }
+
+    function aggregateFYByType(records, fyRange) {
+      const range = resolveFY(fyRange || state.fy);
+      const perType = {};
+      TYPE_CONFIG.forEach((cfg) => {
+        perType[cfg.key] = { count: 0, value: 0 };
+      });
+
+      records.forEach((record) => {
+        const dtValue = record?.datetime || record?.createdAt || record?.updatedAt;
+        if (!dtValue) return;
+        const dt = new Date(dtValue);
+        if (Number.isNaN(dt.getTime())) return;
+        if (range && (dt < range.start || dt > range.end)) return;
+        const typeKey = normalizeType(record?.type);
+        if (!typeKey) return;
+        const value = valueOf(record, typeKey);
+        perType[typeKey].count += 1;
+        perType[typeKey].value += value;
+      });
+
+      const counts = TYPE_CONFIG.map((cfg) => perType[cfg.key].count);
+      const values = TYPE_CONFIG.map((cfg) => perType[cfg.key].value);
+      const totalCount = counts.reduce((sum, val) => sum + val, 0);
+      const totalValue = values.reduce((sum, val) => sum + val, 0);
+
+      return { perType, counts, values, totalCount, totalValue };
+    }
+
+    function filterByFY(records, fyRange) {
+      const range = resolveFY(fyRange || state.fy);
+      return records.filter((record) => {
+        const dtValue = record?.datetime || record?.createdAt || record?.updatedAt;
+        if (!dtValue) return false;
+        const dt = new Date(dtValue);
+        if (Number.isNaN(dt.getTime())) return false;
+        if (!range) return true;
+        return dt >= range.start && dt <= range.end;
+      });
+    }
+
+    function filterByFYAndMonth(records, fyRange, monthIdx) {
+      if (monthIdx == null || monthIdx < 0 || monthIdx > 11) return [];
+      const range = resolveFY(fyRange || state.fy);
+      return records.filter((record) => {
+        const dtValue = record?.datetime || record?.createdAt || record?.updatedAt;
+        if (!dtValue) return false;
+        const dt = new Date(dtValue);
+        if (Number.isNaN(dt.getTime())) return false;
+        if (range && (dt < range.start || dt > range.end)) return false;
+        const idx = monthIndexAprMar(dt);
+        return idx === monthIdx;
+      });
+    }
+
+    function computeFYStats(records, fyRange) {
+      const range = resolveFY(fyRange || state.fy);
+      const filtered = filterByFY(records, range);
+      const aggregate = aggregateFYByType(filtered, range);
+      const bucket = bucketByMonthFY(filtered, {}, range);
+
+      const maxTypeValue = Math.max(...TYPE_CONFIG.map((cfg) => aggregate.perType[cfg.key].value), 0);
+      const reference = Math.max(aggregate.totalValue, maxTypeValue, 1);
+      const barRatio = aggregate.totalValue > 0
+        ? Math.max(0.12, Math.min(aggregate.totalValue / reference, 1))
+        : 0;
+
+      return {
+        totalValue: aggregate.totalValue,
+        totalCount: aggregate.totalCount,
+        perType: aggregate.perType,
+        barRatio,
+        months: bucket.months
+      };
+    }
+
+    async function restoreStoredDirectory(key) {
+      if (!supportsIndexedDB) return false;
+      try {
+        const storedHandle = await getStoredHandle(key);
+        if (!storedHandle) return false;
+        let hasRead = await ensurePermission(storedHandle, 'read', false);
+        if (!hasRead) {
+          hasRead = await ensurePermission(storedHandle, 'read', true);
+        }
+        if (!hasRead) {
+          if (key === 'primary') {
+            primaryDirectoryHandle = null;
+            primaryHasReadAccess = false;
+          } else if (key === 'legacy') {
+            legacyDirectoryHandle = null;
+            legacyHasReadAccess = false;
+          }
+          return false;
+        }
+        if (key === 'primary') {
+          primaryDirectoryHandle = storedHandle;
+          primaryHasReadAccess = true;
+        } else if (key === 'legacy') {
+          legacyDirectoryHandle = storedHandle;
+          legacyHasReadAccess = true;
+        }
+        return true;
+      } catch (err) {
+        console.error(`Failed to restore ${key} handle`, err);
+        return false;
+      }
+    }
+
+    async function initRecoveryData() {
+      if (!supportsDirectoryPicker) {
+        setAnalyticsStatus('File System Access not supported in this browser. Downloads will be used.');
+        renderAnalytics();
+        return;
+      }
+      setAnalyticsStatus('Checking folder access…');
+      try {
+        let primaryRestored = false;
+        let legacyRestored = false;
+        if (supportsIndexedDB) {
+          primaryRestored = await restoreStoredDirectory('primary');
+          legacyRestored = await restoreStoredDirectory('legacy');
+        }
+        refreshLegacyUI();
+
+        if (!primaryRestored && !legacyRestored) {
+          primaryDirectoryHandle = null;
+          primaryHasReadAccess = false;
+          legacyDirectoryHandle = null;
+          legacyHasReadAccess = false;
+          setAnalyticsStatus('Permission needed. Click "Grant access to Recovery Folder".');
+          renderAnalytics();
+          return;
+        }
+
+        await loadRecoveriesFromPrimary();
+      } catch (err) {
+        console.error('Failed to restore Recovery Folder access', err);
+        setAnalyticsStatus('Unable to restore Recovery Folder access. Please grant permission again.');
+      }
+    }
+
+    async function pickPrimaryDirectory() {
+      if (!supportsDirectoryPicker) {
+        setAnalyticsStatus('File System Access not supported in this browser.');
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ id: 'base-recoveries-primary' });
+        if (!handle) return;
+        const hasRead = await ensurePermission(handle, 'read', true);
+        if (!hasRead) {
+          setAnalyticsStatus('Permission denied. Please grant access to the Recovery Folder.');
+          return;
+        }
+        primaryDirectoryHandle = handle;
+        primaryHasReadAccess = true;
+        if (supportsIndexedDB) {
+          await storeHandle('primary', handle);
+        }
+        setAnalyticsStatus(supportsIndexedDB
+          ? 'Permission granted. Loading records…'
+          : 'Permission granted for this session. Loading records…');
+        await loadRecoveriesFromPrimary();
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        console.error('Primary folder selection failed', err);
+        setAnalyticsStatus('Unable to access the selected folder. Please try again.');
+      }
+    }
+
+    async function pickLegacyDirectory() {
+      if (!supportsDirectoryPicker) {
+        setAnalyticsStatus('File System Access not supported in this browser.');
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ id: 'base-recoveries-legacy' });
+        if (!handle) return;
+        const hasRead = await ensurePermission(handle, 'read', true);
+        if (!hasRead) {
+          setAnalyticsStatus('Permission denied. Please grant access to the legacy folder.');
+          return;
+        }
+        legacyDirectoryHandle = handle;
+        legacyHasReadAccess = true;
+        if (supportsIndexedDB) {
+          await storeHandle('legacy', handle);
+        }
+        refreshLegacyUI();
+        setAnalyticsStatus(supportsIndexedDB
+          ? 'Legacy folder connected. Loading records…'
+          : 'Legacy folder connected for this session. Loading records…');
+        await loadRecoveriesFromPrimary();
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        console.error('Legacy folder selection failed', err);
+        setAnalyticsStatus('Unable to access the legacy folder. Please try again.');
+      }
+    }
+
+    async function loadRecoveriesFromPrimary() {
+      if (!supportsDirectoryPicker || !supportsIndexedDB) {
+        return;
+      }
+
+      const filenameMap = new Map();
+      const mergedRecords = [];
+      let primaryCount = 0;
+      let legacyCount = 0;
+      let skippedTotal = 0;
+
+      async function processHandle(handle, key) {
+        if (!handle) return;
+        const isPrimary = key === 'primary';
+        let hasRead = await ensurePermission(handle, 'read', false);
+        if (!hasRead) {
+          hasRead = await ensurePermission(handle, 'read', true);
+        }
+        if (!hasRead) {
+          if (isPrimary) {
+            primaryHasReadAccess = false;
+            primaryDirectoryHandle = null;
+            setFolderStatus('Recovery Folder access lost. Downloads will be used until permission is granted again.');
+          } else {
+            legacyHasReadAccess = false;
+            legacyDirectoryHandle = null;
+          }
+          return;
+        }
+
+        try {
+          const { entries, skipped } = await readRecoveriesFromHandle(handle);
+          skippedTotal += skipped;
+          entries.forEach((entry) => {
+            const { filename, record, raw } = entry;
+            const bucket = filenameMap.get(filename);
+            if (bucket) {
+              const duplicate = bucket.find((existing) => existing.raw === raw);
+              if (duplicate) {
+                skippedTotal += 1;
+                return;
+              }
+              bucket.push(entry);
+            } else {
+              filenameMap.set(filename, [entry]);
+            }
+            mergedRecords.push(record);
+            if (isPrimary) {
+              primaryCount += 1;
+            } else {
+              legacyCount += 1;
+            }
+          });
+          if (isPrimary) {
+            primaryHasReadAccess = true;
+          } else {
+            legacyHasReadAccess = true;
+          }
+        } catch (err) {
+          console.error(`Failed to read ${key} folder`, err);
+          skippedTotal += 1;
+        }
+      }
+
+      setAnalyticsStatus('Loading records…');
+
+      await processHandle(primaryDirectoryHandle, 'primary');
+      await processHandle(legacyDirectoryHandle, 'legacy');
+
+      window.__REC_DATA = mergedRecords;
+      window.__REC_INVALID = skippedTotal;
+
+      const totalCount = mergedRecords.length;
+      let statusMessage = '';
+
+      if (primaryCount && legacyCount) {
+        statusMessage = `Loaded ${primaryCount} primary + ${legacyCount} legacy, skipped ${skippedTotal} invalid.`;
+      } else if (primaryCount) {
+        statusMessage = `Loaded ${primaryCount} record${primaryCount === 1 ? '' : 's'} from Recovery Folder, skipped ${skippedTotal} invalid.`;
+      } else if (legacyCount) {
+        statusMessage = `Loaded ${legacyCount} record${legacyCount === 1 ? '' : 's'} from legacy Recovery Folder, skipped ${skippedTotal} invalid.`;
+      } else if (!primaryDirectoryHandle && !legacyDirectoryHandle) {
+        statusMessage = 'Permission needed. Click "Grant access to Recovery Folder".';
+      } else if (totalCount === 0) {
+        statusMessage = skippedTotal
+          ? `No recovery files found in connected folders (skipped ${skippedTotal} invalid).`
+          : 'No recovery files found in connected folders.';
+      } else {
+        statusMessage = 'Unable to read recovery folders. Please re-grant access.';
+      }
+
+      setAnalyticsStatus(statusMessage);
+      refreshLegacyUI();
+
+      if (primaryDirectoryHandle && primaryHasReadAccess) {
+        await updateFolderSaveStatus();
+      }
+      renderAnalytics();
+    }
+
+    async function readRecoveriesFromHandle(handle) {
+      const entries = [];
+      let skipped = 0;
+      for await (const entry of handle.values()) {
+        try {
+          if (entry.kind !== 'file') continue;
+          if (!entry.name.toLowerCase().endsWith('.json')) continue;
+          const file = await entry.getFile();
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (data && data.schema === 'base.recovery.v1') {
+            entries.push({ filename: entry.name, record: data, raw: text });
+          } else {
+            skipped += 1;
+          }
+        } catch (err) {
+          skipped += 1;
+        }
+      }
+      return { entries, skipped };
+    }
+
+    async function updateFolderSaveStatus() {
+      if (!primaryDirectoryHandle || !primaryHasReadAccess) return;
+      try {
+        const hasWrite = await ensurePermission(primaryDirectoryHandle, 'readwrite', false);
+        if (hasWrite) {
+          directoryHandle = primaryDirectoryHandle;
+          setFolderStatus('Saving directly to Recovery Folder.');
+        } else {
+          if (directoryHandle === primaryDirectoryHandle) {
+            directoryHandle = null;
+          }
+          if (!directoryHandle) {
+            setFolderStatus('Recovery Folder ready for reading. Saving will download until write permission is granted.');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to verify write permission', err);
+      }
+      refreshLegacyUI();
+    }
+
+    async function openHandlesDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('base-recoveries', 1);
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('handles')) {
+            db.createObjectStore('handles');
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function getStoredHandle(key) {
+      try {
+        const db = await openHandlesDB();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction('handles', 'readonly');
+          const store = tx.objectStore('handles');
+          const request = store.get(key);
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => reject(request.error);
+          tx.oncomplete = () => db.close();
+          tx.onabort = () => db.close();
+        });
+      } catch (err) {
+        console.error('IndexedDB read failed', err);
+        return null;
+      }
+    }
+
+    async function storeHandle(key, handle) {
+      if (!supportsIndexedDB) return;
+      try {
+        const db = await openHandlesDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction('handles', 'readwrite');
+          const store = tx.objectStore('handles');
+          const request = store.put(handle, key);
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+          tx.oncomplete = () => db.close();
+          tx.onabort = () => db.close();
+        });
+      } catch (err) {
+        console.error('IndexedDB write failed', err);
+      }
+    }
+
+    function renderAnalytics() {
+      if (!overviewSection) return;
+      const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      syncFYControls();
+      const fyRange = resolveFY(state.fy);
+
+      if (!records.length) {
+        overviewSection.hidden = true;
+        if (ytdChartEl) ytdChartEl.setAttribute('aria-label', 'No recovery data loaded.');
+        if (ytdAmountEl) {
+          ytdAmountEl.textContent = '£0';
+          ytdAmountEl.dataset.value = 0;
+        }
+        if (ytdBarEl) {
+          ytdBarEl.style.transform = 'scaleY(0)';
+          ytdBarEl.dataset.fill = 0;
+        }
+        if (quickTilesEl) quickTilesEl.innerHTML = '';
+        if (sparklineLabelEl) sparklineLabelEl.textContent = `${resolveFY(state.fy).fyLabel} · Apr–Mar`;
+        if (sparklineWrapper) {
+          sparklineWrapper.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No data for selected year.</p>';
+        }
+        renderDivisionChart();
+        renderTypeTab();
+        renderMonthTab();
+        return;
+      }
+
+      if (fySelect) fySelect.disabled = false;
+      if (divisionFYSelect) divisionFYSelect.disabled = false;
+      if (typeFYSelect) typeFYSelect.disabled = false;
+      if (monthFYSelect) monthFYSelect.disabled = false;
+
+      const stats = computeFYStats(records, fyRange);
+      const prevFY = getPreviousFY(fyRange);
+      const prevStats = prevFY ? computeFYStats(records, prevFY) : null;
+
+      overviewSection.hidden = false;
+      if (ytdLabelEl) ytdLabelEl.textContent = fyRange.fyLabel;
+      if (ytdChartEl) {
+        const prevText = prevStats ? ` Previous year total: ${formatGBP(prevStats.totalValue)}.` : '';
+        ytdChartEl.setAttribute('aria-label', `Total recovered this financial year: ${formatGBP(stats.totalValue)} across ${formatNumber(stats.totalCount)} ${pluralize('record', stats.totalCount)}.${prevText}`);
+      }
+      animateCountUp(ytdAmountEl, stats.totalValue);
+      animateBar(ytdBarEl, stats.barRatio);
+      renderPrevComparison(prevStats, stats, prevFY);
+      renderQuickTiles(stats.perType);
+      renderSparkline(stats.months, fyRange);
+      renderDivisionChart();
+      renderTypeTab();
+      renderMonthTab();
+    }
+
+
+    const currencyFormatter = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
+    const numberFormatter = new Intl.NumberFormat('en-GB');
+    const percentFormatter = new Intl.NumberFormat('en-GB', { style: 'percent', maximumFractionDigits: 1 });
+    let countAnimationFrame = null;
+    let barAnimationFrame = null;
+
+    function formatGBP(value) {
+      return currencyFormatter.format(Math.round(Math.max(0, value || 0)));
+    }
+
+    function formatNumber(value) {
+      return numberFormatter.format(Math.max(0, Math.round(value || 0)));
+    }
+
+    function formatPercent(ratio) {
+      return percentFormatter.format(Math.max(0, ratio || 0));
+    }
+
+    function truncate(value, limit = 48) {
+      if (value == null) return '';
+      const str = String(value).trim();
+      return str.length > limit ? `${str.slice(0, limit - 1)}…` : str;
+    }
+
+    function escapeHTML(value) {
+      if (value == null) return '';
+      return String(value).replace(/[&<>"']/g, (char) => {
+        switch (char) {
+          case '&': return '&amp;';
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '"': return '&quot;';
+          case "'": return '&#039;';
+          default: return char;
+        }
+      });
+    }
+
+    function pluralize(word, count) {
+      return count === 1 ? word : `${word}s`;
+    }
+
+    function animateCountUp(el, targetValue) {
+      if (!el) return;
+      if (isReducedMotion()) {
+        const finalValue = Math.max(0, targetValue || 0);
+        el.textContent = formatGBP(finalValue);
+        el.dataset.value = finalValue;
+        return;
+      }
+      const from = Number(el.dataset.value || 0);
+      const to = Math.max(0, targetValue || 0);
+      const duration = 800;
+      const start = performance.now();
+      if (countAnimationFrame) cancelAnimationFrame(countAnimationFrame);
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const current = from + (to - from) * progress;
+        el.textContent = formatGBP(current);
+        el.dataset.value = current;
+        if (progress < 1) {
+          countAnimationFrame = requestAnimationFrame(step);
+        }
+      }
+      countAnimationFrame = requestAnimationFrame(step);
+    }
+
+    function animateBar(el, ratio) {
+      if (!el) return;
+      if (isReducedMotion()) {
+        const finalRatio = Math.max(0, Math.min(ratio || 0, 1));
+        el.style.transform = `scaleY(${finalRatio})`;
+        el.dataset.fill = finalRatio;
+        return;
+      }
+      const from = Number(el.dataset.fill || 0);
+      const to = Math.max(0, Math.min(ratio || 0, 1));
+      const duration = 800;
+      const start = performance.now();
+      if (barAnimationFrame) cancelAnimationFrame(barAnimationFrame);
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const current = from + (to - from) * progress;
+        el.style.transform = `scaleY(${current})`;
+        el.dataset.fill = current;
+        if (progress < 1) {
+          barAnimationFrame = requestAnimationFrame(step);
+        }
+      }
+      barAnimationFrame = requestAnimationFrame(step);
+    }
+
+    function renderQuickTiles(perType) {
+      if (!quickTilesEl) return;
+      const tilesHtml = TYPE_CONFIG.map((cfg) => {
+        const stats = perType[cfg.key] || { count: 0, value: 0 };
+        const countLabel = `${formatNumber(stats.count)} ${pluralize('case', stats.count)}`;
+        const valueLabel = formatGBP(stats.value);
+        return `
+          <article class="quick-tile" aria-label="${cfg.label}: ${countLabel}, total ${valueLabel}">
+            <div class="quick-tile-icon">
+              <img src="${cfg.icon}" alt="" class="neon-icon" width="44" height="44">
+            </div>
+            <div class="quick-tile-text">
+              <span class="quick-tile-label">${cfg.label}</span>
+              <span class="quick-tile-count">${countLabel}</span>
+              <span class="quick-tile-value">${valueLabel}</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+      quickTilesEl.innerHTML = tilesHtml;
+    }
+
+    function renderSparkline(months = [], fyRange) {
+      if (!sparklineWrapper) return;
+      const range = resolveFY(fyRange || state.fy);
+      if (sparklineLabelEl) {
+        sparklineLabelEl.textContent = `${range.fyLabel} · Apr–Mar`;
+      }
+      if (!months.length) {
+        sparklineWrapper.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No data for selected year.</p>';
+        return;
+      }
+
+      const maxCount = months.reduce((max, m) => Math.max(max, m.count || 0), 0);
+      const width = Math.max(360, (months.length - 1) * 44 || 360);
+      const height = 120;
+      const step = months.length > 1 ? width / (months.length - 1) : 0;
+      const baseline = height - 12;
+      const topPadding = 12;
+      const points = months.map((m, idx) => {
+        const x = months.length > 1 ? idx * step : width / 2;
+        const ratio = maxCount > 0 ? (m.count || 0) / maxCount : 0;
+        const y = baseline - ((height - topPadding * 2) * ratio);
+        return { x, y, count: m.count || 0, label: m.label };
+      });
+
+      const linePath = points
+        .map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`)
+        .join(' ');
+      const areaPath = `M ${points[0].x.toFixed(2)} ${baseline} ${points
+        .map((pt) => `L ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`)
+        .join(' ')} L ${points[points.length - 1].x.toFixed(2)} ${baseline} Z`;
+
+      const gridLines = points
+        .map((pt, idx) => `<line x1="${pt.x.toFixed(2)}" y1="${topPadding}" x2="${pt.x.toFixed(2)}" y2="${baseline}" opacity="${idx % 2 === 0 ? 0.12 : 0.05}"></line>`)
+        .join('');
+
+      const circles = points
+        .map((pt) => {
+          const aria = `${pt.label}: ${formatNumber(pt.count)} ${pluralize('seizure', pt.count)}`;
+          return `<circle class="sparkline-point" cx="${pt.x.toFixed(2)}" cy="${pt.y.toFixed(2)}" r="4" tabindex="0" data-label="${pt.label}" data-count="${pt.count}" role="img" aria-label="${escapeHTML(aria)}"></circle>`;
+        })
+        .join('');
+
+      const svg = `
+        <svg class="sparkline-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Monthly recovery counts for ${range.fyLabel}">
+          <defs>
+            <linearGradient id="sparkline-gradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7cc7ff" stop-opacity="0.45"></stop>
+              <stop offset="100%" stop-color="#0d1528" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <g class="sparkline-grid">${gridLines}</g>
+          <path class="sparkline-area" d="${areaPath}"></path>
+          <path class="sparkline-line" d="${linePath}"></path>
+          <g class="sparkline-points">${circles}</g>
+        </svg>`;
+
+      sparklineWrapper.innerHTML = svg;
+
+      const tooltip = ensureSparklineTooltip();
+      const svgEl = sparklineWrapper.querySelector('svg');
+      const pointEls = Array.from(sparklineWrapper.querySelectorAll('.sparkline-point'));
+
+      const hide = () => {
+        tooltip.style.display = 'none';
+        tooltip.setAttribute('aria-hidden', 'true');
+      };
+
+      const positionTooltip = (event, point) => {
+        const bounds = sparklineWrapper.getBoundingClientRect();
+        let x;
+        let y;
+        if (event instanceof MouseEvent || event instanceof PointerEvent) {
+          x = event.clientX - bounds.left;
+          y = event.clientY - bounds.top;
+        } else {
+          x = Number(point.getAttribute('cx'));
+          y = Number(point.getAttribute('cy'));
+        }
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
+      };
+
+      pointEls.forEach((point) => {
+        const show = (event) => {
+          const monthLabel = point.dataset.label || '';
+          const count = Number(point.dataset.count || 0);
+          tooltip.textContent = `${monthLabel}: ${formatNumber(count)}`;
+          tooltip.style.display = 'block';
+          tooltip.setAttribute('aria-hidden', 'false');
+          positionTooltip(event, point);
+        };
+        point.addEventListener('mouseenter', show);
+        point.addEventListener('mousemove', (event) => positionTooltip(event, point));
+        point.addEventListener('mouseleave', hide);
+        point.addEventListener('focus', show);
+        point.addEventListener('blur', hide);
+      });
+
+      if (svgEl) {
+        svgEl.addEventListener('mouseleave', hide);
+      }
+    }
+
+    function ensureSparklineTooltip() {
+      let tooltip = sparklineWrapper.querySelector('.sparkline-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'sparkline-tooltip';
+        tooltip.style.display = 'none';
+        tooltip.setAttribute('role', 'tooltip');
+        tooltip.setAttribute('aria-hidden', 'true');
+        sparklineWrapper.appendChild(tooltip);
+      }
+      tooltip.setAttribute('aria-hidden', 'true');
+      return tooltip;
+    }
+
+    function renderPrevComparison(prevStats, currentStats, prevFY) {
+      if (!compareEl || !deltaEl || !deltaNoteEl || !prevTrackEl || !prevBarEl || !prevLabelEl) return;
+      if (!prevStats) {
+        compareEl.hidden = false;
+        deltaEl.textContent = 'No previous FY data available';
+        deltaEl.className = 'ytd-delta';
+        if (deltaNoteEl) deltaNoteEl.textContent = '';
+        prevTrackEl.hidden = true;
+        prevBarEl.style.transform = 'scaleY(0)';
+        prevBarEl.dataset.fill = 0;
+        prevLabelEl.hidden = true;
+        return;
+      }
+
+      const diff = currentStats.totalValue - prevStats.totalValue;
+      const diffLabel = diff === 0 ? 'No change' : `${diff > 0 ? '+' : '–'}${formatGBP(Math.abs(diff))}`;
+      const percent = prevStats.totalValue === 0
+        ? (diff === 0 ? 0 : 100)
+        : Math.round((diff / prevStats.totalValue) * 100);
+      const percentLabel = prevStats.totalValue === 0
+        ? (diff === 0 ? '0%' : 'n/a')
+        : `${percent > 0 ? '+' : ''}${percent}%`;
+
+      compareEl.hidden = false;
+      const prevLabelText = prevFY ? prevFY.fyLabel : 'Prev FY';
+      deltaEl.textContent = `${diffLabel} (${percentLabel}) vs ${prevLabelText}`;
+      deltaEl.className = 'ytd-delta';
+      if (diff > 0) deltaEl.classList.add('positive');
+      if (diff < 0) deltaEl.classList.add('negative');
+
+      if (deltaNoteEl) {
+        const prevLabel = prevFY ? prevFY.fyLabel : 'Previous FY';
+        deltaNoteEl.textContent = `${prevLabel} total: ${formatGBP(prevStats.totalValue)} across ${formatNumber(prevStats.totalCount)} ${pluralize('record', prevStats.totalCount)}.`;
+      }
+
+      const reference = Math.max(currentStats.totalValue, prevStats.totalValue, 1);
+      const ratio = prevStats.totalValue > 0 ? Math.max(0.1, Math.min(prevStats.totalValue / reference, 1)) : 0;
+      prevTrackEl.hidden = false;
+      prevLabelEl.hidden = false;
+      prevLabelEl.textContent = prevFY ? prevFY.fyLabel.replace('FY ', '') : 'Prev FY';
+      animateBar(prevBarEl, ratio);
+    }
+
+    function activateTab(activeButton) {
+      if (!activeButton || !tabButtons.length || !tabPanels.length) return;
+      const target = activeButton.getAttribute('aria-controls');
+      tabButtons.forEach((btn) => {
+        const isActive = btn === activeButton;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+      });
+      tabPanels.forEach((panel) => {
+        const isActive = panel.id === target;
+        panel.classList.toggle('is-active', isActive);
+        panel.hidden = !isActive;
+      });
+      if (target === 'tab-division') {
+        renderDivisionChart();
+      } else if (target === 'tab-type') {
+        renderTypeTab();
+      } else if (target === 'tab-month') {
+        renderMonthTab();
+      }
+    }
+
+    function renderDivisionChart() {
+      if (!divisionChartEl) return;
+      const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const fyRange = resolveFY(state.fy);
+
+      if (divisionFYSelect) {
+        divisionFYSelect.value = state.fy;
+        divisionFYSelect.setAttribute('title', state.fy);
+      }
+
+      if (divisionFilter) {
+        divisionFilter.value = state.division === 'All' ? 'ALL' : state.division;
+      }
+
+      if (divisionChartLabelEl) {
+        divisionChartLabelEl.textContent = `${fyRange.fyLabel} · Apr–Mar`;
+      }
+      if (divisionValueLabelEl) {
+        divisionValueLabelEl.textContent = `${fyRange.fyLabel} · Apr–Mar`;
+      }
+
+      if (!records.length) {
+        const emptyMsg = '<p class="fine-print" style="margin:16px 0 0;">No recovery data available.</p>';
+        divisionChartEl.innerHTML = emptyMsg;
+        if (divisionValueChartEl) divisionValueChartEl.innerHTML = emptyMsg;
+        return;
+      }
+
+      const bucket = bucketByMonthFY(records, { division: state.division }, fyRange);
+      const divisionKey = state.division === 'All' ? 'ALL' : String(state.division).toUpperCase();
+      const divisionLabel = divisionKey === 'ALL' ? 'All divisions' : (divisionKey === 'OTHER' ? 'Other' : `Division ${divisionKey}`);
+
+      renderColumn(divisionChartEl, {
+        categories: FY_MONTHS,
+        data: bucket.counts,
+        label: `${divisionLabel} monthly recoveries (${fyRange.fyLabel})`,
+        tooltipFormatter: (labelText, value) => `${labelText}: ${formatNumber(value)} ${pluralize('seizure', value)}`
+      });
+
+      if (divisionValueChartEl) {
+        renderColumn(divisionValueChartEl, {
+          categories: FY_MONTHS,
+          data: bucket.values,
+          label: `${divisionLabel} monthly recovery value (${fyRange.fyLabel})`,
+          tooltipFormatter: (labelText, value) => `${labelText}: ${formatGBP(value)}`
+        });
+      }
+    }
+
+    function renderTypeTab() {
+      if (!typeCountChartEl || !typeValueChartEl || !typeDoughnutEl) return;
+      const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const fyRange = resolveFY(state.fy);
+
+      if (typeFYSelect) {
+        typeFYSelect.value = state.fy;
+        typeFYSelect.setAttribute('title', state.fy);
+      }
+      if (typeFilter) {
+        typeFilter.value = state.type === 'All' ? 'ALL' : state.type;
+      }
+
+      if (typeCountLabelEl) {
+        typeCountLabelEl.textContent = `${fyRange.fyLabel} · Apr–Mar`;
+      }
+      if (typeValueLabelEl) {
+        typeValueLabelEl.textContent = `${fyRange.fyLabel} · Apr–Mar`;
+      }
+      if (typeDoughnutLabelEl) {
+        typeDoughnutLabelEl.textContent = `${fyRange.fyLabel} share by type`;
+      }
+
+      const emptyMsg = '<p class="fine-print" style="margin:16px 0 0;">No recovery data available.</p>';
+      if (!records.length) {
+        typeCountChartEl.innerHTML = emptyMsg;
+        typeValueChartEl.innerHTML = emptyMsg;
+        typeDoughnutEl.innerHTML = emptyMsg;
+        if (typeLegendEl) typeLegendEl.innerHTML = '';
+        return;
+      }
+
+      const bucket = bucketByMonthFY(records, { type: state.type }, fyRange);
+      const selectedType = state.type === 'All' ? 'All types' : state.type;
+
+      renderColumn(typeCountChartEl, {
+        categories: FY_MONTHS,
+        data: bucket.counts,
+        label: `${selectedType} monthly recoveries (${fyRange.fyLabel})`,
+        tooltipFormatter: (labelText, value) => `${labelText}: ${formatNumber(value)} ${pluralize('seizure', value)}`
+      });
+
+      renderColumn(typeValueChartEl, {
+        categories: FY_MONTHS,
+        data: bucket.values,
+        label: `${selectedType} monthly recovery value (${fyRange.fyLabel})`,
+        tooltipFormatter: (labelText, value) => `${labelText}: ${formatGBP(value)}`
+      });
+
+      const typeAgg = aggregateFYByType(records, fyRange);
+      renderDoughnut(typeDoughnutEl, typeLegendEl, {
+        labels: TYPE_CONFIG.map((cfg) => cfg.label),
+        icons: TYPE_CONFIG.map((cfg) => cfg.icon),
+        values: typeAgg.values,
+        counts: typeAgg.counts,
+        totalValue: typeAgg.totalValue,
+        totalCount: typeAgg.totalCount,
+        colors: DOUGHNUT_COLORS,
+        fyLabel: fyRange.fyLabel
+      });
+    }
+
+    function renderMonthTab() {
+      if (!monthStackedChartEl || !monthTop3El || !monthTableBodyEl) return;
+      const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const fyRange = resolveFY(state.fy);
+
+      if (monthFYSelect) {
+        monthFYSelect.value = state.fy;
+        monthFYSelect.setAttribute('title', state.fy);
+      }
+
+      const monthIndex = typeof state.monthIdx === 'number' && state.monthIdx >= 0 && state.monthIdx <= 11
+        ? state.monthIdx
+        : 0;
+      state.monthIdx = monthIndex;
+      if (monthFilter) monthFilter.value = String(monthIndex);
+      const monthLabel = FY_MONTHS[monthIndex] || 'April';
+
+      if (monthStackedTitleEl) monthStackedTitleEl.textContent = `${monthLabel} breakdown`;
+      if (monthStackedLabelEl) monthStackedLabelEl.textContent = `${fyRange.fyLabel} · ${monthLabel}`;
+      if (monthTop3LabelEl) monthTop3LabelEl.textContent = `${fyRange.fyLabel} · ${monthLabel}`;
+      if (monthTableLabelEl) monthTableLabelEl.textContent = `${fyRange.fyLabel} · ${monthLabel}`;
+
+      const emptyMessage = '<p class="fine-print" style="margin:16px 0 0;">No recovery data available.</p>';
+
+      if (!records.length) {
+        monthStackedChartEl.innerHTML = emptyMessage;
+        if (monthLegendEl) monthLegendEl.innerHTML = '';
+        renderTopThree(monthTop3El, { items: [], maxCount: 0 });
+        renderMonthTable([], monthTableBodyEl, monthTableEmptyEl);
+        return;
+      }
+
+      const monthRecords = filterByFYAndMonth(records, fyRange, monthIndex);
+
+      if (!monthRecords.length) {
+        monthStackedChartEl.innerHTML = emptyMessage;
+        if (monthLegendEl) monthLegendEl.innerHTML = '';
+        renderTopThree(monthTop3El, { items: [], maxCount: 0, monthLabel, fyLabel: fyRange.fyLabel });
+        renderMonthTable([], monthTableBodyEl, monthTableEmptyEl, monthLabel, fyRange.fyLabel);
+        return;
+      }
+
+      const summary = summariseByType(monthRecords);
+      const stacks = TYPE_CONFIG.map((cfg, idx) => ({
+        key: cfg.key,
+        label: cfg.label,
+        count: summary[cfg.key]?.count || 0,
+        value: summary[cfg.key]?.value || 0,
+        icon: cfg.icon,
+        color: DOUGHNUT_COLORS[idx % DOUGHNUT_COLORS.length]
+      })).filter((item) => item.count > 0);
+
+      renderStackedSingle(monthStackedChartEl, monthLegendEl, {
+        stacks,
+        fyLabel: fyRange.fyLabel,
+        monthLabel
+      });
+
+      const sorted = TYPE_CONFIG.map((cfg) => ({
+        label: cfg.label,
+        key: cfg.key,
+        count: summary[cfg.key]?.count || 0,
+        value: summary[cfg.key]?.value || 0,
+        icon: cfg.icon
+      })).filter((item) => item.count > 0).sort((a, b) => {
+        if (b.count === a.count) return (b.value || 0) - (a.value || 0);
+        return b.count - a.count;
+      });
+
+      renderTopThree(monthTop3El, {
+        items: sorted.slice(0, 3),
+        maxCount: sorted.length ? Math.max(...sorted.map((item) => item.count)) : 0,
+        monthLabel,
+        fyLabel: fyRange.fyLabel
+      });
+
+      renderMonthTable(monthRecords, monthTableBodyEl, monthTableEmptyEl, monthLabel, fyRange.fyLabel);
+    }
+
+    function summariseByType(records) {
+      const totals = {};
+      TYPE_CONFIG.forEach((cfg) => {
+        totals[cfg.key] = { count: 0, value: 0 };
+      });
+      records.forEach((record) => {
+        const typeKey = normalizeType(record?.type) || 'Counterfeit Goods';
+        if (!totals[typeKey]) totals[typeKey] = { count: 0, value: 0 };
+        totals[typeKey].count += 1;
+        totals[typeKey].value += valueOf(record, typeKey);
+      });
+      return totals;
+    }
+
+    function renderStackedSingle(container, legendContainer, { stacks = [], fyLabel = '', monthLabel = '' } = {}) {
+      if (!container) return;
+      container.innerHTML = '';
+      const totalCount = stacks.reduce((sum, stack) => sum + stack.count, 0);
+      if (!stacks.length || totalCount === 0) {
+        container.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No seizures recorded for this period.</p>';
+        if (legendContainer) legendContainer.innerHTML = '';
+        return;
+      }
+
+      const svgWidth = 220;
+      const svgHeight = 260;
+      const topPad = 20;
+      const bottomPad = 30;
+      const chartHeight = svgHeight - topPad - bottomPad;
+      const columnWidth = 80;
+      const columnX = (svgWidth - columnWidth) / 2;
+      let currentY = topPad + chartHeight;
+
+      const segments = stacks.map((stack, index) => {
+        const ratio = stack.count / totalCount;
+        const height = chartHeight * ratio;
+        currentY -= height;
+        return {
+          ...stack,
+          y: currentY,
+          height,
+          index
+        };
+      }).filter((seg) => seg.height > 0);
+
+      const segmentsMarkup = segments.map((seg) => `
+        <rect
+          class="stacked-segment"
+          x="${columnX.toFixed(2)}"
+          y="${seg.y.toFixed(2)}"
+          width="${columnWidth.toFixed(2)}"
+          height="${seg.height.toFixed(2)}"
+          fill="${seg.color}"
+          data-label="${seg.label}"
+          data-count="${seg.count}"
+          data-value="${seg.value}"
+          tabindex="0"
+          role="img"
+          aria-label="${escapeHTML(`${seg.label}: ${formatNumber(seg.count)} ${pluralize('seizure', seg.count)} · ${formatGBP(seg.value)}`)}"
+        ></rect>
+      `).join('');
+
+      const svg = `
+        <svg class="stacked-svg" viewBox="0 0 ${svgWidth} ${svgHeight}" preserveAspectRatio="none" role="img" aria-label="${monthLabel ? `${monthLabel} recovery split by type for ${fyLabel}` : 'Monthly recovery split by type'}">
+          <g class="stacked-column">
+            ${segmentsMarkup}
+          </g>
+          <g class="stacked-axis">
+            <text x="${(svgWidth / 2).toFixed(2)}" y="${(svgHeight - 6).toFixed(2)}" text-anchor="middle">${formatNumber(totalCount)} ${pluralize('seizure', totalCount)}</text>
+          </g>
+        </svg>
+      `;
+
+      container.innerHTML = svg;
+
+      const tooltip = ensureStackedTooltip(container);
+      const segmentNodes = Array.from(container.querySelectorAll('.stacked-segment'));
+      const svgEl = container.querySelector('.stacked-svg');
+
+      const showTooltip = (event, target) => {
+        const labelText = target.dataset.label || '';
+        const count = Number(target.dataset.count || 0);
+        const value = Number(target.dataset.value || 0);
+        tooltip.textContent = `${labelText}: ${formatNumber(count)} ${pluralize('seizure', count)} · ${formatGBP(value)}`;
+        tooltip.style.display = 'block';
+        tooltip.setAttribute('aria-hidden', 'false');
+        positionTooltip(event, target, tooltip, container);
+      };
+
+      const hideTooltip = () => {
+        tooltip.style.display = 'none';
+        tooltip.setAttribute('aria-hidden', 'true');
+      };
+
+      segmentNodes.forEach((segment) => {
+        segment.addEventListener('mouseenter', (event) => showTooltip(event, segment));
+        segment.addEventListener('mousemove', (event) => positionTooltip(event, segment, tooltip, container));
+        segment.addEventListener('mouseleave', hideTooltip);
+        segment.addEventListener('focus', (event) => showTooltip(event, segment));
+        segment.addEventListener('blur', hideTooltip);
+        segment.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') hideTooltip();
+        });
+      });
+
+      if (svgEl) {
+        svgEl.addEventListener('mouseleave', hideTooltip);
+      }
+
+      if (legendContainer) {
+        const legendItems = stacks.map((stack) => `
+          <li>
+            <img src="${stack.icon || ''}" alt="">
+            <div>
+              <span>${stack.label}</span>
+              <strong>${formatNumber(stack.count)}</strong>
+            </div>
+          </li>
+        `).join('');
+        legendContainer.innerHTML = legendItems;
+      }
+    }
+
+    function ensureStackedTooltip(container) {
+      let tooltip = container.querySelector('.stacked-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'stacked-tooltip';
+        tooltip.setAttribute('role', 'tooltip');
+        tooltip.setAttribute('aria-hidden', 'true');
+        container.appendChild(tooltip);
+      }
+      tooltip.style.display = 'none';
+      tooltip.setAttribute('aria-hidden', 'true');
+      return tooltip;
+    }
+
+    function renderTopThree(container, { items = [], maxCount = 0, monthLabel = '', fyLabel = '' } = {}) {
+      if (!container) return;
+      if (!items.length || maxCount === 0) {
+        container.innerHTML = '<p class="fine-print" style="margin:12px 0 0;">No standout types for this period.</p>';
+        return;
+      }
+      const markup = `
+        <ol class="top3-list">
+          ${items.map((item) => {
+            const width = maxCount ? Math.round((item.count / maxCount) * 100) : 0;
+            return `
+              <li>
+                <div class="top3-meta">
+                  <img src="${item.icon || ''}" alt="">
+                  <div>
+                    <span class="top3-label">${item.label}</span>
+                    <span class="top3-sub">${formatGBP(item.value)}</span>
+                  </div>
+                </div>
+                <div class="top3-bar" role="img" aria-label="${item.label}: ${formatNumber(item.count)} ${pluralize('seizure', item.count)}">
+                  <span class="top3-bar-fill" style="width:${width}%"></span>
+                  <span class="top3-count">${formatNumber(item.count)}</span>
+                </div>
+              </li>
+            `;
+          }).join('')}
+        </ol>
+      `;
+      container.innerHTML = markup;
+    }
+
+    function renderMonthTable(records, tbodyEl, emptyEl, monthLabel = '', fyLabel = '') {
+      if (!tbodyEl) return;
+      const sorted = Array.isArray(records)
+        ? [...records].sort((a, b) => {
+            const da = new Date(a?.datetime || a?.createdAt || 0);
+            const db = new Date(b?.datetime || b?.createdAt || 0);
+            return db - da;
+          })
+        : [];
+
+      if (!sorted.length) {
+        tbodyEl.innerHTML = '';
+        if (emptyEl) emptyEl.hidden = false;
+        return;
+      }
+
+      const rows = sorted.map((record) => {
+        const typeKey = normalizeType(record?.type) || 'Counterfeit Goods';
+        const value = formatGBP(valueOf(record, typeKey));
+        const incident = record?.incidentNumber || record?.id || '—';
+        const divisionRaw = normalizeDivision(record?.division);
+        const division = divisionRaw === 'OTHER' ? 'Other' : divisionRaw;
+        const location = truncate(record?.location || '', 48);
+        return `
+          <tr>
+            <td data-title="Incident">${escapeHTML(incident)}</td>
+            <td data-title="Type">${escapeHTML(typeKey)}</td>
+            <td data-title="Division">${escapeHTML(division)}</td>
+            <td data-title="Value">${value}</td>
+            <td data-title="Location">${escapeHTML(location)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      tbodyEl.innerHTML = rows;
+      if (emptyEl) emptyEl.hidden = true;
+    }
+
+    function renderColumn(container, { categories = [], data = [], label = '', tooltipFormatter } = {}) {
+      if (!container) return;
+      const catCount = categories.length;
+      if (!catCount || data.length !== catCount) {
+        container.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No data available.</p>';
+        return;
+      }
+
+      const numericData = data.map((val) => Number(val) || 0);
+      const maxValue = Math.max(...numericData, 0);
+      const safeMax = maxValue > 0 ? maxValue : 1;
+      const width = Math.max(520, catCount * 46);
+      const height = 220;
+      const topPad = 24;
+      const bottomPad = 40;
+      const chartHeight = height - topPad - bottomPad;
+      const step = width / catCount;
+      const barWidth = Math.min(30, step * 0.6);
+
+      const bars = [];
+      const hits = [];
+      const axisLabels = [];
+      const tooltipFormatterFn = typeof tooltipFormatter === 'function'
+        ? tooltipFormatter
+        : (labelText, value) => `${labelText}: ${formatNumber(value)} ${pluralize('seizure', value)}`;
+      numericData.forEach((value, idx) => {
+        const category = categories[idx] ?? '';
+        const ratio = safeMax === 0 ? 0 : (value / safeMax);
+        const barHeight = chartHeight * ratio;
+        const x = idx * step + (step - barWidth) / 2;
+        const y = topPad + (chartHeight - barHeight);
+        const ariaText = tooltipFormatterFn(category, value);
+        const ariaAttr = escapeHTML(ariaText);
+        bars.push(`<rect class="column-bar" x="${x.toFixed(2)}" y="${(y).toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barHeight.toFixed(2)}" data-label="${category}" data-value="${value}" tabindex="0" role="img" aria-label="${ariaAttr}"></rect>`);
+        hits.push(`<rect class="column-hit" x="${x.toFixed(2)}" y="${topPad}" width="${barWidth.toFixed(2)}" height="${chartHeight}" data-label="${category}" data-value="${value}"></rect>`);
+        axisLabels.push(`<text x="${(idx * step + step / 2).toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle">${category}</text>`);
+      });
+
+      const gridLines = [];
+      const gridSteps = 4;
+      for (let i = 0; i <= gridSteps; i += 1) {
+        const ratio = i / gridSteps;
+        const y = topPad + chartHeight - chartHeight * ratio;
+        gridLines.push(`<line x1="0" y1="${y.toFixed(2)}" x2="${width}" y2="${y.toFixed(2)}"></line>`);
+      }
+
+      const svg = `
+        <svg class="column-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${label}">
+          <g class="column-grid">${gridLines.join('')}</g>
+          <g class="column-bars">${bars.join('')}</g>
+          <g class="column-hits">${hits.join('')}</g>
+          <g class="column-axis">${axisLabels.join('')}</g>
+        </svg>`;
+
+      container.innerHTML = svg;
+
+      const tooltip = ensureColumnTooltip(container);
+      const barElements = Array.from(container.querySelectorAll('.column-bar'));
+      const hitElements = Array.from(container.querySelectorAll('.column-hit'));
+      const svgElement = container.querySelector('svg');
+
+      const show = (event, labelText, value, targetEl) => {
+        tooltip.textContent = tooltipFormatterFn(labelText, value);
+        tooltip.style.display = 'block';
+        tooltip.setAttribute('aria-hidden', 'false');
+        positionTooltip(event, targetEl);
+      };
+
+      const hide = () => {
+        tooltip.style.display = 'none';
+        tooltip.setAttribute('aria-hidden', 'true');
+      };
+
+      const positionTooltip = (event, targetEl) => {
+        const bounds = container.getBoundingClientRect();
+        let x;
+        let y;
+        if (event instanceof MouseEvent || event instanceof PointerEvent) {
+          x = event.clientX - bounds.left;
+          y = event.clientY - bounds.top;
+        } else if (targetEl) {
+          const rect = targetEl.getBoundingClientRect();
+          x = rect.left + rect.width / 2 - bounds.left;
+          y = rect.top + rect.height / 2 - bounds.top;
+        } else {
+          x = bounds.width / 2;
+          y = bounds.height / 2;
+        }
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
+      };
+
+      hitElements.forEach((hit) => {
+        const labelText = hit.dataset.label || '';
+        const value = Number(hit.dataset.value || 0);
+        hit.addEventListener('mouseenter', (event) => show(event, labelText, value, hit));
+        hit.addEventListener('mousemove', (event) => positionTooltip(event, hit));
+        hit.addEventListener('mouseleave', hide);
+      });
+
+      barElements.forEach((bar) => {
+        const labelText = bar.dataset.label || '';
+        const value = Number(bar.dataset.value || 0);
+        bar.addEventListener('focus', (event) => show(event, labelText, value, bar));
+        bar.addEventListener('blur', hide);
+        bar.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') hide();
+        });
+      });
+
+      if (svgElement) {
+        svgElement.addEventListener('mouseleave', hide);
+      }
+    }
+
+    function ensureColumnTooltip(container) {
+      let tooltip = container.querySelector('.column-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'column-tooltip';
+        tooltip.setAttribute('role', 'tooltip');
+        tooltip.setAttribute('aria-hidden', 'true');
+        container.appendChild(tooltip);
+      }
+      tooltip.style.display = 'none';
+      tooltip.setAttribute('aria-hidden', 'true');
+      return tooltip;
+    }
+
+    function renderDoughnut(container, legendContainer, { labels = [], values = [], icons = [], counts = [], totalValue = 0, totalCount = 0, colors = [], fyLabel = '' } = {}) {
+      if (!container) return;
+      const numericValues = values.map((val) => Math.max(0, Number(val) || 0));
+      const total = numericValues.reduce((sum, v) => sum + v, 0);
+      container.innerHTML = '';
+      if (legendContainer) legendContainer.innerHTML = '';
+
+      if (!numericValues.length || total <= 0) {
+        container.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No recovery data available.</p>';
+        return;
+      }
+
+      const size = 260;
+      const outerRadius = 110;
+      const innerRadius = 70;
+      const cx = size / 2;
+      const cy = size / 2;
+      let currentAngle = -Math.PI / 2;
+      const colorPalette = colors && colors.length ? colors : DOUGHNUT_COLORS;
+
+      const segments = numericValues.map((value, idx) => {
+        const proportion = total ? value / total : 0;
+        const startAngle = currentAngle;
+        const angle = proportion * Math.PI * 2;
+        currentAngle += angle;
+        return {
+          label: labels[idx] ?? `Type ${idx + 1}`,
+          value,
+          count: counts[idx] || 0,
+          percent: proportion,
+          startAngle,
+          endAngle: currentAngle,
+          color: colorPalette[idx % colorPalette.length],
+          icon: icons[idx] || ''
+        };
+      }).filter((seg) => seg.value > 0);
+
+      if (!segments.length) {
+        container.innerHTML = '<p class="fine-print" style="margin:16px 0 0;">No recovery data available.</p>';
+        return;
+      }
+
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('class', 'doughnut-svg');
+      svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', fyLabel ? `Recovered value share by type for ${fyLabel}` : 'Recovered value share by type');
+
+      segments.forEach((seg, idx) => {
+        const path = document.createElementNS(svgNS, 'path');
+        path.setAttribute('class', 'doughnut-segment');
+        path.setAttribute('fill', seg.color);
+        path.setAttribute('d', describeDonutSegment(cx, cy, outerRadius, innerRadius, seg.startAngle, seg.endAngle));
+        path.setAttribute('tabindex', '0');
+        path.setAttribute('role', 'img');
+        path.setAttribute('aria-label', `${seg.label}: ${formatGBP(seg.value)} (${formatPercent(seg.percent)}) – ${formatNumber(seg.count)} ${pluralize('seizure', seg.count)}`);
+        path.dataset.label = seg.label;
+        path.dataset.value = seg.value;
+        path.dataset.percent = seg.percent;
+        path.dataset.count = seg.count;
+        path.dataset.color = seg.color;
+        svg.appendChild(path);
+      });
+
+      container.appendChild(svg);
+
+      const center = document.createElement('div');
+      center.className = 'doughnut-center';
+      center.innerHTML = `
+        <span>${fyLabel || 'FY total'}</span>
+        <strong>${formatGBP(totalValue)}</strong>
+        <span>${formatNumber(totalCount)} ${pluralize('seizure', totalCount)}</span>`;
+      container.appendChild(center);
+
+      const tooltip = ensureDoughnutTooltip(container);
+
+      const showTooltip = (event, target) => {
+        const labelText = target.dataset.label || '';
+        const value = Number(target.dataset.value || 0);
+        const percent = Number(target.dataset.percent || 0);
+        const count = Number(target.dataset.count || 0);
+        tooltip.textContent = `${labelText}: ${formatGBP(value)} (${formatPercent(percent)}) – ${formatNumber(count)} ${pluralize('seizure', count)}`;
+        tooltip.style.display = 'block';
+        tooltip.setAttribute('aria-hidden', 'false');
+        positionTooltip(event, target, tooltip, container);
+      };
+
+      const hideTooltip = () => {
+        tooltip.style.display = 'none';
+        tooltip.setAttribute('aria-hidden', 'true');
+      };
+
+      svg.querySelectorAll('.doughnut-segment').forEach((segment) => {
+        segment.addEventListener('mouseenter', (event) => showTooltip(event, segment));
+        segment.addEventListener('mousemove', (event) => positionTooltip(event, segment, tooltip, container));
+        segment.addEventListener('mouseleave', hideTooltip);
+        segment.addEventListener('focus', (event) => showTooltip(event, segment));
+        segment.addEventListener('blur', hideTooltip);
+        segment.addEventListener('keydown', (event) => { if (event.key === 'Escape') hideTooltip(); });
+      });
+
+      svg.addEventListener('mouseleave', hideTooltip);
+
+      if (legendContainer) {
+        const legendItems = TYPE_CONFIG.map((cfg, idx) => {
+          const value = numericValues[idx] || 0;
+          const percent = total ? value / total : 0;
+          const icon = cfg.icon || '';
+          return `
+            <li>
+              <img src="${icon}" alt="">
+              <div>
+                <span>${cfg.label}</span>
+                <strong>${formatPercent(percent)}</strong>
+              </div>
+            </li>`;
+        }).join('');
+        legendContainer.innerHTML = legendItems;
+      }
+
+      function polarToCartesian(centerX, centerY, radius, angleInRadians) {
+        return {
+          x: centerX + (radius * Math.cos(angleInRadians)),
+          y: centerY + (radius * Math.sin(angleInRadians))
+        };
+      }
+
+      function describeDonutSegment(cx, cy, outerR, innerR, startAngle, endAngle) {
+        const startOuter = polarToCartesian(cx, cy, outerR, startAngle);
+        const endOuter = polarToCartesian(cx, cy, outerR, endAngle);
+        const startInner = polarToCartesian(cx, cy, innerR, endAngle);
+        const endInner = polarToCartesian(cx, cy, innerR, startAngle);
+        const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
+
+        return [
+          'M', startOuter.x, startOuter.y,
+          'A', outerR, outerR, 0, largeArcFlag, 1, endOuter.x, endOuter.y,
+          'L', startInner.x, startInner.y,
+          'A', innerR, innerR, 0, largeArcFlag, 0, endInner.x, endInner.y,
+          'Z'
+        ].join(' ');
+      }
+    }
+
+    function ensureDoughnutTooltip(container) {
+      let tooltip = container.querySelector('.doughnut-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'doughnut-tooltip';
+        tooltip.setAttribute('role', 'tooltip');
+        tooltip.setAttribute('aria-hidden', 'true');
+        container.appendChild(tooltip);
+      }
+      tooltip.style.display = 'none';
+      tooltip.setAttribute('aria-hidden', 'true');
+      return tooltip;
+    }
+
+    function positionTooltip(event, targetEl, tooltipEl, containerEl) {
+      const bounds = containerEl.getBoundingClientRect();
+      let x;
+      let y;
+      if (event instanceof MouseEvent || event instanceof PointerEvent) {
+        x = event.clientX - bounds.left;
+        y = event.clientY - bounds.top;
+      } else if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        x = rect.left + rect.width / 2 - bounds.left;
+        y = rect.top + rect.height / 2 - bounds.top;
+      } else {
+        x = bounds.width / 2;
+        y = bounds.height / 2;
+      }
+      tooltipEl.style.left = `${x}px`;
+      tooltipEl.style.top = `${y}px`;
+    }
+
+    async function exportCurrentPanelAsPNG() {
+      const targetInfo = getActivePanelForExport();
+      if (!targetInfo) {
+        console.warn('No analytics panel found for export');
+        return;
+      }
+
+      const restoreTooltips = hideTooltipsForExport();
+      try {
+        const canvas = await renderPanelToCanvas(targetInfo.element);
+        const stamp = formatStamp(new Date());
+        const safeFY = state && state.fy ? state.fy.replace(/[^A-Za-z0-9_-]+/g, '') : 'FY';
+        const filename = `Recoveries-Dashboard-${safeFY || 'FY'}-${stamp}.png`;
+        triggerDownloadFromCanvas(canvas, filename);
+        showToast(`Dashboard exported as ${filename}`, { includePattern: false });
+      } finally {
+        restoreTooltips();
+      }
+    }
+
+    function getActivePanelForExport() {
+      const candidates = [];
+      if (overviewSection && !overviewSection.hidden) {
+        candidates.push({ element: overviewSection, visibility: getElementVisibilityRatio(overviewSection) });
+      }
+      const activeTab = tabPanels.find((panel) => panel.classList.contains('is-active') && !panel.hidden);
+      if (activeTab) {
+        candidates.push({ element: activeTab, visibility: getElementVisibilityRatio(activeTab) + 0.001 });
+      }
+      if (!candidates.length) {
+        return overviewSection ? { element: overviewSection, visibility: 1 } : null;
+      }
+      candidates.sort((a, b) => b.visibility - a.visibility);
+      return candidates[0];
+    }
+
+    function getElementVisibilityRatio(element) {
+      if (!element) return 0;
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return 0;
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth || rect.width;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || rect.height;
+      const visibleWidth = Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0));
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+      const visibleArea = visibleWidth * visibleHeight;
+      const totalArea = rect.width * rect.height;
+      return totalArea === 0 ? 0 : visibleArea / totalArea;
+    }
+
+    function hideTooltipsForExport() {
+      const selectors = ['.column-tooltip', '.doughnut-tooltip', '.stacked-tooltip', '.sparkline-tooltip'];
+      const originalStates = [];
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          originalStates.push({
+            el,
+            visibility: el.style.visibility,
+            opacity: el.style.opacity,
+            display: el.style.display
+          });
+          el.style.visibility = 'hidden';
+          el.style.opacity = '0';
+          el.style.display = 'none';
+        });
+      });
+      return () => {
+        originalStates.forEach(({ el, visibility, opacity, display }) => {
+          el.style.visibility = visibility || '';
+          el.style.opacity = opacity || '';
+          el.style.display = display || '';
+        });
+      };
+    }
+
+    async function renderPanelToCanvas(panelEl) {
+      const panelRect = panelEl.getBoundingClientRect();
+      const rawWidth = Math.max(panelRect.width, 1);
+      const rawHeight = Math.max(panelRect.height, 1);
+      const maxWidth = 1600;
+      const width = Math.min(rawWidth, maxWidth);
+      const scaleFactor = rawWidth === 0 ? 1 : width / rawWidth;
+      const height = rawHeight * scaleFactor;
+      const dpr = window.devicePixelRatio || 1;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.save();
+      ctx.scale(dpr * scaleFactor, dpr * scaleFactor);
+
+      const backgroundFill = resolvePanelBackgroundColor(panelEl);
+      ctx.fillStyle = backgroundFill;
+      ctx.fillRect(0, 0, rawWidth, rawHeight);
+
+      drawBackgrounds(ctx, panelEl, panelRect);
+      await drawSVGs(ctx, panelEl, panelRect);
+      await drawImages(ctx, panelEl, panelRect);
+      drawTextContent(ctx, panelEl, panelRect);
+
+      ctx.restore();
+      return canvas;
+    }
+
+    function resolvePanelBackgroundColor(panelEl) {
+      const style = getComputedStyle(panelEl);
+      const color = style.backgroundColor;
+      if (color && !isTransparentColor(color)) return color;
+      const bodyStyle = getComputedStyle(document.body);
+      const bodyColor = bodyStyle.backgroundColor;
+      if (bodyColor && !isTransparentColor(bodyColor)) return bodyColor;
+      return '#0b1732';
+    }
+
+    function drawBackgrounds(ctx, panelEl, panelRect) {
+      const elements = new Set();
+      elements.add(panelEl);
+      panelEl.querySelectorAll('.card, .chart-card, .ytd-card, .sparkline-card, .quick-tile, .top3-list li, .doughnut-wrapper, .tab-controls, .tab-panel, .table, .analytics-overview-grid, .quick-tiles, .ytd-chart-track').forEach((el) => elements.add(el));
+      elements.forEach((el) => drawBackgroundForElement(ctx, el, panelRect));
+    }
+
+    function drawBackgroundForElement(ctx, el, panelRect) {
+      if (!el || el === document.body) return;
+      if (el.hasAttribute('hidden') || el.closest('[hidden]')) return;
+      const style = getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      const x = rect.left - panelRect.left;
+      const y = rect.top - panelRect.top;
+      const color = resolveElementBackgroundColor(el, style);
+      if (!color) return;
+      const radii = getBorderRadii(style);
+      ctx.save();
+      ctx.globalAlpha *= parseFloat(style.opacity) || 1;
+      drawRoundedRectPath(ctx, x, y, rect.width, rect.height, radii);
+      ctx.fillStyle = color;
+      ctx.fill();
+      const borderWidth = parseFloat(style.borderTopWidth) || 0;
+      const borderColor = style.borderColor;
+      if (borderWidth > 0 && borderColor && !isTransparentColor(borderColor)) {
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = borderWidth;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function resolveElementBackgroundColor(el, style) {
+      if (style.backgroundImage && style.backgroundImage !== 'none') {
+        if (el.classList.contains('card') || el.classList.contains('chart-card') || el.classList.contains('ytd-card')) {
+          return 'rgba(18,24,40,0.88)';
+        }
+        if (el.classList.contains('quick-tile')) {
+          return 'rgba(16,24,44,0.82)';
+        }
+        if (el.classList.contains('sparkline-card') || el.classList.contains('doughnut-wrapper')) {
+          return 'rgba(16,24,44,0.8)';
+        }
+      }
+      const bgColor = style.backgroundColor;
+      if (bgColor && !isTransparentColor(bgColor)) {
+        return bgColor;
+      }
+      if (el.classList.contains('card') || el.classList.contains('chart-card') || el.classList.contains('ytd-card')) {
+        return 'rgba(18,24,40,0.88)';
+      }
+      if (el.classList.contains('quick-tile')) {
+        return 'rgba(16,24,44,0.82)';
+      }
+      if (el.classList.contains('top3-list') || el.classList.contains('top3')) {
+        return 'rgba(16,24,44,0.8)';
+      }
+      if (el.classList.contains('table')) {
+        return 'rgba(12,20,36,0.92)';
+      }
+      return null;
+    }
+
+    function isTransparentColor(color) {
+      if (!color) return true;
+      const normalized = color.trim().toLowerCase();
+      if (normalized === 'transparent') return true;
+      if (normalized.startsWith('rgba')) {
+        const alpha = parseFloat(normalized.split(',').pop());
+        if (Number.isFinite(alpha) && alpha === 0) return true;
+      }
+      return false;
+    }
+
+    function getBorderRadii(style) {
+      const parse = (value) => {
+        const radius = parseFloat(value);
+        return Number.isNaN(radius) ? 0 : radius;
+      };
+      return [
+        parse(style.borderTopLeftRadius),
+        parse(style.borderTopRightRadius),
+        parse(style.borderBottomRightRadius),
+        parse(style.borderBottomLeftRadius)
+      ];
+    }
+
+    function drawRoundedRectPath(ctx, x, y, width, height, radii) {
+      const [tl, tr, br, bl] = radii.map((value) => Math.max(0, Math.min(value, Math.min(width, height) / 2)));
+      ctx.beginPath();
+      ctx.moveTo(x + tl, y);
+      ctx.lineTo(x + width - tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + tr);
+      ctx.lineTo(x + width, y + height - br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - br, y + height);
+      ctx.lineTo(x + bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - bl);
+      ctx.lineTo(x, y + tl);
+      ctx.quadraticCurveTo(x, y, x + tl, y);
+      ctx.closePath();
+    }
+
+    async function drawSVGs(ctx, panelEl, panelRect) {
+      const svgs = Array.from(panelEl.querySelectorAll('svg'));
+      const jobs = svgs.map(async (svg) => {
+        if (svg.hasAttribute('hidden') || svg.closest('[hidden]')) return;
+        const rect = svg.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const clone = svg.cloneNode(true);
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        clone.setAttribute('width', rect.width);
+        clone.setAttribute('height', rect.height);
+        if (!clone.getAttribute('viewBox')) {
+          clone.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+        }
+        const serialized = new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([serialized], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        try {
+          const image = await loadImage(url);
+          const x = rect.left - panelRect.left;
+          const y = rect.top - panelRect.top;
+          ctx.drawImage(image, x, y, rect.width, rect.height);
+        } catch (err) {
+          console.error('Failed to render SVG for export', err);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      });
+      await Promise.all(jobs);
+    }
+
+    async function drawImages(ctx, panelEl, panelRect) {
+      const imgs = Array.from(panelEl.querySelectorAll('img'));
+      const jobs = imgs.map(async (img) => {
+        if (img.hasAttribute('hidden') || img.closest('[hidden]')) return;
+        const rect = img.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        if (img.closest('svg')) return;
+        try {
+          const image = await loadImage(img.src);
+          const x = rect.left - panelRect.left;
+          const y = rect.top - panelRect.top;
+          ctx.drawImage(image, x, y, rect.width, rect.height);
+        } catch (err) {
+          console.error('Failed to draw image for export', err);
+        }
+      });
+      await Promise.all(jobs);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        if (src && !src.startsWith('data:') && !src.startsWith('blob:')) {
+          image.crossOrigin = 'anonymous';
+        }
+        let settled = false;
+        const finalize = () => {
+          if (!settled) {
+            settled = true;
+            resolve(image);
+          }
+        };
+        image.onload = finalize;
+        image.onerror = (err) => {
+          if (!settled) {
+            settled = true;
+            reject(err);
+          }
+        };
+        image.src = src;
+        if (image.complete && image.naturalWidth) {
+          finalize();
+        }
+      });
+    }
+
+    function drawTextContent(ctx, panelEl, panelRect) {
+      const walker = document.createTreeWalker(panelEl, NodeFilter.SHOW_TEXT);
+      const skipSelectors = ['svg', '.column-tooltip', '.doughnut-tooltip', '.stacked-tooltip', '.sparkline-tooltip'];
+      const skipMatcher = (el) => skipSelectors.some((selector) => el.closest(selector));
+      while (walker.nextNode()) {
+        const textNode = walker.currentNode;
+        const text = textNode.textContent ? textNode.textContent.trim() : '';
+        if (!text) continue;
+        const parent = textNode.parentElement;
+        if (!parent) continue;
+        if (parent.hasAttribute('hidden') || parent.closest('[hidden]')) continue;
+        if (skipMatcher(parent)) continue;
+        const style = getComputedStyle(parent);
+        if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) continue;
+        if (parent.closest('[aria-hidden="true"]')) continue;
+        const rect = parent.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) continue;
+        const x = rect.left - panelRect.left + (parseFloat(style.paddingLeft) || 0);
+        let y = rect.top - panelRect.top + (parseFloat(style.paddingTop) || 0);
+        ctx.save();
+        const fontStyle = style.fontStyle || 'normal';
+        const fontVariant = style.fontVariant || 'normal';
+        const fontWeight = style.fontWeight || '400';
+        const fontSize = style.fontSize || '14px';
+        const fontFamily = style.fontFamily || 'sans-serif';
+        ctx.font = `${fontStyle} ${fontVariant} ${fontWeight} ${fontSize} ${fontFamily}`.trim();
+        ctx.fillStyle = style.color || '#ffffff';
+        ctx.textBaseline = 'top';
+        const paddingLeft = parseFloat(style.paddingLeft) || 0;
+        const paddingRight = parseFloat(style.paddingRight) || 0;
+        const maxWidth = Math.max(0, rect.width - paddingLeft - paddingRight);
+        const fontSizeValue = parseFloat(fontSize) || 14;
+        const lineHeight = parseFloat(style.lineHeight) || fontSizeValue * 1.2;
+        let currentY = y;
+        const lines = text.split('\n');
+        lines.forEach((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            currentY += lineHeight;
+            return;
+          }
+          currentY = drawWrappedText(ctx, trimmed, x, currentY, maxWidth || rect.width, lineHeight);
+        });
+        ctx.restore();
+      }
+    }
+
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+      if (!text) return y;
+      const words = text.split(/\s+/);
+      let line = '';
+      let currentY = y;
+      const limit = maxWidth && Number.isFinite(maxWidth) ? maxWidth : 1e6;
+      for (let i = 0; i < words.length; i += 1) {
+        const testLine = line ? `${line} ${words[i]}` : words[i];
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > limit && line) {
+          ctx.fillText(line, x, currentY);
+          line = words[i];
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      if (line) {
+        ctx.fillText(line, x, currentY);
+        currentY += lineHeight;
+      }
+      return currentY;
+    }
+
+    function triggerDownloadFromCanvas(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function showToast(message, options = {}) {
+      if (!toast) return;
+      const { includePattern = true } = options;
+      toast.textContent = includePattern
+        ? `${message} • File name pattern: REC-[INCIDENT]-YYYYMMDD-HHMMSS.json`
+        : message;
+      toast.hidden = false;
+      toast.classList.add('is-visible');
+      if (toastTimer) window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => {
+        toast.classList.remove('is-visible');
+        toast.hidden = true;
+      }, 4200);
+    }
+
+    function showDownloadReminder(fileName) {
+      if (!downloadReminder || !downloadReminderClose || !downloadReminderFile) return;
+      reminderLastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      downloadReminderFile.textContent = fileName;
+      downloadReminder.hidden = false;
+      downloadReminderClose.focus();
+    }
+
+    function hideDownloadReminder() {
+      if (!downloadReminder || downloadReminder.hidden) return;
+      downloadReminder.hidden = true;
+      if (reminderLastFocus && typeof reminderLastFocus.focus === 'function') {
+        reminderLastFocus.focus();
+      }
+      reminderLastFocus = null;
+    }
+  })();
+</script>
+</body>
+</html>

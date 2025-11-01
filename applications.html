@@ -1,0 +1,107 @@
+<!doctype html>
+<!-- nav update: 2025-02-14 – unified site header -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>B.A.S.E — Applications</title>
+
+  <link rel="icon" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="stylesheet" href="./styles/base.css">
+
+  <script defer src="./Applications/JSON/app-registry.js"></script>
+  <script defer src="./scripts/data.js"></script>
+  <script defer src="./scripts/apps.js"></script>
+  <script defer src="./scripts/main.js"></script>
+  <script defer src="./scripts/nav.js"></script>
+</head>
+<body class="forms-page">
+  <!-- Primary Navigation (GlassNav v2.1) -->
+  <nav class="glassnav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a class="nav-logo" href="./index.html" aria-label="BASE home">
+        <img src="./lib/assets/images/logos/base-logo.png" alt="BASE" height="44" width="44" loading="lazy">
+      </a>
+
+      <ul class="nav-list">
+        <li>
+          <a class="nav-link" data-page="home" href="./index.html">
+            <span class="label">Home</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="briefing" href="./briefing.html">
+            <span class="label">Briefing</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link is-active" data-page="applications" href="./applications.html" aria-current="page">
+            <span class="label">Applications</span>
+            <svg class="underline" viewBox="0 0 140 14" preserveAspectRatio="none">
+              <path d="M6,10 Q70,2 134,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="forms" href="./forms.html">
+            <span class="label">Forms</span>
+            <svg class="underline" viewBox="0 0 90 14" preserveAspectRatio="none">
+              <path d="M6,10 Q45,2 84,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="recoveries" href="./recoveries.html">
+            <span class="label">Recoveries</span>
+            <svg class="underline" viewBox="0 0 130 14" preserveAspectRatio="none">
+              <path d="M6,10 Q65,2 124,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="directory" href="./directory.html">
+            <span class="label">Directory</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="settings" href="./settings.html">
+            <span class="label">Settings</span>
+            <svg class="underline" viewBox="0 0 105 14" preserveAspectRatio="none">
+              <path d="M6,10 Q52,2 99,10" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="card home-hero">
+      <h1 class="home-title">B.A.S.E. Applications</h1>
+      <p class="home-desc">Access key reporting tools and reference systems directly.</p>
+    </section>
+
+    <div id="apps-error" class="notice danger" hidden>
+      <strong>Apps unavailable.</strong>
+      <p id="apps-error-message" style="margin:6px 0 0;">Unable to load <span class="kbd">Applications/JSON/app.json</span>. Refresh the page or replace the file on the shared drive.</p>
+    </div>
+
+    <div id="apps-meta" class="topapps-meta" hidden>
+      <span id="apps-meta-version"></span>
+      <span id="apps-meta-updated"></span>
+      <span id="apps-meta-updated-by"></span>
+    </div>
+
+    <section class="icon-grid" id="apps-grid" data-full="true" role="grid" aria-label="Applications"></section>
+  </main>
+</body>
+</html>

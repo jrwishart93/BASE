@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="color-scheme" content="dark" />
+<title>SPR — No MOT — Builder</title>
+<style>
+  /* ====== Liquid Glass Tokens (matches your existing palette) ====== */
+  :root{
+    --bg0:#0B1220;       /* deep navy base */
+    --bg1:#0F1A32;       /* panel navy */
+    --ink:#E9EEFB;       /* main text */
+    --muted:#B9C3DA;     /* secondary text */
+    --aqua:#5FF5F8;      /* aqua glow */
+    --blue:#7AA2FF;      /* sky blue */
+    --violet:#9C73FF;    /* subtle violet */
+    --glass-1: rgba(255,255,255,.10);
+    --glass-2: rgba(255,255,255,.16);
+    --stroke: rgba(255,255,255,.20);
+    --shadow: 0 16px 40px rgba(0,0,0,.35);
+    --ok:#50d195;
+    --warn:#ffd36b;
+    --danger:#ff6b6b;
+  }
+
+  /* ====== Base ====== */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    color:var(--ink);
+    background:
+      radial-gradient(1000px 600px at 15% -10%, rgba(122,162,255,.22), transparent 60%),
+      radial-gradient(900px 500px at 85% 110%, rgba(95,245,248,.18), transparent 60%),
+      linear-gradient(180deg, #0B1220 0%, #0F1A32 100%);
+    font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  }
+
+  .wrap{
+    display:grid;
+    grid-template-columns: 380px 1fr;
+    gap:24px;
+    min-height:100dvh;
+    padding:24px;
+  }
+
+  @media (max-width: 1000px){
+    .wrap{grid-template-columns: 1fr; padding:16px}
+  }
+
+  /* ====== Cards / Glass ====== */
+  .card{
+    background: linear-gradient(180deg, var(--glass-1), var(--glass-2));
+    border:1px solid var(--stroke);
+    border-radius:22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(16px) saturate(120%);
+  }
+
+  /* ====== Left: Controls ====== */
+  .panel{
+    padding:18px 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .title{
+    font-weight:700; font-size:18px; letter-spacing:.3px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .title .dot{
+    width:9px;height:9px;border-radius:999px;
+    background:linear-gradient(135deg,var(--aqua),var(--blue));
+    box-shadow:0 0 18px rgba(122,162,255,.8), 0 0 28px rgba(95,245,248,.6);
+  }
+
+  .group{padding:12px; border:1px solid var(--stroke); border-radius:16px}
+  .group h3{margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:600; letter-spacing:.2px}
+
+  .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+  .row-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
+  .row-1{display:grid; grid-template-columns: 1fr; gap:10px}
+
+  label{font-size:12px; color:var(--muted)}
+  input[type="text"], input[type="date"], input[type="time"], select, textarea{
+    width:100%; padding:12px 14px; color:var(--ink); background:rgba(255,255,255,.06);
+    border:1px solid var(--stroke); border-radius:999px; outline:none;
+  }
+  textarea{border-radius:16px; min-height:88px; resize:vertical; padding:12px 14px}
+  .help{font-size:12px; color:var(--muted); margin-top:6px}
+
+  /* Pills / toggles */
+  .pills{display:flex; flex-wrap:wrap; gap:8px}
+  .pill{
+    user-select:none; cursor:pointer;
+    padding:8px 12px; border-radius:999px; border:1px solid var(--stroke);
+    background:rgba(255,255,255,.06);
+    transition: transform .04s ease;
+    font-size:13px;
+  }
+  .pill[data-active="true"]{
+    border-color: transparent;
+    background:linear-gradient(135deg, rgba(122,162,255,.25), rgba(95,245,248,.25));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 0 1px rgba(255,255,255,.25);
+  }
+  .pill:active{transform: scale(.98)}
+
+  /* Buttons */
+  .actions{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{
+    appearance:none; border:1px solid var(--stroke); border-radius:999px;
+    background:linear-gradient(135deg, rgba(122,162,255,.18), rgba(95,245,248,.14));
+    color:var(--ink); padding:10px 14px; font-weight:600; cursor:pointer;
+  }
+  .btn.secondary{background: rgba(255,255,255,.06)}
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+
+  /* ====== Right: Output ====== */
+  .stage{
+    padding:18px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .hdr{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px 14px; border:1px solid var(--stroke); border-radius:16px;
+  }
+  .hdr h1{
+    font-size:16px; margin:0; font-weight:700;
+    background: linear-gradient(135deg, var(--aqua), var(--blue));
+    -webkit-background-clip: text; background-clip:text; color:transparent;
+    text-align: center;
+    flex-grow: 1;
+  }
+  .report{
+    padding:16px; border:1px solid var(--stroke); border-radius:16px; background:rgba(255,255,255,.06);
+    white-space:pre-wrap; font-size:15px; line-height:1.6;
+  }
+  .sep{
+    height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+    margin:10px 0;
+  }
+  .dim{color:var(--muted)}
+
+  .footer-note{font-size:12px; color:var(--muted); text-align:right}
+
+  /* ====== Back Button ====== */
+  .back-btn, .back-btn-float {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid var(--stroke);
+    background: var(--glass-1);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    transition: all .1s ease;
+  }
+  .back-btn:hover, .back-btn-float:hover {
+    background: var(--glass-2);
+    color: var(--ink);
+  }
+  .back-btn:focus-visible, .back-btn-float:focus-visible {
+    outline: 2px solid var(--aqua);
+    outline-offset: 2px;
+  }
+
+  .back-btn-float {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    display: none; /* Hidden by default */
+    z-index: 100;
+  }
+
+  @media (max-width: 760px) {
+    .back-btn-float {
+      display: flex;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ================= LEFT: CONTROLS ================= -->
+    <aside class="card panel" id="controls">
+      <div class="title"><span class="dot"></span><span>SPR — No MOT — Builder</span></div>
+
+      <div class="group">
+        <h3>Report Header</h3>
+        <div class="row">
+          <div>
+            <label>Locus street</label>
+            <input id="locusStreet" type="text" placeholder="Lothian Road" />
+          </div>
+          <div>
+            <label>Town / City</label>
+            <input id="town" type="text" placeholder="Edinburgh" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Accused & Pronouns</h3>
+        <div class="pills" id="genderPills">
+          <div class="pill" data-value="male">Male</div>
+          <div class="pill" data-value="female">Female</div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Accused full name</label>
+            <input id="accusedName" type="text" placeholder="Alex Example" />
+          </div>
+          <div>
+            <label>Date of birth</label>
+            <input id="accusedDOB" type="text" placeholder="01/01/1985" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Known to police</label>
+            <select id="knownToPolice">
+              <option>known</option>
+              <option>unknown</option>
+            </select>
+          </div>
+          <div>
+            <label>Convictions</label>
+            <select id="convictions">
+              <option>no</option>
+              <option>previous</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-1" id="convictWrap" hidden>
+          <div>
+            <label>Specify previous convictions (if applicable)</label>
+            <input id="convictDetail" type="text" placeholder="e.g., speeding in 2023" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Licence status</label>
+            <select id="licence">
+              <option>full UK driving licence</option>
+              <option>provisional UK driving licence</option>
+            </select>
+          </div>
+          <div>
+            <label>Penalty points</label>
+            <select id="points">
+              <option>no</option>
+              <option>current</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Vehicle</h3>
+        <div class="row-3">
+          <div>
+            <label>Colour</label>
+            <input id="vehColour" type="text" placeholder="Blue" />
+          </div>
+          <div>
+            <label>Make</label>
+            <input id="vehMake" type="text" placeholder="BMW" />
+          </div>
+          <div>
+            <label>Model</label>
+            <input id="vehModel" type="text" placeholder="X1" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Registration mark</label>
+            <input id="vehReg" type="text" placeholder="AB12 CDE" />
+          </div>
+          <div>
+            <label>Owner/keeper is the accused</label>
+            <select id="isKeeper">
+              <option>yes</option>
+              <option>no</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Locus Details</h3>
+        <div class="row">
+          <div>
+            <label>Road setting</label>
+            <select id="roadSetting">
+              <option>residential</option>
+              <option>rural</option>
+              <option>urban</option>
+              <option>city centre</option>
+            </select>
+          </div>
+          <div>
+            <label>Speed limit (mph)</label>
+            <input id="speedLimit" type="text" placeholder="30" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Incident date</label>
+            <input id="incidentDate" type="date" />
+          </div>
+          <div>
+            <label>Incident time</label>
+            <input id="incidentTime" type="time" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Light conditions</label>
+            <select id="light">
+              <option>daylight</option>
+              <option>darkness</option>
+            </select>
+          </div>
+          <div>
+            <label>Weather</label>
+            <select id="weather">
+              <option>clear</option>
+              <option>overcast</option>
+              <option>raining</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Road surface</label>
+            <select id="surface">
+              <option>dry</option>
+              <option>wet</option>
+              <option>damp</option>
+            </select>
+          </div>
+          <div>
+            <label>Traffic</label>
+            <select id="traffic">
+              <option>light</option>
+              <option>moderate</option>
+              <option>heavy</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Pedestrian activity</label>
+            <select id="peds">
+              <option>low</option>
+              <option>moderate</option>
+              <option>high</option>
+            </select>
+          </div>
+          <div>
+            <label>Street driven on (repeat)</label>
+            <input id="driveStreet" type="text" placeholder="Lothian Road" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Stop & Checks</h3>
+        <div class="pills" id="signalPills">
+          <div class="pill" data-value="blue lights">Blue lights</div>
+          <div class="pill" data-value="siren">Siren</div>
+          <div class="pill" data-value="hand signal">Hand signal</div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Police witness 1 (surname)</label>
+            <input id="pw1" type="text" placeholder="Smith" />
+          </div>
+          <div>
+            <label>Police witness 2 (surname)</label>
+            <input id="pw2" type="text" placeholder="Brown" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>MOT expiry date</label>
+            <input id="motExpiry" type="date" />
+          </div>
+          <div>
+            <label>COFP non-compliance notification date</label>
+            <input id="notifyDate" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Remarks</h3>
+        <div class="row">
+          <div>
+            <label>Interaction tone</label>
+            <select id="tone">
+              <option>cooperative</option>
+              <option>polite</option>
+              <option>evasive</option>
+              <option>argumentative</option>
+            </select>
+          </div>
+          <div>
+            <label>COFP amount (£)</label>
+            <input id="cofpAmount" type="text" value="100" />
+          </div>
+        </div>
+        <div class="help">The report auto-states payment due within 28 days and cites Section 47(1) and (2) RTA 1988.</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="copyBtn">Copy report</button>
+        <button class="btn secondary" id="selectBtn">Select all</button>
+        <button class="btn secondary" id="resetBtn">Reset</button>
+      </div>
+    </aside>
+
+    <!-- ================= RIGHT: OUTPUT ================= -->
+    <main class="card stage">
+      <div class="hdr">
+        <a class="back-btn" id="backBtn" role="button" aria-label="Back to Forms" title="Back to Forms" href="../../../forms.html">← Forms</a>
+        <h1 id="title">SPR – No MOT – [Locus Street, Town/City]</h1>
+        <div class="dim">Live preview</div>
+      </div>
+      <div class="report" id="output" spellcheck="false"></div>
+      <div class="footer-note">Built for quick copy and paste. Updates as you type.</div>
+    </main>
+  </div>
+
+<script>
+(function(){
+  // Helpers
+  const $ = s => document.querySelector(s);
+  const esc = s => (s||'').toString().replace(/[&<>"]/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m]));
+  const val = id => document.getElementById(id)?.value || '';
+  const fmtDate = d => {
+    if(!d) return '';
+    try{
+      const dt = new Date(d);
+      if(isNaN(dt)) return d;
+      const opts = { year:'numeric', month:'long', day:'numeric' };
+      return dt.toLocaleDateString('en-GB', opts);
+    }catch{ return d; }
+  };
+  const fmtTime = t => t || ''; // keep as HH:MM
+
+  // --- Back Navigation ---
+  const backUrl = '../../../forms.html';
+  function goBack(e){
+    if (e) e.preventDefault();
+    if(typeof window.openLocal === 'function'){
+      try {
+        window.openLocal(null, backUrl);
+        return;
+      } catch (err) {
+        console.warn('openLocal failed, falling back to href', err);
+      }
+    }
+    window.location.href = backUrl;
+  }
+
+  // --- Event Listeners ---
+  // Back buttons
+  $('#backBtn').addEventListener('click', goBack);
+  
+  // Floating back button
+  const floatBackBtn = document.createElement('a');
+  floatBackBtn.className = 'back-btn-float';
+  floatBackBtn.id = 'backBtnFloat';
+  floatBackBtn.setAttribute('aria-label', 'Back to Forms');
+  floatBackBtn.setAttribute('title', 'Back to Forms');
+  floatBackBtn.setAttribute('href', backUrl);
+  floatBackBtn.innerHTML = '←';
+  document.body.appendChild(floatBackBtn);
+  floatBackBtn.addEventListener('click', goBack);
+
+  // Keyboard shortcuts for navigation
+  window.addEventListener('keydown', e => {
+    const isTyping = document.activeElement && (document.activeElement.isContentEditable || /input|textarea|select/i.test(document.activeElement.tagName));
+    if (isTyping) return;
+
+    if (e.key === 'Escape' || (e.altKey && e.key === 'ArrowLeft') || (e.metaKey && e.key === '[')) {
+      e.preventDefault();
+      goBack();
+    }
+  });
+
+
+  // Pronouns
+  let gender = 'male';
+  const P = () => {
+    const g = gender;
+    return {
+      subj: g==='male' ? 'He' : 'She',
+      obj:  g==='male' ? 'him' : 'her',
+      poss: g==='male' ? 'his' : 'her',
+      refl: g==='male' ? 'himself' : 'herself'
+    };
+  };
+
+  // Toggle pills
+  function makeSingleSelectPills(containerSel, initial){
+    const box = $(containerSel);
+    if(!box) return { get:()=>initial };
+    let current = initial;
+    [...box.children].forEach(p=>{
+      if(p.dataset.value===initial) p.dataset.active = 'true';
+      p.addEventListener('click', ()=>{
+        [...box.children].forEach(c=>c.dataset.active='false');
+        p.dataset.active='true';
+        current = p.dataset.value;
+        render();
+      });
+    });
+    return { get:()=>current };
+  }
+  function makeMultiSelectPills(containerSel){
+    const box = $(containerSel);
+    if(!box) return { get:()=>[] };
+    [...box.children].forEach(p=>{
+      p.addEventListener('click', ()=>{
+        p.dataset.active = p.dataset.active === 'true' ? 'false' : 'true';
+        render();
+      });
+    });
+    return {
+      get:()=> [...box.children].filter(c=>c.dataset.active==='true').map(c=>c.dataset.value)
+    };
+  }
+
+  const genderCtl = makeSingleSelectPills('#genderPills','male');
+  const signalCtl = makeMultiSelectPills('#signalPills');
+
+  // Show convictions detail when "previous"
+  $('#convictions').addEventListener('change',()=>{
+    const show = val('convictions')==='previous';
+    $('#convictWrap').hidden = !show;
+    render();
+  });
+
+  // Inputs re-render
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // Buttons
+  $('#copyBtn').addEventListener('click', async ()=>{
+    const text = $('#output').innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      toast('Report copied');
+    }catch(e){
+      selectOutput(); toast('Selected text — press Cmd/Ctrl+C');
+    }
+  });
+  $('#selectBtn').addEventListener('click', selectOutput);
+  $('#resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('#controls input').forEach(i=>i.value='');
+    document.querySelectorAll('#controls select').forEach(s=>s.selectedIndex=0);
+    // reset pills
+    [...$('#genderPills').children].forEach((c,i)=>c.dataset.active = i===0?'true':'false');
+    [...$('#signalPills').children].forEach(c=>c.dataset.active='false');
+    $('#convictWrap').hidden = true;
+    gender = 'male';
+    render();
+  });
+
+  function selectOutput(){
+    const el = $('#output');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+
+  // Tiny toast
+  function toast(msg){
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.position='fixed'; t.style.left='50%'; t.style.top='18px'; t.style.transform='translateX(-50%)';
+    t.style.padding='8px 12px'; t.style.border='1px solid var(--stroke)';
+    t.style.background='linear-gradient(135deg, rgba(122,162,255,.25), rgba(95,245,248,.22))';
+    t.style.borderRadius='999px'; t.style.zIndex='9999'; t.style.boxShadow='var(--shadow)';
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 1300);
+  }
+
+  // Render
+  function render(){
+    gender = genderCtl.get();
+    const pron = P();
+
+    const locusStreet = val('locusStreet') || '[Locus Street]';
+    const town = val('town') || '[Town/City]';
+    $('#title').textContent = `SPR – No MOT – ${locusStreet}, ${town}`;
+
+    const isKeeper = val('isKeeper')==='yes';
+    const keeperLine = isKeeper
+      ? `The accused is the owner and registered keeper of a`
+      : `The vehicle involved is a`;
+
+    const vehColour = val('vehColour') || '[vehicle colour]';
+    const vehMake   = val('vehMake')   || '[vehicle make]';
+    const vehModel  = val('vehModel')  || '[vehicle model]';
+    const vehReg    = val('vehReg')    || '[registration mark]';
+
+    const known = val('knownToPolice') || 'known';
+    const convictions = val('convictions') || 'no';
+    const convictDetail = val('convictDetail');
+    const convictionsText = convictions==='previous'
+      ? `previous convictions${convictDetail?` for ${convictDetail}`:''}`
+      : `no convictions`;
+
+    const licence = val('licence') || 'full UK driving licence';
+    const points  = val('points')  || 'no';
+
+    const roadSetting = val('roadSetting') || 'residential';
+    const speedLimit  = val('speedLimit')  || '[speed limit]';
+    const incidentDate= val('incidentDate');
+    const incidentTime= val('incidentTime');
+    const light       = val('light') || 'daylight';
+    const weather     = val('weather') || 'clear';
+    const surface     = val('surface') || 'dry';
+    const traffic     = val('traffic') || 'light';
+    const peds        = val('peds') || 'low';
+    const driveStreet = val('driveStreet') || locusStreet;
+
+    const pw1 = val('pw1') || '[surname 1]';
+    const pw2 = val('pw2') || '[surname 2]';
+    const accusedName = val('accusedName') || '[full name]';
+    const accusedDOB  = val('accusedDOB')  || '[date of birth]';
+
+    const signalsSel = signalCtl.get();
+    const signalsText = signalsSel.length
+      ? signalsSel.join(' / ')
+      : '[blue lights / siren / hand signal]';
+
+    const motExpiry = val('motExpiry') ? fmtDate(val('motExpiry')) : '[date of expiry]';
+    const notifyDate= val('notifyDate')? fmtDate(val('notifyDate')): '[date of notification]';
+    const amount    = val('cofpAmount') || '100';
+
+    const tone = val('tone') || 'cooperative';
+
+    // Sections (respecting your phrasing and layout)
+    const header = `SPR – No MOT – ${locusStreet}, ${town}
+
+⸻`;
+
+    const antecedents =
+`Antecedents ;
+
+${keeperLine} ${vehColour} ${vehMake} ${vehModel}, registration mark ${vehReg}. ${pron.subj}/${pron.obj === 'her' ? 'she' : 'he'} is ${known} to police and has ${convictionsText}. The accused is the holder of a ${licence} with ${points} penalty points.`;
+
+    const locus =
+`
+⸻
+
+Locus ;
+
+The locus is ${locusStreet}, ${town} — a ${roadSetting} road with a ${speedLimit} mph limit. The incident occurred about ${fmtTime(incidentTime)||'[time]'} on ${fmtDate(incidentDate)||'[date]'} in ${light} hours. The weather was ${weather} and the road surface was ${surface}. There was ${traffic} traffic and ${peds} pedestrian activity.`;
+
+    const events =
+`
+⸻
+
+Events ;
+
+About ${fmtTime(incidentTime)||'[time of offence]'} on ${fmtDate(incidentDate)||'[date]'}, police witness ${pw1} and police witness ${pw2} were on routine mobile patrol, both in full uniform, when they observed a ${vehColour} ${vehMake} ${vehModel}, registration mark ${vehReg}, being driven on ${driveStreet}, ${town}.
+
+The vehicle was signalled to stop using ${signalsText}, and the police witnesses approached the driver. The driver identified ${pron.refl === 'himself' ? 'himself' : 'herself'} as the now accused, ${accusedName}, ${accusedDOB}.
+
+Police witness ${pw1} carried out a series of checks on the Police National Computer and DVLA database which confirmed that the vehicle did not have a valid MOT certificate. The MOT for the vehicle had expired on ${motExpiry}.
+
+As such, the accused was offered and accepted a Conditional Offer Fixed Penalty Ticket for using a motor vehicle on a road without a valid MOT test certificate, contrary to Section 47(1) and (2) of the Road Traffic Act 1988. The ticket was for the sum of £${amount}, payable within 28 days.
+
+The accused accepted the offer, and the terms and conditions of the Conditional Offer Fixed Penalty Ticket were fully explained to ${pron.obj}. The accused confirmed that ${pron.subj.toLowerCase()} understood.
+
+While in the presence of police witness ${pw2}, police witness ${pw1} cautioned and charged the accused with the offence libelled. The accused confirmed ${pron.subj.toLowerCase()} understood and made no reply.
+
+On ${notifyDate}, police witness ${pw1} later received notification that the accused had failed to comply with the conditions of the Conditional Offer Fixed Penalty Ticket. As such, this report has been submitted for consideration of prosecution.
+
+Contrary to Section 47(1) and (2) of the Road Traffic Act 1988.`;
+
+    const remarks =
+`
+⸻
+
+Remarks ;
+
+In the opinion of police witness ${pw1}, the accused was ${tone} throughout the interaction. The accused was made aware of ${pron.poss} responsibilities as a vehicle owner and driver, including ensuring the vehicle has a valid MOT test certificate prior to use on a public road.`;
+
+    $('#output').textContent = `${header}
+
+${antecedents}${locus}${events}${remarks}`;
+  }
+
+  // Initial render
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="color-scheme" content="dark" />
+<title>Antecedents</title>
+<style>
+  :root{
+    --bg0:#040915; --bg1:#0b1732; --bg2:#0f1a32; --ink:#e9eefb;
+    --cy:#5ff5f8; --cy2:#7aa2ff; --cy3:#9c73ff;
+    --glass: rgba(255,255,255,.06); --glass-2: rgba(255,255,255,.08);
+    --stroke: rgba(255,255,255,.14);
+    --glow: rgba(122,162,255,.25);
+    --muted:#b8c2da; --accent:#7aa2ff; --danger:#ff6b6b;
+    --pill:#16223d; --pill-hover:#22335a; --pill-active:#29406f;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    --radius:18px; --radius-sm:12px;
+    --warn-bg: rgba(255,107,107,0.12); --warn-bd: rgba(255,107,107,0.55);
+    --dur: 5200ms; --morph: 560ms ease;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 30% -10%, #1a2544 0%, transparent 45%),
+      radial-gradient(900px 700px at 110% 10%, #14345a 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg0),var(--bg1));
+    overflow:hidden; /* enabled after intro */
+  }
+  /* INTRO */
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+    background:repeating-radial-gradient(circle at 30% 30%, rgba(255,255,255,.08) 0 1px, transparent 1px 2px);
+    filter:blur(1px); z-index:2}
+  #intro{position:fixed; inset:0; z-index:3}
+  .stage{position:relative;width:100%;height:100%}
+  .clouds{position:absolute;inset:0;z-index:1;filter:saturate(115%)}
+  .hero{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+    width:min(420px,90vw);min-height:64px;border-radius:999px;
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.03));
+    border:1px solid var(--stroke);
+    box-shadow:inset 0 0 20px rgba(255,255,255,.14), 0 6px 24px rgba(0,0,0,.35), 0 0 30px var(--glow);
+    backdrop-filter:blur(12px) saturate(130%);
+    display:flex;align-items:center;justify-content:center;padding:10px 18px;z-index:10;
+    animation:breathe 2.6s ease-in-out infinite;
+  }
+  @keyframes breathe{50%{transform:translate(-50%,-50%) scale(1.02)}}
+  .title{
+    font-weight:800;font-size:clamp(24px,6vw,38px);letter-spacing:.03em;white-space:nowrap;
+    background:linear-gradient(90deg,var(--cy),var(--cy2),var(--cy3));
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 12px var(--glow);
+    animation:shimmer 7s ease infinite;
+  }
+  @keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .bubble{
+    position:absolute;will-change:transform;pointer-events:none;
+    color:rgba(220,235,255,.9);font-weight:600;font-size:12px;letter-spacing:.01em;
+    padding:6px 10px;border-radius:999px;white-space:nowrap;opacity:0;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid rgba(122,162,255,.14);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.08), 0 2px 15px rgba(0,0,0,.3), 0 0 18px rgba(122,162,255,.08);
+    backdrop-filter:blur(5px);
+    animation:bubbleIn 900ms ease forwards, bubblePulse 8s ease-in-out 700ms infinite;
+  }
+  @keyframes bubbleIn{to{opacity:.28}}
+  @keyframes bubblePulse{50%{opacity:.34}}
+  .loader-wrap{position:fixed;left:50%;bottom:10vh;transform:translateX(-50%);width:min(360px,86vw);text-align:center;z-index:10}
+  .loader-label{font-size:clamp(.9rem,2.5vw,1rem);color:rgba(255,255,255,.76);margin-bottom:10px;text-shadow:0 0 10px var(--glow)}
+  .loader{
+    position:relative;height:10px;border-radius:6px;overflow:hidden;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.1), 0 0 22px var(--glow);
+    backdrop-filter:blur(8px);
+    transition:width var(--morph), height var(--morph), border-radius var(--morph), padding var(--morph), box-shadow var(--morph), transform var(--morph);
+    margin:0 auto;
+  }
+  .bar{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;
+    background:linear-gradient(90deg,var(--cy),var(--cy2),var(--cy3));
+    box-shadow:0 0 14px var(--cy), inset 0 0 10px rgba(255,255,255,.22);
+    animation:grow var(--dur) cubic-bezier(.4,0,.2,1) forwards, ripple 1.2s ease infinite;}
+  .shine{content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent); mix-blend-mode:overlay; animation:shine 2s linear infinite;}
+  @keyframes grow{to{width:100%}} @keyframes ripple{50%{box-shadow:0 0 26px var(--cy), inset 0 0 16px rgba(255,255,255,.3)}} @keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+  .loader.toBtn{height:48px; border-radius:14px; padding:0 18px; box-shadow:0 14px 36px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18);
+    background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));}
+  .loader.toBtn .bar, .loader.toBtn .shine{opacity:0}
+  .cta{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; letter-spacing:.22em; text-transform:uppercase; font-size:13px; opacity:0; transition:opacity var(--morph); color:var(--ink)}
+  .loader.toBtn .cta{opacity:1}
+  .skip{position:fixed; right:2vw; bottom:2vh; z-index:10; padding:7px 11px; font-weight:700; font-size:.9rem; color:var(--ink); background:var(--glass); border:1px solid rgba(255,255,255,.15); border-radius:9px; box-shadow:0 0 10px var(--glow); cursor:pointer; opacity:.8}
+  .skip:hover{opacity:1}
+  .fade-out{animation:fade .52s ease forwards} @keyframes fade{to{opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .bubble,.bar,.shine{animation:none !important} }
+
+  /* APP */
+  #app{opacity:0; pointer-events:none; transition:opacity .6s ease}
+  #app.ready{opacity:1; pointer-events:auto}
+  body.app-scroll{overflow:auto}
+  header.app-head{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:12px; padding:14px 18px;
+    background:linear-gradient(180deg, rgba(20,26,42,0.85), rgba(20,26,42,0.55));
+    backdrop-filter: blur(14px); border-bottom:1px solid var(--stroke);
+  }
+  header.app-head h1{ margin:0; font-size:18px; letter-spacing:0.3px }
+  .wrap{
+    display:grid; grid-template-columns: 1fr 620px; gap:18px;
+    padding:18px; max-width:1600px; margin:0 auto;
+  }
+  .right{ position:sticky; top:12px; align-self:flex-start; display:flex; gap:12px; align-items:flex-start }
+  .output{
+    flex:1 1 auto;
+    background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+    border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:12px; min-width:420px;
+  }
+  .output header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
+  .output h3{ margin:0; font-size:16px }
+  .timestamp{ color:var(--muted); font-size:12px }
+  .warn-list{ margin:6px 0 0 0; padding:8px; border-radius:10px; border:1px solid var(--warn-bd); background:var(--warn-bg); font-size:12px }
+  .outbox{ margin-top:8px; background:rgba(0,0,0,0.35); border:1px solid var(--stroke); border-radius:12px; padding:10px }
+  textarea.readonly{
+    width:100%; height:720px;
+    border:0; outline:0; background:transparent; color:var(--ink);
+    font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:14.5px; line-height:1.6; letter-spacing:.2px; resize:vertical
+  }
+  .controls{ position:sticky; top:12px; display:flex; flex-direction:column; gap:8px; min-width:170px }
+  .btn{ border:1px solid var(--stroke); background:var(--glass); padding:10px 12px; border-radius:12px; color:var(--ink); font-size:14px; line-height:1; cursor:pointer; box-shadow:var(--shadow) }
+  .btn:hover{ background:var(--glass-2) }
+  .btn.primary{ border-color: rgba(122,162,255,0.6) }
+  .btn.danger{ border-color: rgba(255,107,107,0.6) }
+  .btn.small{ padding:8px 10px; font-size:13px }
+
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); overflow:clip; margin-bottom:16px }
+  .card header{ background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-bottom:1px solid var(--stroke); padding:14px 16px; display:flex; gap:12px; align-items:center }
+  .card h2{ margin:0; font-size:16px; letter-spacing:0.2px; flex:1 }
+  .card p.desc{ margin:0; color:var(--muted); font-size:13px }
+  .card main{ padding:12px 12px 6px 12px }
+  .card footer{ padding:10px 12px; display:flex; gap:8px; border-top:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)) }
+
+  .item{ display:grid; grid-template-columns: 1fr auto; gap:12px; padding:12px; border:1px solid transparent; border-radius:var(--radius-sm) }
+  .item:hover{ background:rgba(255,255,255,0.04); border-color:var(--stroke) }
+  .item.yn-required.warn{ border-color: var(--warn-bd); background: var(--warn-bg) }
+  .item-label{ font-weight:600; font-size:14px; line-height:1.3 }
+  .badge{ display:inline-block; margin-left:8px; font-size:11px; color:#fff; background:var(--danger); padding:2px 6px; border-radius:999px; vertical-align:middle }
+  .inline-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+  .pills{ display:flex; gap:6px; align-items:center; flex-wrap:wrap }
+  .pill{ background:var(--pill); border:1px solid var(--stroke); padding:8px 10px; border-radius:999px; font-size:13px; cursor:pointer; user-select:none }
+  .pill:hover{ background:var(--pill-hover) }
+  .pill.active{ background:var(--pill-active); border-color: rgba(122,162,255,0.7); box-shadow:0 0 0 1px rgba(122,162,255,0.25) inset }
+  .remark-toggle{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; padding:6px 8px; border-radius:8px }
+  .remark-toggle:hover{ color:var(--ink); background:rgba(255,255,255,0.05) }
+
+  .remark{ grid-column:1 / -1; margin-top:8px; display:none }
+  .remark textarea{ width:100%; min-height:84px; resize:vertical; padding:10px 12px; border-radius:12px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:var(--ink); font-family:inherit; font-size:14px }
+  .remark .meta{ display:flex; justify-content:space-between; align-items:center; margin-top:6px; color:var(--muted); font-size:12px }
+
+  /* RO tidy selector */
+  .ro-wrap{ display:flex; flex-direction:column; gap:10px; width:100% }
+  .seg{ display:flex; flex-wrap:wrap; gap:6px }
+  .seg button{
+    appearance:none; border:1px solid var(--stroke); background:var(--glass);
+    color:var(--ink); padding:8px 10px; border-radius:10px; cursor:pointer; font-size:13px
+  }
+  .seg button.active{ background:var(--glass-2); border-color: rgba(122,162,255,.6); box-shadow:0 0 0 1px rgba(122,162,255,.25) inset }
+  .ro-sub{ display:none }
+  .ro-sub.show{ display:flex }
+  .ro-preview{
+    margin-top:4px; padding:10px; border-radius:12px; border:1px dashed var(--stroke);
+    background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    color:var(--muted); font-size:13px; white-space:pre-line
+  }
+
+  /* BAIL: guided mini-form */
+  .bail-form{ grid-column:1 / -1; display:none; gap:8px; padding:10px; border:1px dashed var(--stroke);
+    border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)) }
+  .bail-form.show{ display:grid }
+  .bail-form .row{ display:grid; grid-template-columns: 1fr 1fr; gap:8px }
+  .bail-form label{ font-size:12px; color:var(--muted) }
+  .bail-form input, .bail-form select, .bail-form textarea{
+    width:100%; padding:9px 10px; border-radius:10px; border:1px solid var(--stroke);
+    background:rgba(255,255,255,0.06); color:var(--ink); font-size:14px
+  }
+  .bail-form textarea{ min-height:80px; resize:vertical }
+
+  .sep{ margin:8px 0 0 0; color:var(--muted); font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace }
+
+  @media (max-width:1100px){
+    .wrap{ grid-template-columns:1fr }
+    .right{ position:static; top:auto; flex-direction:column }
+    .controls{
+      position:fixed; left:0; right:0; bottom:0; top:auto;
+      background:linear-gradient(180deg, rgba(20,26,42,0.92), rgba(20,26,42,0.92));
+      border-top:1px solid var(--stroke);
+      padding:10px; flex-direction:row; justify-content:center; gap:10px; z-index:50;
+    }
+    textarea.readonly{ height:340px }
+    body.app-scroll{ padding-bottom:76px }
+    .bail-form .row{ grid-template-columns: 1fr }
+  }
+  @media print{
+    #intro, .grain, .controls, .card footer, .remark-toggle, .btn{ display:none !important }
+    .wrap{ grid-template-columns:1fr }
+    .output{ page-break-before:always }
+    textarea.readonly{ height:auto }
+  }
+</style>
+</head>
+<body class="intro">
+
+<!-- INTRO -->
+<div class="grain" aria-hidden="true"></div>
+<div id="intro" aria-label="Antecedents intro">
+  <div class="stage" id="stage">
+    <div class="clouds" id="clouds" aria-hidden="true"></div>
+    <div class="hero" id="hero"><div class="title">Antecedents</div></div>
+    <div class="loader-wrap">
+      <div class="loader-label" id="loaderLabel" aria-live="polite">Loading<span id="dots">...</span></div>
+      <div class="loader" id="loader" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="bar" id="bar"></div>
+        <div class="shine"></div>
+        <span class="cta" id="cta" aria-hidden="true">Start</span>
+      </div>
+    </div>
+  </div>
+  <button class="skip" id="skip">Skip</button>
+</div>
+
+<!-- APP -->
+<div id="app" aria-hidden="true">
+  <header class="app-head"><h1>Antecedents</h1></header>
+  <div class="wrap">
+    <div id="formRoot" aria-live="polite"></div>
+
+    <div class="right">
+      <aside class="output" aria-label="Antecedents text area">
+        <header>
+          <h3>Antecedents Text</h3>
+          <span class="timestamp" id="timestamp">Last update: —</span>
+        </header>
+        <div id="warnings" class="warn-list" style="display:none"></div>
+        <div class="outbox"><textarea id="outputBox" class="readonly" readonly></textarea></div>
+      </aside>
+
+      <nav class="controls" aria-label="Actions">
+        <button class="btn small" id="markAllUnknownBtn">Mark all Unknown</button>
+        <button class="btn small danger" id="resetBtn">Clear form</button>
+        <button class="btn small primary" id="copyBtn">Copy text</button>
+        <button class="btn small" id="exportBtn">Export .txt</button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+/* INTRO (same as before) */
+(function intro(){
+  const WORDS = [
+    "RO Views on Diversion","Family Circumstances","Mental Health Overview",
+    "Personal Circumstances / Needs","Social Work Involvement","Interpreter Required",
+    "Risk of Reoffending","Means to Pay a Fine","SCRA / EEI Referral",
+    "Previous Convictions","Pending Cases","Driving Licence Number",
+    "Licence Points","On Bail at Time of Offence","Bail Conditions",
+    "Education / Employment / Training","Attitude to Offending",
+    "Alcohol / Drug Issues","Disability","Vulnerabilities",
+    "Children","Impact of Remand on Children","VPD Information","Medical Examinations"
+  ];
+  const intro = document.getElementById('intro');
+  const clouds = document.getElementById('clouds');
+  const loader = document.getElementById('loader');
+  const label  = document.getElementById('loaderLabel');
+  const dots   = document.getElementById('dots');
+  const skip   = document.getElementById('skip');
+  const app = document.getElementById('app');
+  const DURATION = getComputedStyle(document.documentElement).getPropertyValue('--dur').trim();
+  const D_MS = parseInt(DURATION,10) || 5200;
+  const COUNT = 22;
+  let raf;
+  function makeBubble(text, idx){
+    const s = document.createElement('span'); s.className = 'bubble'; s.textContent = text; clouds.appendChild(s);
+    const W = window.innerWidth, H = window.innerHeight;
+    const startX = Math.random()*W, startY = Math.random()*H;
+    const angle = Math.random()*Math.PI*2; const speed = 0.3 + Math.random()*0.5;
+    const vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
+    const driftX = (Math.random()*0.3 - 0.15), driftY = (Math.random()*0.3 - 0.15);
+    s.style.transform = `translate(${startX}px, ${startY}px)`; s.style.animationDelay = (Math.random()*800) + 'ms';
+    s.style.fontSize = (11 + Math.random()*3.5) + 'px'; s.style.filter = `blur(${(Math.random()*1.2 + .2).toFixed(1)}px)`;
+    bubbles[idx] = {el:s, x:startX, y:startY, vx, vy, driftX, driftY};
+  }
+  const bubbles = [];
+  function tick(){
+    const W = window.innerWidth, H = window.innerHeight;
+    for(const b of bubbles){
+      b.vx += b.driftX*0.01; b.vy += b.driftY*0.01;
+      const max = 1.2; const sp = Math.hypot(b.vx,b.vy);
+      if(sp>max){ b.vx = b.vx/sp*max; b.vy = b.vy/sp*max; }
+      b.x += b.vx; b.y += b.vy;
+      const m = 100; if(b.x<-m) b.x=W+m; if(b.x>W+m) b.x=-m; if(b.y<-m) b.y=H+m; if(b.y>H+m) b.y=-m;
+      b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function initBubbles(){ clouds.innerHTML=''; for(let i=0;i<COUNT;i++) makeBubble(WORDS[i%WORDS.length], i); if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }
+  initBubbles(); window.addEventListener('resize', ()=>{ if(raf) cancelAnimationFrame(raf); initBubbles(); });
+
+  let d=0; const dotsTimer = setInterval(()=>{ d=(d+1)%4; dots.textContent='.'.repeat(d); }, 300);
+  let progress = 0; const progTimer = setInterval(()=>{ progress = Math.min(100, progress + 5); loader.setAttribute('aria-valuenow', String(progress)); }, D_MS/20);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const morphAt = reduce ? 400 : D_MS;
+  setTimeout(()=>{ morphToButton(); }, morphAt);
+
+  function morphToButton(){
+    clearInterval(dotsTimer); clearInterval(progTimer);
+    loader.classList.add('toBtn');
+    loader.setAttribute('role','button'); loader.setAttribute('tabindex','0'); loader.setAttribute('aria-label','Start antecedents');
+    const go = ()=>{
+      intro.classList.add('fade-out');
+      setTimeout(()=>{
+        intro.style.display='none';
+        document.body.classList.add('app-scroll');
+        app.setAttribute('aria-hidden','false');
+        app.classList.add('ready');
+      }, 520);
+    };
+    loader.addEventListener('click', go, {once:true});
+    loader.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
+    label.textContent = 'Ready';
+  }
+  skip.addEventListener('click', ()=>{
+    if(raf) cancelAnimationFrame(raf);
+    intro.classList.add('fade-out');
+    setTimeout(()=>{
+      intro.style.display='none';
+      document.body.classList.add('app-scroll');
+      app.setAttribute('aria-hidden','false');
+      app.classList.add('ready');
+    }, 280);
+  });
+})();
+
+/* APP LOGIC */
+const STORAGE_KEY = "antecedents_onefile_v3";
+const REQUIRED_YN = ["prev_conv","pending","dl_held","bail_now"];
+
+/* Sections */
+const SECTIONS = [
+  {
+    id:"ro_views",
+    title:"RO VIEWS ON DIVERSION FROM PROSECUTION",
+    desc:"Select the relevant disposal path below.",
+    items:[
+      { id:"ro_options_ui", type:"ro_ui" },
+      { id:"rw_fpn", label:"Recordable Police Warning or Fixed Penalty Notice considered and ruled out because #insert details#", type:"placeholder" },
+      { id:"ro_alt", label:"Reporting Officers opinion on alternative to prosecution (including Diversion from Prosecution) #insert details#", type:"placeholder" },
+    ],
+    separatorAfter:true
+  },
+  {
+    id:"family",
+    title:"FAMILY CIRCUMSTANCES",
+    desc:"Background and caring responsibilities.",
+    items:[
+      { id:"fam_bg", label:"Family Background:", type:"open" },
+      { id:"has_children", label:"Does the accused have children", type:"yn" },
+      { id:"children_details", label:"Details of children inclusive of age and any known vulnerabilities:", type:"open" },
+      { id:"main_carer", label:"Is the accused the main or sole carer of the children", type:"yn" },
+      { id:"remand_impact", label:"What practical impact the remand of the accused would have on those children (as informed by the accused):", type:"open" },
+    ],
+    separatorAfter:true
+  },
+  {
+    id:"mental",
+    title:"MENTAL HEALTH OVERVIEW: ACCUSED",
+    desc:"Health details, risks and examinations.",
+    items:[
+      { id:"mh_declared", label:"Detail any mental health issues or concerns declared by the accused:", type:"open" },
+      { id:"mh_disorder", label:"Detail any mental disorder, illness or condition known or suspected to be suffered by the accused, including the source of this belief such as a medical examination, police observations, or friends or family:", type:"open" },
+      { id:"mh_risk", label:"Detail any known or suspected risk of suicide, overdose or self-harm:", type:"open" },
+      { id:"mh_vpd", label:"Provide a summary of any relevant information held on VPD regarding accused mental health:", type:"open" },
+      { id:"mh_exam", label:"Detail any relevant medical examinations conducted in respect of accused mental health and/or mental capacity (including fitness to be detained/fitness for court):", type:"open" },
+    ],
+    separatorAfter:true
+  },
+  {
+    id:"personal",
+    title:"PERSONAL CIRCUMSTANCES / NEEDS",
+    desc:"Education, work, attitude and vulnerabilities.",
+    items:[
+      { id:"edu_emp", label:"Education / Employment / Training:", type:"open" },
+      { id:"att_off", label:"Attitude to Offending:", type:"open" },
+      { id:"substance", label:"Alcohol / Drug / Other issues:", type:"open" },
+      { id:"disability", label:"Disability:", type:"open" },
+      { id:"vulnerabilities", label:"Vulnerabilities:", type:"open" },
+    ],
+    separatorAfter:true
+  },
+  {
+    id:"social_interpreter_inline",
+    title:"__INLINE_ONLY__",
+    desc:"",
+    items:[
+      { id:"sw_involve", label:"Social Work Involvement:", type:"open" },
+      { id:"interpreter", label:"Interpreter Required:", type:"open" },
+    ],
+    separatorAfter:true
+  },
+  {
+    id:"cjs",
+    title:"ACCUSED CRIMINAL JUSTICE BACKGROUND",
+    desc:"Risk, means, convictions, bail.",
+    items:[
+      /* Risk choices support: Low/Medium/High/Unknown */
+      { id:"risk_public", label:"Risk of Reoffending / to Public:", type:"open", choices:["Low","Medium","High","Unknown"] },
+      { id:"means_fine", label:"Means to pay a fine:", type:"open" },
+      { id:"ref_scra", label:"Recent referral to SCRA/EEI:", type:"open" },
+      { id:"prev_conv", label:"Any Previous Convictions", type:"yn" },
+      { id:"pending", label:"Any Pending Cases", type:"yn" },
+      { id:"dl_held", label:"Driving licence held", type:"yn" },
+      { id:"dl_number", label:"Driving Licence number:", type:"open" },
+      { id:"dl_points", label:"Current/Live points on accused Driving Licence:", type:"open" },
+      { id:"bail_now", label:"Was accused on Bail at the time of the offence - #Yes/No#", type:"bail_flag" },
+      { id:"bail_para", label:"Accused appeared at #insert court details# on #insert date# where he/she was released on Bail #with/without conditions#.\nThe conditions are #insert bail conditions if relevant#", type:"bail_composite" },
+    ],
+    separatorAfter:false
+  }
+];
+
+/* Default state */
+function defaultState(){
+  const s={};
+  for(const sec of SECTIONS){ for(const it of sec.items){ if(it.type!=="ro_ui"){ s[it.id]={choice:"Unknown", remark:""}; } } }
+  s.__ro = { group:"none", sub:"" };
+  /* BAIL: Guided UI state */
+  s.__bail = { court:"", date:"", pronoun:"he", with:"without", conditions:"" };
+  return s;
+}
+
+/* Load/save */
+let state=(function(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed=JSON.parse(raw);
+    const base=defaultState();
+    for(const k in base){ if(!(k in parsed)) parsed[k]=base[k]; }
+    return parsed;
+  }catch(_){ return defaultState(); }
+})();
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+/* DOM */
+const formRoot=document.getElementById("formRoot");
+const outBox=document.getElementById("outputBox");
+const tsEl=document.getElementById("timestamp");
+const warnBox=document.getElementById("warnings");
+const CHOICES=["Yes","No","Unknown","N/A"];
+
+/* Helpers */
+function toast(msg){
+  const t=document.createElement("div");
+  t.textContent=msg;
+  t.style.position="fixed"; t.style.bottom="16px"; t.style.right="16px";
+  t.style.background="rgba(0,0,0,0.7)"; t.style.color="white";
+  t.style.padding="10px 12px"; t.style.borderRadius="10px"; t.style.fontSize="13px";
+  t.style.zIndex=9999; t.style.border="1px solid rgba(255,255,255,0.15)";
+  document.body.appendChild(t); setTimeout(()=>t.remove(),1700);
+}
+function findItemById(id){
+  for(const s of SECTIONS){ for(const it of s.items){ if(it.id===id) return it; } }
+  return null;
+}
+/* Risk choices support */
+function getChoicesFor(itemId){
+  const def=findItemById(itemId);
+  return (def && def.choices) ? def.choices : CHOICES;
+}
+
+/* UI bits */
+function pill(label, active){
+  const el=document.createElement("button");
+  el.type="button"; el.className="pill"+(active?" active":"");
+  el.textContent=label; el.dataset.choice=label; el.setAttribute("aria-pressed",active?"true":"false");
+  return el;
+}
+
+/* RO tidy options (unchanged behavior) */
+function createROOptionsUI(){
+  const box=document.createElement("div");
+  box.className="item";
+  box.style.border="1px dashed var(--stroke)";
+
+  const label=document.createElement("div");
+  label.className="item-label";
+  label.textContent="Select the relevant outcome below";
+
+  const wrap=document.createElement("div");
+  wrap.className="inline-controls ro-wrap";
+
+  const primary=document.createElement("div"); primary.className="seg";
+  const groups=[
+    {id:"no", name:"No (not appropriate)"},
+    {id:"rpw", name:"RPW"},
+    {id:"fpt", name:"FPT"},
+    {id:"diversion", name:"Diversion considered"},
+    {id:"unknown", name:"All Unknown"},
+  ];
+  const btnsPrimary={};
+  groups.forEach(g=>{
+    const b=document.createElement("button"); b.textContent=g.name; b.dataset.group=g.id;
+    if(state.__ro.group===g.id) b.classList.add("active");
+    b.addEventListener("click", ()=>{
+      state.__ro.group=g.id; state.__ro.sub=""; saveState();
+      Object.values(btnsPrimary).forEach(el=>el.classList.remove("active"));
+      b.classList.add("active");
+      updateROSubVisibility(); applyROSelection();
+    });
+    btnsPrimary[g.id]=b; primary.appendChild(b);
+  });
+
+  const subRPW=document.createElement("div"); subRPW.className="seg ro-sub"; subRPW.style.marginTop="4px";
+  const rpwOpts=[
+    {id:"rpw_considered", name:"Considered (not issued)", lines:[
+      "A Recordable Police Warning was considered; however, the accused did not meet the eligibility criteria due to their previous criminal history and the nature of the current offence.",
+      "A report to the Procurator Fiscal was therefore submitted."
+    ]},
+    {id:"rpw_issued_not_met", name:"Issued (conditions not met)", lines:[
+      "A Recordable Police Warning was issued to the accused at the time of the offence; however, the conditions of the warning were not met, and the matter now requires to be reported to the Procurator Fiscal."
+    ]},
+    {id:"rpw_issued_completed", name:"Issued (completed)", lines:[
+      "A Recordable Police Warning was issued and accepted by the accused. No further action is required in relation to this offence."
+    ]},
+  ];
+  const btnsRPW={};
+  rpwOpts.forEach(o=>{
+    const b=document.createElement("button"); b.textContent=o.name; b.dataset.sub=o.id;
+    if(state.__ro.sub===o.id) b.classList.add("active");
+    b.addEventListener("click", ()=>{
+      state.__ro.sub=o.id; saveState();
+      Object.values(btnsRPW).forEach(el=>el.classList.remove("active"));
+      b.classList.add("active");
+      applyCustomLines(o.lines); roPreview.textContent=o.lines.join("\n");
+    });
+    btnsRPW[o.id]=b; subRPW.appendChild(b);
+  });
+
+  const subFPT=document.createElement("div"); subFPT.className="seg ro-sub"; subFPT.style.marginTop="4px";
+  const fptOpts=[
+    {id:"fpt_considered", name:"Considered (not issued)", lines:[
+      "A Fixed Penalty Ticket was considered but ruled out, as the offence did not meet the relevant criteria for disposal by fixed penalty."
+    ]},
+    {id:"fpt_issued_not_met", name:"Issued (not dealt with)", lines:[
+      "The accused was issued with a Fixed Penalty Ticket at the time of the offence. The reporting officer was later notified that the ticket was not dealt with within the specified time, and the matter now requires to be reported to the Procurator Fiscal."
+    ]},
+    {id:"fpt_issued_settled", name:"Issued (paid/settled)", lines:[
+      "The accused was issued with a Fixed Penalty Ticket at the time of the offence, which has since been settled. No further action is required."
+    ]},
+  ];
+  const btnsFPT={};
+  fptOpts.forEach(o=>{
+    const b=document.createElement("button"); b.textContent=o.name; b.dataset.sub=o.id;
+    if(state.__ro.sub===o.id) b.classList.add("active");
+    b.addEventListener("click", ()=>{
+      state.__ro.sub=o.id; saveState();
+      Object.values(btnsFPT).forEach(el=>el.classList.remove("active"));
+      b.classList.add("active");
+      applyCustomLines(o.lines); roPreview.textContent=o.lines.join("\n");
+    });
+    btnsFPT[o.id]=b; subFPT.appendChild(b);
+  });
+
+  const roPreview=document.createElement("div"); roPreview.className="ro-preview"; roPreview.textContent="";
+
+  function updateROSubVisibility(){
+    subRPW.classList.toggle("show", state.__ro.group==="rpw");
+    subFPT.classList.toggle("show", state.__ro.group==="fpt");
+    if(state.__ro.group!=="rpw" && state.__ro.group!=="fpt"){
+      state.__ro.sub=""; saveState();
+      Object.values(btnsRPW).forEach(el=>el.classList.remove("active"));
+      Object.values(btnsFPT).forEach(el=>el.classList.remove("active"));
+    }
+  }
+  function applyROSelection(){
+    if(state.__ro.group==="no"){
+      applyCustomLines([
+        "A Recordable Police Warning or Fixed Penalty Notice was not considered appropriate due to the nature and circumstances of the offence.",
+        "No alternative to prosecution was identified as suitable."
+      ]);
+      roPreview.textContent="A Recordable Police Warning or Fixed Penalty Notice was not considered appropriate due to the nature and circumstances of the offence.\nNo alternative to prosecution was identified as suitable.";
+      return;
+    }
+    if(state.__ro.group==="diversion"){
+      applyCustomLines([
+        "Diversion from Prosecution was considered but ruled out, as the nature of the offence was not suitable for such a disposal."
+      ]);
+      roPreview.textContent="Diversion from Prosecution was considered but ruled out, as the nature of the offence was not suitable for such a disposal.";
+      return;
+    }
+    if(state.__ro.group==="unknown"){
+      applyCustomLines([
+        "It is not known whether any Recordable Police Warning, Fixed Penalty Notice, or Diversion from Prosecution was considered in this case.",
+        "No information is held regarding the decision-making process."
+      ]);
+      roPreview.textContent="It is not known whether any Recordable Police Warning, Fixed Penalty Notice, or Diversion from Prosecution was considered in this case.\nNo information is held regarding the decision-making process.";
+      return;
+    }
+    roPreview.textContent = (state.__ro.group==="rpw") ? "Choose an RPW option…" : (state.__ro.group==="fpt") ? "Choose an FPT option…" : "";
+  }
+  function applyCustomLines(lines){
+    if(!state.rw_fpn) state.rw_fpn={choice:"Unknown",remark:""};
+    state.rw_fpn.choice="Yes"; state.rw_fpn.remark=lines[0]||"";
+    if(!state.ro_alt) state.ro_alt={choice:"Unknown",remark:""};
+    if(lines[1]){ state.ro_alt.choice="Yes"; state.ro_alt.remark=lines[1]; }
+    else { state.ro_alt.choice="Unknown"; state.ro_alt.remark=""; }
+    saveState(); updateOutput(); toast("Applied to RO views.");
+  }
+  updateROSubVisibility(); applyROSelection();
+  const wrapEl=wrap; wrapEl.append(primary, subRPW, subFPT, roPreview);
+  box.append(label, wrapEl);
+  return box;
+}
+
+/* BAIL: Guided UI */
+function createBailCompositeRow(item){
+  const row=document.createElement("div");
+  row.className="item"; row.dataset.itemId=item.id;
+
+  const label=document.createElement("div");
+  label.className="item-label"; label.textContent=item.label;
+
+  // Standard choice pills for bail_para itself (keep for consistency)
+  const controls=document.createElement("div"); controls.className="inline-controls";
+  const pills=document.createElement("div"); pills.className="pills";
+  const selChoices = getChoicesFor(item.id);
+  (selChoices).forEach(c=>{
+    const p=pill(c, state[item.id]?.choice===c);
+    p.addEventListener("click", ()=>{ setChoice(item.id, c); focusContext.currentItemId=item.id; });
+    pills.appendChild(p);
+  });
+
+  const toggle=document.createElement("button");
+  toggle.type="button"; toggle.className="remark-toggle"; toggle.textContent="Add remark";
+  toggle.addEventListener("click", ()=>{ remarkWrap.style.display = (remarkWrap.style.display==="grid"||remarkWrap.style.display==="block")?"none":"grid"; bailForm.classList.toggle("show", remarkWrap.style.display!=="none"); textarea.focus(); });
+
+  controls.append(pills, toggle);
+
+  const remarkWrap=document.createElement("div"); remarkWrap.className="remark";
+  remarkWrap.style.display = state[item.id]?.remark ? "grid" : "none";
+  const textarea=document.createElement("textarea");
+  textarea.placeholder="(Optional) Free text for bail paragraph…"; textarea.value = state[item.id]?.remark || "";
+  textarea.addEventListener("input", ()=>{ setRemark(item.id, textarea.value); count.textContent=`${textarea.value.length} chars`; });
+  const meta=document.createElement("div"); meta.className="meta";
+  const count=document.createElement("span"); count.textContent = `${textarea.value.length} chars`;
+  const hint=document.createElement("span"); hint.textContent="Tip: The guided fields below will auto-build the sentence.";
+  meta.append(count, hint);
+  remarkWrap.append(textarea, meta);
+
+  // Guided subform (auto shown when bail_now == Yes)
+  const bailForm=document.createElement("div");
+  bailForm.className="bail-form"; // toggled with .show
+  bailForm.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Court details</label>
+        <input id="b_court" type="text" placeholder="e.g., Glasgow Sheriff Court"/>
+      </div>
+      <div>
+        <label>Date</label>
+        <input id="b_date" type="date"/>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Pronoun</label>
+        <select id="b_pronoun">
+          <option value="he">he</option>
+          <option value="she">she</option>
+          <option value="they">they</option>
+        </select>
+      </div>
+      <div>
+        <label>Bail conditions</label>
+        <select id="b_with">
+          <option value="with">with conditions</option>
+          <option value="without">without conditions</option>
+        </select>
+      </div>
+    </div>
+    <div id="b_cond_wrap" style="display:none">
+      <label>Conditions (if applicable)</label>
+      <textarea id="b_conditions" placeholder="Type bail conditions…"></textarea>
+    </div>
+  `;
+  const $ = (sel)=> bailForm.querySelector(sel);
+  $("#b_court").value = state.__bail.court || "";
+  $("#b_date").value  = state.__bail.date  || "";
+  $("#b_pronoun").value = state.__bail.pronoun || "he";
+  $("#b_with").value    = state.__bail.with || "without";
+  $("#b_conditions").value = state.__bail.conditions || "";
+  const condWrap = $("#b_cond_wrap");
+  condWrap.style.display = (state.__bail.with==="with") ? "block" : "none";
+
+  const updateBail=(triggerOutput=true)=>{
+    state.__bail.court = $("#b_court").value.trim();
+    state.__bail.date  = $("#b_date").value;
+    state.__bail.pronoun = $("#b_pronoun").value;
+    state.__bail.with = $("#b_with").value;
+    state.__bail.conditions = $("#b_conditions").value.trim();
+    saveState();
+    if(triggerOutput) updateOutput();
+  };
+  $("#b_court").addEventListener("input", ()=>updateBail());
+  $("#b_date").addEventListener("input", ()=>updateBail());
+  $("#b_pronoun").addEventListener("change", ()=>updateBail());
+  $("#b_with").addEventListener("change", ()=>{
+    condWrap.style.display = ($("#b_with").value==="with") ? "block" : "none";
+    updateBail();
+  });
+  $("#b_conditions").addEventListener("input", ()=>updateBail());
+
+  // Assemble row
+  row.append(label, controls, remarkWrap, bailForm);
+  // Auto-open if bail_now is Yes
+  maybeOpenBailGuidedForm(bailForm, textarea);
+  return row;
+}
+
+/* Build a standard row */
+function createItemRow(item){
+  if(item.type==="ro_ui") return createROOptionsUI();
+  if(item.type==="bail_composite") return createBailCompositeRow(item);
+
+  const row=document.createElement("div");
+  row.className="item"; row.dataset.itemId=item.id;
+
+  const label=document.createElement("div");
+  label.className="item-label"; label.textContent=item.label;
+
+  if(REQUIRED_YN.includes(item.id)){
+    const badge=document.createElement("span"); badge.className="badge"; badge.textContent="Requires Yes/No";
+    label.appendChild(badge);
+    row.classList.add("yn-required");
+  }
+
+  const controls=document.createElement("div"); controls.className="inline-controls";
+  const pills=document.createElement("div"); pills.className="pills";
+  const selChoices = getChoicesFor(item.id);
+  for(const c of selChoices){
+    const p=pill(c, state[item.id]?.choice===c);
+    p.addEventListener("click", ()=>{ setChoice(item.id, c); focusContext.currentItemId=item.id; });
+    pills.appendChild(p);
+  }
+
+  const toggle=document.createElement("button");
+  toggle.type="button"; toggle.className="remark-toggle"; toggle.textContent="Add remark";
+  toggle.addEventListener("click", ()=>{ remarkWrap.style.display = (remarkWrap.style.display==="grid"||remarkWrap.style.display==="block")?"none":"grid"; textarea.focus(); });
+
+  controls.append(pills, toggle);
+
+  const remarkWrap=document.createElement("div"); remarkWrap.className="remark";
+  remarkWrap.style.display = state[item.id]?.remark ? "grid" : "none";
+  const textarea=document.createElement("textarea");
+  textarea.placeholder="Type remark…"; textarea.value = state[item.id]?.remark || "";
+  textarea.addEventListener("input", ()=>{ setRemark(item.id, textarea.value); count.textContent=`${textarea.value.length} chars`; });
+  const meta=document.createElement("div"); meta.className="meta";
+  const count=document.createElement("span"); count.textContent = `${textarea.value.length} chars`;
+  const hint=document.createElement("span"); hint.textContent="Tip: Arrow keys cycle options; ‘r’ focuses remarks.";
+  meta.append(count, hint);
+  remarkWrap.append(textarea, meta);
+
+  row.append(label, controls, remarkWrap);
+  return row;
+}
+
+/* Render form */
+function renderForm(){ formRoot.innerHTML=""; for(const sec of SECTIONS) formRoot.appendChild(createSectionCard(sec)); }
+function createSectionCard(section){
+  const card=document.createElement("section");
+  card.className="card"; card.dataset.sectionId=section.id;
+  const head=document.createElement("header");
+  const h2=document.createElement("h2"); h2.textContent = section.title !== "__INLINE_ONLY__" ? section.title : " ";
+  const d=document.createElement("p"); d.className="desc"; d.textContent = section.desc || "";
+  if(section.title!=="__INLINE_ONLY__") head.append(h2,d);
+  const body=document.createElement("main");
+  for(const item of section.items){ body.appendChild(createItemRow(item)); }
+  const foot=document.createElement("footer");
+  const setUnknown=document.createElement("button");
+  setUnknown.type="button"; setUnknown.className="btn small"; setUnknown.textContent="Set all Unknown";
+  setUnknown.addEventListener("click", ()=>{
+    for(const it of section.items){
+      if(it.type==="ro_ui") continue;
+      setChoice(it.id,"Unknown",{silent:true}); setRemark(it.id,"",{silent:true});
+    }
+    refreshPillsForSection(section.id); updateOutput();
+  });
+  foot.append(setUnknown);
+  card.append(head, body, foot);
+  return card;
+}
+renderForm();
+
+/* State + refresh */
+function setChoice(itemId, choice, opts={}){
+  if(!state[itemId]) state[itemId]={choice:"Unknown",remark:""};
+  state[itemId].choice=choice; saveState(); refreshPills(itemId);
+
+  // If bail flag toggled to Yes -> auto-open guided form
+  if(itemId==="bail_now"){
+    maybeOpenBailGuidedForm();
+  }
+  if(!opts.silent) updateOutput();
+}
+function setRemark(itemId, remark, opts={}){
+  if(!state[itemId]) state[itemId]={choice:"Unknown",remark:""};
+  state[itemId].remark=remark; saveState();
+  if(!opts.silent) updateOutput();
+}
+function refreshPills(itemId){
+  const row=document.querySelector(`.item[data-item-id="${itemId}"]`); if(!row) return;
+  const selChoices = getChoicesFor(itemId);
+  row.querySelectorAll(".pill").forEach(p=>{
+    const c=p.dataset.choice; const on=state[itemId]?.choice===c;
+    p.classList.toggle("active",on); p.setAttribute("aria-pressed",on?"true":"false");
+  });
+  if(REQUIRED_YN.includes(itemId)){
+    const bad = !["Yes","No"].includes(state[itemId]?.choice);
+    row.classList.toggle("warn", bad);
+  }
+}
+function refreshPillsForSection(sectionId){
+  document.querySelectorAll(`section.card[data-section-id="${sectionId}"] .item`).forEach(row=>{
+    const itemId=row.dataset.itemId; if(!itemId) return;
+    refreshPills(itemId);
+    const ta=row.querySelector("textarea"), wrap=row.querySelector(".remark"), count=row.querySelector(".remark .meta span");
+    if(ta){ ta.value=state[itemId]?.remark||""; if(count) count.textContent=`${ta.value.length} chars`; }
+    if(wrap) wrap.style.display = (state[itemId]?.remark) ? "grid" : "none";
+  });
+}
+
+/* Bail guided form opener */
+function maybeOpenBailGuidedForm(bailFormEl=null, textareaEl=null){
+  const bailYes = (state.bail_now && state.bail_now.choice==="Yes");
+  const compositeRow = document.querySelector(`.item[data-item-id="bail_para"]`);
+  if(!compositeRow) return;
+  const guided = compositeRow.querySelector(".bail-form");
+  const remarkWrap = compositeRow.querySelector(".remark");
+  const ta = textareaEl || compositeRow.querySelector(".remark textarea");
+
+  if(bailYes){
+    if(remarkWrap) remarkWrap.style.display="grid";
+    if(guided) guided.classList.add("show");
+    // Focus the first empty required field
+    const court = guided?.querySelector("#b_court");
+    const date  = guided?.querySelector("#b_date");
+    setTimeout(()=>{
+      if(court && !court.value){ court.focus(); return; }
+      if(date && !date.value){ date.focus(); return; }
+      if(ta) ta.focus();
+    }, 10);
+    // Ensure bail_para choice is set to Yes so it participates
+    if(!state.bail_para) state.bail_para={choice:"Yes",remark:state.bail_para?.remark||""};
+    state.bail_para.choice="Yes"; saveState(); refreshPills("bail_para");
+  }else{
+    if(guided) guided.classList.remove("show");
+    // Keep remark optional; output logic will handle No/Unknown
+  }
+}
+
+/* Output builder */
+function buildOutput(){
+  const lines=[];
+  const dash=" — ";
+  const mapChoice=(c)=> c==="N/A"?"Not applicable":(c||"Unknown");
+  const get=(id)=> state[id] || {choice:"Unknown",remark:""};
+
+  const natural={
+    fam_bg:"Limited information is known regarding the accused’s family background.",
+    has_children:"It is not known whether the accused has any children.",
+    children_details:"There are no details available regarding dependents, ages, or potential vulnerabilities.",
+    main_carer:"It is not known whether the accused holds any caring responsibilities.",
+    remand_impact:"The impact of any potential remand on dependents cannot be assessed.",
+    mh_declared:"There are no known or declared mental health issues or concerns relating to the accused.",
+    mh_disorder:"No medical information has been provided or observed that would indicate the presence of a mental disorder, illness, or condition.",
+    mh_risk:"There is no information to suggest any risk of suicide, overdose, or self-harm.",
+    mh_vpd:"No relevant entries are held on police systems in respect of mental health concerns.",
+    mh_exam:"No medical examinations have been conducted or recorded.",
+    edu_emp:"No details are known regarding the accused’s education, employment, or training.",
+    att_off:"The accused’s attitude towards offending is not known.",
+    substance:"There is no information available to indicate alcohol, drug, or substance misuse issues.",
+    disability:"No disabilities are known or recorded.",
+    vulnerabilities:"No specific vulnerabilities are known or recorded.",
+    sw_involve:"No current or previous Social Work involvement is known.",
+    interpreter:"No interpreter requirements are known or have been identified.",
+    risk_public:"Risk of reoffending or risk to the public: Unknown.",
+    means_fine:"Means to pay a fine: Unknown.",
+    ref_scra:"Recent referral to SCRA/EEI: Unknown.",
+    prev_conv:"Previous convictions: Unknown.",
+    pending:"Pending cases: Unknown.",
+    dl_held:"Driving licence held: Unknown.",
+    dl_number:"Driving licence number: Unknown.",
+    dl_points:"Current/live points on driving licence: Unknown.",
+    bail_now:"Was the accused on bail at the time of the offence: Unknown."
+  };
+
+  function writeLine(item, st){
+    const label=item.label.replace(/\s*:\s*$/,"");
+
+    /* Custom per-item choices (e.g., Low/Medium/High/Unknown for risk) */
+    if (item.choices && item.choices.length){
+      if (st.choice === "Unknown"){
+        // allow natural Unknown sentence if defined
+        if(natural[item.id]) return natural[item.id] + (st.remark?`${dash}${st.remark}`:"");
+        return `${label}: Unknown` + (st.remark?`${dash}${st.remark}`:"");
+      } else {
+        let line = `${label}: ${st.choice}`;
+        if(st.remark) line += `${dash}${st.remark}`;
+        return line;
+      }
+    }
+
+    if(item.type==="bail_flag"){
+      let line = `${label.replace(" - #Yes/No#","")}: ${mapChoice(st.choice)}`;
+      if(st.remark) line += `${dash}${st.remark}`;
+      return line;
+    }
+
+    if(item.type==="bail_composite"){
+      const bailFlag=get("bail_now").choice;
+      if(bailFlag==="No") return ""; // omit when not on bail
+      if(bailFlag==="Unknown") return natural.bail_now;
+
+      // Build from guided fields if any available
+      const b = state.__bail || {court:"",date:"",pronoun:"he",with:"without",conditions:""};
+      const hasCore = b.court || b.date; // if neither, fall back to template or remark
+      if(hasCore){
+        const dateStr = b.date ? new Date(b.date).toLocaleDateString() : "#insert date#";
+        const pronoun = (b.pronoun||"he");
+        const withText = b.with==="with" ? "with conditions" : "without conditions";
+        let sent = `Accused appeared at ${b.court||"#insert court details#"} on ${dateStr} where ${pronoun} was released on Bail ${withText}.`;
+        if(b.with==="with"){
+          sent += ` The conditions are ${b.conditions || "#insert bail conditions if relevant#"}.`;
+        }
+        return sent;
+      }
+      // else: preserve template + optional remark
+      return st.remark ? `${item.label}${dash}${st.remark}` : item.label;
+    }
+
+    if(item.type==="placeholder"){
+      if(st.choice==="Yes"){
+        return st.remark ? item.label.replace("#insert details#", st.remark) : item.label;
+      }else{
+        let base = `${label.replace(/\s*#insert details#\s*$/,"")}: ${mapChoice(st.choice)}`;
+        if(st.remark) base += `${dash}${st.remark}`;
+        return base;
+      }
+    }
+
+    // Standard open/yn with natural Unknown lines
+    if(st.choice==="Unknown" && natural[item.id]){
+      return natural[item.id] + (st.remark?`${dash}${st.remark}`:"");
+    }
+    if(st.choice==="Yes"){
+      let line = `${label}: Yes`; if(st.remark) line += `${dash}${st.remark}`; return line;
+    }
+    if(["No","N/A","Unknown"].includes(st.choice)){
+      let line = `${label}: ${mapChoice(st.choice)}`; if(st.remark) line += `${dash}${st.remark}`; return line;
+    }
+    let line = `${label}: Unknown`; if(st.remark) line += `${dash}${st.remark}`; return line;
+  }
+
+  function writeSection(section){
+    if(section.title!=="__INLINE_ONLY__") lines.push(section.title, "");
+    const items=section.items.filter(it=>it.type!=="ro_ui");
+    const allUnknown = items.every(it => ((state[it.id]||{}).choice==="Unknown" && !(state[it.id]||{}).remark));
+
+    if(allUnknown){
+      if(section.id==="ro_views"){
+        lines.push(
+          "A Recordable Police Warning or Fixed Penalty Notice was not considered appropriate due to the nature and circumstances of the offence.",
+          "No alternative to prosecution was identified as suitable.",
+          ""
+        );
+      }else if(section.id==="family"){
+        lines.push(natural.fam_bg, natural.has_children, natural.children_details, natural.main_carer, natural.remand_impact, "");
+      }else if(section.id==="mental"){
+        lines.push(natural.mh_declared, natural.mh_disorder, natural.mh_risk, natural.mh_vpd, natural.mh_exam, "");
+      }else if(section.id==="personal"){
+        lines.push(natural.edu_emp, natural.att_off, natural.substance, natural.disability, natural.vulnerabilities, "");
+      }else if(section.id==="social_interpreter_inline"){
+        lines.push(natural.sw_involve, natural.interpreter, "");
+      }else{
+        for(const it of items){ lines.push(writeLine(it, state[it.id]||{choice:"Unknown",remark:""})); } lines.push("");
+      }
+    }else{
+      for(const it of items){ const line=writeLine(it, state[it.id]||{choice:"Unknown",remark:""}); if(line!=="") lines.push(line); }
+      lines.push("");
+    }
+    if(section.separatorAfter) lines.push("⸻",""); 
+  }
+
+  writeSection(SECTIONS[0]);
+  writeSection(SECTIONS[1]);
+  writeSection(SECTIONS[2]);
+  writeSection(SECTIONS[3]);
+  writeSection(SECTIONS[4]);
+  writeSection(SECTIONS[5]);
+
+  return lines.join("\n");
+}
+
+/* Warnings + output */
+function updateWarnings(){
+  const badIds = REQUIRED_YN.filter(id => !["Yes","No"].includes((state[id]||{}).choice));
+  document.querySelectorAll(".item.yn-required").forEach(row=>{
+    const id=row.dataset.itemId; const bad = badIds.includes(id);
+    row.classList.toggle("warn", bad);
+  });
+  if(badIds.length){
+    warnBox.style.display="block";
+    const labels=badIds.map(id=>{
+      const def=findItemById(id);
+      return (def && def.label ? def.label.replace(/\s*:\s*$/,"") : id);
+    });
+    warnBox.innerHTML = "<strong>Action needed:</strong> set <em>Yes</em> or <em>No</em> for —<br>• " + labels.join("<br>• ");
+  }else{
+    warnBox.style.display="none"; warnBox.innerHTML="";
+  }
+}
+function updateOutput(){
+  outBox.value = buildOutput();
+  tsEl.textContent = "Last update: " + new Date().toLocaleString();
+  updateWarnings();
+}
+updateOutput();
+
+/* Buttons */
+document.getElementById("markAllUnknownBtn").addEventListener("click", ()=>{
+  for(const k in state){ if(k==="__ro" || k==="__bail") continue; state[k].choice="Unknown"; state[k].remark=""; }
+  // Reset guided bail too
+  state.__bail = { court:"", date:"", pronoun:"he", with:"without", conditions:"" };
+  saveState();
+  document.querySelectorAll(".item").forEach(row=>{
+    const id=row.dataset.itemId; if(!id) return;
+    refreshPills(id);
+    const wrap=row.querySelector(".remark"), ta=row.querySelector("textarea"), count=row.querySelector(".remark .meta span");
+    if(ta) ta.value=""; if(wrap) wrap.style.display="none"; if(count) count.textContent="0 chars";
+  });
+  updateOutput();
+});
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Clear the form and remove saved data?")) return;
+  state=defaultState(); saveState(); renderForm(); updateOutput();
+});
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  const txt=outBox.value;
+  try{ await navigator.clipboard.writeText(txt); toast("Text copied to clipboard."); }
+  catch(_){ outBox.select(); document.execCommand("copy"); toast("Text copied (fallback)."); }
+});
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const blob=new Blob([outBox.value],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url; a.download="Antecedents.txt"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+/* Keyboard navigation */
+const focusContext={ currentItemId:null };
+document.addEventListener("click",(e)=>{ const row=e.target.closest(".item"); if(row) focusContext.currentItemId=row.dataset.itemId; });
+document.addEventListener("keydown",(e)=>{
+  const id=focusContext.currentItemId; if(!id) return;
+  if(["ArrowLeft","ArrowRight"].includes(e.key)){
+    e.preventDefault();
+    const opts = getChoicesFor(id);
+    const idx = Math.max(0, opts.indexOf(state[id]?.choice||"Unknown"));
+    const next = e.key==="ArrowRight" ? (idx+1)%opts.length : (idx-1+opts.length)%opts.length;
+    setChoice(id, opts[next]);
+  }else if(e.key.toLowerCase()==="r"){
+    e.preventDefault();
+    const row=document.querySelector(`.item[data-item-id="${id}"]`);
+    if(!row) return;
+    const wrap=row.querySelector(".remark"); if(wrap && wrap.style.display==="none") wrap.style.display="grid";
+    const ta=row.querySelector("textarea"); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+  }
+});
+
+/* Initial focus */
+(function(){ const first=document.querySelector(".item"); if(first) focusContext.currentItemId=first.dataset.itemId; })();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "schema": "base.recovery.v1",
+  "id": "REC-4467-20251031-123500",
+  "datetime": "2025-10-31T12:35:00.000Z",
+  "incidentNumber": "4467",
+  "division": "E",
+  "location": "Great Jnt Street, Edinburgh",
+  "officers": [
+    "PC Smith and Jones"
+  ],
+  "enquiryOfficer": "PC Jones",
+  "type": "Vehicle",
+  "details": {
+    "reason": "Seized Stolen",
+    "colour": "Blue",
+    "make": "Nissan",
+    "model": "Micra",
+    "vrm": "FG44RFT",
+    "estimatedValueGBP": 650
+  },
+  "remarks": "Stolen car recovered",
+  "createdAt": "2025-10-31T12:36:10.358Z",
+  "createdBy": "BASE recoveries.html v1.0"
+}
