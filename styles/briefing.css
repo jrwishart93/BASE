@@ -1,18 +1,19 @@
 /* Intel feed layout */
 #intel-feed {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(14px, 2vw, 20px);
 }
 
 .intel-card {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   border-radius: 16px;
   border: 1px solid #243355;
   background: #111a2e;
-  padding: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: clamp(14px, 2.6vw, 18px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+  min-height: 100%;
 }
 
 .intel-thumb {
@@ -32,12 +33,12 @@
 .intel-title {
   margin: 0;
   font-weight: 700;
-  font-size: 16px;
+  font-size: clamp(1rem, 2.3vw, 1.15rem);
 }
 
 .intel-sub {
   color: #9fb0d0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .intel-chips {
@@ -51,8 +52,8 @@
   background: #1b2a48;
   border: 1px solid #2a3a60;
   border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 12px;
+  padding: 4px 12px;
+  font-size: 13px;
 }
 
 .intel-text {
@@ -62,7 +63,7 @@
 
 .intel-foot {
   margin-top: auto;
-  font-size: 12px;
+  font-size: 13px;
   color: #9fb0d0;
 }
 
@@ -73,7 +74,7 @@
 
 @media (max-width: 640px) {
   #intel-feed {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 14px;
   }
 
@@ -96,7 +97,8 @@
   }
 
   .intel-card {
-    padding: 14px;
-    gap: 10px;
+    padding: 16px;
+    gap: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
   }
 }
