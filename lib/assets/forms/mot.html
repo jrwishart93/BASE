@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
 <title>No MOT – B.A.S.E.</title>
 <link rel="stylesheet" href="../../../styles/base.css">
@@ -35,19 +35,19 @@
       radial-gradient(1000px 600px at 15% -10%, rgba(122,162,255,.22), transparent 60%),
       radial-gradient(900px 500px at 85% 110%, rgba(95,245,248,.18), transparent 60%),
       linear-gradient(180deg, #0B1220 0%, #0F1A32 100%);
-    font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
   }
 
   .wrap{
     display:grid;
-    grid-template-columns: 380px 1fr;
-    gap:24px;
+    grid-template-columns: minmax(0, 1fr);
+    gap:clamp(16px, 3vw, 24px);
     min-height:100dvh;
-    padding:24px;
+    padding:clamp(18px, 4vw, 28px);
   }
 
-  @media (max-width: 1000px){
-    .wrap{grid-template-columns: 1fr; padding:16px}
+  @media (min-width: 1040px){
+    .wrap{ grid-template-columns: minmax(0, 380px) minmax(0, 1fr); }
   }
 
   /* ====== Cards / Glass ====== */
@@ -61,13 +61,13 @@
 
   /* ====== Left: Controls ====== */
   .panel{
-    padding:18px 18px 20px;
+    padding:clamp(18px, 3.6vw, 24px);
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap:clamp(14px, 2.4vw, 20px);
   }
   .title{
-    font-weight:700; font-size:18px; letter-spacing:.3px;
+    font-weight:700; font-size:clamp(1.05rem, 2.4vw, 1.25rem); letter-spacing:.3px;
     display:flex; align-items:center; gap:10px;
   }
   .title .dot{
@@ -76,20 +76,27 @@
     box-shadow:0 0 18px rgba(122,162,255,.8), 0 0 28px rgba(95,245,248,.6);
   }
 
-  .group{padding:12px; border:1px solid var(--stroke); border-radius:16px}
-  .group h3{margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:600; letter-spacing:.2px}
+  .group{padding:clamp(12px, 2.5vw, 18px); border:1px solid var(--stroke); border-radius:16px}
+  .group h3{margin:0 0 10px 0; font-size:clamp(0.9rem, 2vw, 1rem); color:var(--muted); font-weight:600; letter-spacing:.2px}
 
-  .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
-  .row-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
-  .row-1{display:grid; grid-template-columns: 1fr; gap:10px}
+  .row,
+  .row-3,
+  .row-1{
+    display:grid;
+    gap:clamp(10px, 2vw, 16px);
+  }
+  .row{ grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); }
+  .row-3{ grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); }
+  .row-1{ grid-template-columns:1fr; }
 
-  label{font-size:12px; color:var(--muted)}
+  label{font-size:clamp(13px, 1.6vw, 14px); color:var(--muted)}
   input[type="text"], input[type="date"], input[type="time"], select, textarea{
     width:100%; padding:12px 14px; color:var(--ink); background:rgba(255,255,255,.06);
-    border:1px solid var(--stroke); border-radius:999px; outline:none;
+    border:1px solid var(--stroke); border-radius:18px; outline:none;
+    min-height:44px;
   }
-  textarea{border-radius:16px; min-height:88px; resize:vertical; padding:12px 14px}
-  .help{font-size:12px; color:var(--muted); margin-top:6px}
+  textarea{border-radius:16px; min-height:clamp(140px, 28vh, 220px); resize:vertical; padding:12px 14px}
+  .help{font-size:13px; color:var(--muted); margin-top:6px}
 
   /* Pills / toggles */
   .pills{display:flex; flex-wrap:wrap; gap:8px}
@@ -108,34 +115,36 @@
   .pill:active{transform: scale(.98)}
 
   /* Buttons */
-  .actions{display:flex; gap:10px; flex-wrap:wrap}
+  .actions{display:flex; gap:12px; flex-wrap:wrap}
   .btn{
     appearance:none; border:1px solid var(--stroke); border-radius:999px;
     background:linear-gradient(135deg, rgba(122,162,255,.18), rgba(95,245,248,.14));
-    color:var(--ink); padding:10px 14px; font-weight:600; cursor:pointer;
+    color:var(--ink); padding:12px clamp(16px, 4vw, 22px); font-weight:600; cursor:pointer;
+    min-height:44px;
   }
   .btn.secondary{background: rgba(255,255,255,.06)}
   .btn:disabled{opacity:.6; cursor:not-allowed}
 
   /* ====== Right: Output ====== */
   .stage{
-    padding:18px;
-    display:flex; flex-direction:column; gap:12px;
+    padding:clamp(18px, 3.4vw, 24px);
+    display:flex; flex-direction:column; gap:clamp(12px, 2vw, 18px);
   }
   .hdr{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:12px 14px; border:1px solid var(--stroke); border-radius:16px;
+    display:flex; align-items:center; justify-content:space-between; gap:clamp(10px, 2vw, 16px);
+    padding:clamp(12px, 2.5vw, 18px); border:1px solid var(--stroke); border-radius:18px;
+    flex-wrap:wrap;
   }
   .hdr h1{
-    font-size:16px; margin:0; font-weight:700;
+    font-size:clamp(1rem, 2.4vw, 1.2rem); margin:0; font-weight:700;
     background: linear-gradient(135deg, var(--aqua), var(--blue));
     -webkit-background-clip: text; background-clip:text; color:transparent;
-    text-align: center;
+    text-align: left;
     flex-grow: 1;
   }
   .report{
-    padding:16px; border:1px solid var(--stroke); border-radius:16px; background:rgba(255,255,255,.06);
-    white-space:pre-wrap; font-size:15px; line-height:1.6;
+    padding:clamp(16px, 3vw, 22px); border:1px solid var(--stroke); border-radius:18px; background:rgba(255,255,255,.06);
+    white-space:pre-wrap; font-size:16px; line-height:1.65;
   }
   .sep{
     height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
@@ -143,7 +152,7 @@
   }
   .dim{color:var(--muted)}
 
-  .footer-note{font-size:12px; color:var(--muted); text-align:right}
+  .footer-note{font-size:13px; color:var(--muted); text-align:right}
 
   /* ====== Back Button ====== */
   .back-btn, .back-btn-float {
@@ -156,9 +165,10 @@
     border: 1px solid var(--stroke);
     background: var(--glass-1);
     color: var(--muted);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    padding: 6px 12px;
+    padding: 10px 16px;
+    min-height: 44px;
     transition: all .1s ease;
   }
   .back-btn:hover, .back-btn-float:hover {
@@ -172,19 +182,20 @@
 
   .back-btn-float {
     position: fixed;
-    bottom: 16px;
-    left: 16px;
-    width: 44px;
-    height: 44px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: max(16px, env(safe-area-inset-left));
+    width: 52px;
+    height: 52px;
     font-size: 20px;
     display: none; /* Hidden by default */
     z-index: 100;
   }
 
   @media (max-width: 760px) {
-    .back-btn-float {
-      display: flex;
-    }
+    .back-btn-float { display:flex; }
+    .hdr{ flex-direction:column; align-items:flex-start; }
+    .hdr h1{ text-align:left; }
+    .report{ font-size:15.5px; }
   }
 </style>
 <script defer src="../../../scripts/nav.js"></script>

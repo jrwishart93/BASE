@@ -34,6 +34,8 @@ body{
     linear-gradient(180deg,var(--bg0),var(--bg1));
   background-attachment:fixed;
   filter:brightness(1); /* JS will clamp 0.9..1.1 */
+  font-size:16px;
+  line-height:1.6;
 }
 ::selection{background:rgba(122,162,255,.25)}
 a{color:inherit}
@@ -80,6 +82,9 @@ header.app{
   position:sticky; top:0; z-index:5;
   display:flex; gap:12px; align-items:center; justify-content:space-between;
   padding:12px clamp(12px,3vw,24px);
+  padding-top:calc(12px + env(safe-area-inset-top));
+  padding-left:max(clamp(12px,3vw,24px), env(safe-area-inset-left));
+  padding-right:max(clamp(12px,3vw,24px), env(safe-area-inset-right));
   background:linear-gradient(180deg, rgba(20,26,42,.88), rgba(20,26,42,.54));
   border-bottom:1px solid var(--stroke);
   backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
@@ -96,8 +101,9 @@ header.app{
 header.app .sub{ margin:2px 0 0; color:var(--muted); font-size:clamp(14px,2.5vw,16px) }
 
 .wrap{
-  display:grid; gap:14px; padding:14px clamp(12px,3vw,24px) 90px;
-  grid-template-columns: 1fr min(720px, 96vw);
+  display:grid; gap:clamp(16px,2.6vw,24px);
+  padding:14px clamp(12px,3vw,24px) max(96px, env(safe-area-inset-bottom) + 72px);
+  grid-template-columns:1fr min(720px, 96vw);
   align-items:start; max-width:1800px; width:100%; margin:0 auto;
 }
 @media (max-width:1100px){ .wrap{ grid-template-columns:1fr } }
@@ -112,24 +118,24 @@ header.app .sub{ margin:2px 0 0; color:var(--muted); font-size:clamp(14px,2.5vw,
   overflow:clip;
 }
 .card header{ padding:14px 16px; border-bottom:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); display:flex; flex-wrap:wrap; gap:8px; align-items:center }
-.card header h2{ margin:0; font-size:16px; letter-spacing:.2px; flex:1 }
-.card header p{ margin:0; color:var(--muted); font-size:13px }
-.card main{ padding:12px; display:grid; gap:8px }
-.card footer{ padding:10px 12px; border-top:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); display:flex; gap:8px; flex-wrap:wrap }
+.card header h2{ margin:0; font-size:clamp(1rem, 2.2vw, 1.2rem); letter-spacing:.2px; flex:1 }
+.card header p{ margin:0; color:var(--muted); font-size:14px }
+.card main{ padding:16px; display:grid; gap:12px }
+.card footer{ padding:12px 16px; border-top:1px solid var(--stroke); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); display:flex; gap:10px; flex-wrap:wrap }
 
 .output{
   background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
   border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow);
-  padding:12px; position:sticky; top:86px;
+  padding:clamp(14px, 2.6vw, 20px); position:sticky; top:calc(86px + env(safe-area-inset-top));
 }
-.output header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
-.output h3{ margin:0; font-size:16px }
-.timestamp{ color:var(--muted); font-size:12px }
+.output header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:12px; flex-wrap:wrap }
+.output h3{ margin:0; font-size:clamp(1rem, 2.2vw, 1.15rem) }
+.timestamp{ color:var(--muted); font-size:13px }
 .outbox{ margin-top:8px; background:rgba(0,0,0,.35); border:1px solid var(--stroke); border-radius:12px; padding:10px }
 textarea.readonly{
-  width:100%; height:70vh; min-height:360px; resize:vertical;
+  width:100%; min-height:clamp(320px, 60vh, 640px); resize:vertical;
   border:0; outline:0; background:transparent; color:var(--ink);
-  font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:14.5px; line-height:1.6; letter-spacing:.2px;
+  font-family:ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:15px; line-height:1.65; letter-spacing:.18px;
 }
 
 /* ================================
@@ -150,11 +156,11 @@ textarea.readonly{
 .pill:hover{ background:#22335a }
 .pill.active{ background:#29406f; border-color:rgba(122,162,255,.7); box-shadow:0 0 0 1px rgba(122,162,255,.25) inset }
 .glass-input, .glass-select, .glass-area{
-  width:100%; padding:12px 14px; border-radius:999px; border:1px solid var(--stroke);
+  width:100%; padding:12px 14px; border-radius:18px; border:1px solid var(--stroke);
   background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
-  color:var(--ink); box-shadow:var(--shadow); outline:none;
+  color:var(--ink); box-shadow:var(--shadow); outline:none; min-height:44px;
 }
-.glass-area{ border-radius:14px; min-height:84px; resize:vertical; font-family:inherit }
+.glass-area{ border-radius:16px; min-height:clamp(140px, 32vh, 240px); resize:vertical; font-family:inherit }
 .glass-input::placeholder, .glass-area::placeholder{ color:rgba(233,238,251,.6) }
 .glass-select{
   padding-right:42px; appearance:none; position:relative;
@@ -166,7 +172,7 @@ textarea.readonly{
 .remark-toggle{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; padding:6px 8px; border-radius:8px }
 .remark-toggle:hover{ color:var(--ink); background:rgba(255,255,255,.05) }
 .remark{ grid-column:1 / -1; display:none; gap:6px }
-.remark .meta{ display:flex; justify-content:space-between; color:var(--muted); font-size:12px }
+.remark .meta{ display:flex; justify-content:space-between; color:var(--muted); font-size:13px }
 
 /* ================================
    TOP ACTION BUTTONS
@@ -175,18 +181,18 @@ textarea.readonly{
 .btn{
   appearance:none; -webkit-appearance:none;
   border:1px solid var(--stroke); background:var(--glass); color:var(--ink);
-  border-radius:12px; padding:10px 12px; font-size:14px; cursor:pointer; box-shadow:var(--shadow)
+  border-radius:14px; padding:12px 16px; font-size:15px; cursor:pointer; box-shadow:var(--shadow); min-height:44px
 }
 .btn:hover{ filter:brightness(1.06) }
 .btn:active{ transform:translateY(1px) }
 .btn.primary{ border-color:rgba(122,162,255,.6) }
-.btn.small{ padding:8px 10px; font-size:13px }
+.btn.small{ padding:10px 14px; font-size:14px; min-height:44px }
 
 /* ================================
    TOAST
    ================================ */
 .toast{
-  position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(18px);
+  position:fixed; left:50%; bottom:max(24px, env(safe-area-inset-bottom) + 18px); transform:translateX(-50%) translateY(18px);
   padding:10px 14px; border-radius:999px; border:1px solid var(--stroke);
   background:linear-gradient(180deg, rgba(8,13,28,.85), rgba(8,13,28,.75));
   box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);

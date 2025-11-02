@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
 <title>No Insurance – B.A.S.E.</title>
 <link rel="stylesheet" href="../../../styles/base.css">
@@ -27,34 +27,37 @@
       radial-gradient(1000px 600px at 15% -10%, rgba(122,162,255,.22), transparent 60%),
       radial-gradient(900px 500px at 85% 110%, rgba(95,245,248,.18), transparent 60%),
       linear-gradient(180deg, #0B1220 0%, #0F1A32 100%);
-    font: 15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    font: 16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   }
-  .wrap{display:grid; grid-template-columns:380px 1fr; gap:24px; min-height:100dvh; padding:24px}
-  @media (max-width: 1020px){ .wrap{grid-template-columns:1fr; padding:16px} }
+  .wrap{
+    display:grid; grid-template-columns:minmax(0, 1fr); gap:clamp(16px, 2.8vw, 24px);
+    min-height:100dvh; padding:clamp(16px, 3vw, 24px);
+  }
+  @media (min-width:1080px){ .wrap{ grid-template-columns:minmax(0, 360px) minmax(0, 1fr); } }
 
   .card{background:linear-gradient(180deg,var(--glass-1),var(--glass-2)); border:1px solid var(--stroke);
         border-radius:22px; box-shadow:var(--shadow); backdrop-filter: blur(16px) saturate(120%);}
 
-  .panel{padding:18px 18px 20px; display:flex; flex-direction:column; gap:14px}
-  .title{font-weight:700; font-size:18px; letter-spacing:.3px; display:flex; align-items:center; gap:10px}
+  .panel{padding:clamp(18px, 3.6vw, 24px); display:flex; flex-direction:column; gap:clamp(14px, 2.4vw, 20px)}
+  .title{font-weight:700; font-size:clamp(1.05rem, 2.4vw, 1.25rem); letter-spacing:.3px; display:flex; align-items:center; gap:10px}
   .title .dot{width:9px;height:9px;border-radius:999px;
     background:linear-gradient(135deg,var(--aqua),var(--blue));
     box-shadow:0 0 18px rgba(122,162,255,.8), 0 0 28px rgba(95,245,248,.6);
   }
 
-  .group{padding:12px; border:1px solid var(--stroke); border-radius:16px}
-  .group h3{margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:600; letter-spacing:.2px}
-  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
-  .row-1{display:grid; grid-template-columns:1fr; gap:10px}
+  .group{padding:clamp(12px, 2.5vw, 18px); border:1px solid var(--stroke); border-radius:16px}
+  .group h3{margin:0 0 10px 0; font-size:clamp(0.9rem, 2vw, 1rem); color:var(--muted); font-weight:600; letter-spacing:.2px}
+  .row{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:clamp(10px, 2vw, 16px)}
+  .row-3{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:clamp(10px, 2vw, 16px)}
+  .row-1{display:grid; grid-template-columns:1fr; gap:clamp(10px, 2vw, 16px)}
 
-  label{font-size:12px; color:var(--muted)}
+  label{font-size:clamp(13px, 1.6vw, 14px); color:var(--muted)}
   input[type="text"], input[type="date"], input[type="time"], select, textarea{
     width:100%; padding:12px 14px; color:var(--ink); background:rgba(255,255,255,.06);
-    border:1px solid var(--stroke); border-radius:999px; outline:none;
+    border:1px solid var(--stroke); border-radius:18px; outline:none; min-height:44px;
   }
-  textarea{border-radius:16px; min-height:88px; resize:vertical; padding:12px 14px}
-  .help{font-size:12px; color:var(--muted); margin-top:6px}
+  textarea{border-radius:16px; min-height:clamp(140px, 28vh, 220px); resize:vertical; padding:12px 14px}
+  .help{font-size:13px; color:var(--muted); margin-top:6px}
 
   .pills{display:flex; flex-wrap:wrap; gap:8px}
   .pill{
@@ -69,24 +72,24 @@
   }
   .pill:active{transform:scale(.98)}
 
-  .actions{display:flex; gap:10px; flex-wrap:wrap}
-  .btn{appearance:none; border:1px solid var(--stroke); border-radius:999px;
+  .actions{display:flex; gap:12px; flex-wrap:wrap}
+  .btn{appearance:none; border:1px solid var(--stroke); border-radius:14px;
        background:linear-gradient(135deg, rgba(122,162,255,.18), rgba(95,245,248,.14));
-       color:var(--ink); padding:10px 14px; font-weight:600; cursor:pointer}
+       color:var(--ink); padding:12px 16px; font-weight:600; cursor:pointer; min-height:44px}
   .btn.secondary{background:rgba(255,255,255,.06)}
   .btn:disabled{opacity:.6; cursor:not-allowed}
 
-  .stage{padding:18px; display:flex; flex-direction:column; gap:12px}
-  .hdr{display:flex; align-items:center; justify-content:space-between; gap:12px;
-       padding:12px 14px; border:1px solid var(--stroke); border-radius:16px}
-  .hdr h1{font-size:16px; margin:0; font-weight:700;
+  .stage{padding:clamp(18px, 3.4vw, 24px); display:flex; flex-direction:column; gap:clamp(12px, 2vw, 18px)}
+  .hdr{display:flex; align-items:center; justify-content:space-between; gap:clamp(10px, 2vw, 16px);
+       padding:clamp(12px, 2.5vw, 18px); border:1px solid var(--stroke); border-radius:18px; flex-wrap:wrap}
+  .hdr h1{font-size:clamp(1rem, 2.4vw, 1.2rem); margin:0; font-weight:700;
           background:linear-gradient(135deg,var(--aqua),var(--blue));
           -webkit-background-clip:text; background-clip:text; color:transparent}
-  .report{padding:16px; border:1px solid var(--stroke); border-radius:16px; background:rgba(255,255,255,.06);
-          white-space:pre-wrap; font-size:15px; line-height:1.6}
+  .report{padding:clamp(16px, 3vw, 22px); border:1px solid var(--stroke); border-radius:18px; background:rgba(255,255,255,.06);
+          white-space:pre-wrap; font-size:16px; line-height:1.65}
   .sep{height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent); margin:10px 0}
   .dim{color:var(--muted)}
-  .footer-note{font-size:12px; color:var(--muted); text-align:right}
+  .footer-note{font-size:13px; color:var(--muted); text-align:right}
 </style>
 <script defer src="../../../scripts/nav.js"></script>
 </head>
