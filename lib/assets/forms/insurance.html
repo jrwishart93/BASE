@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <meta name="color-scheme" content="dark" />
-<title>SPR — No Insurance — Builder</title>
+<title>No Insurance – B.A.S.E.</title>
+<link rel="stylesheet" href="../../../styles/base.css">
 <style>
   :root{
     --bg0:#0B1220;
@@ -87,8 +88,39 @@
   .dim{color:var(--muted)}
   .footer-note{font-size:12px; color:var(--muted); text-align:right}
 </style>
+<script defer src="../../../scripts/nav.js"></script>
 </head>
 <body>
+
+<!-- Form GlassNav (reuses bundled styles from scripts/nav.js) -->
+<nav class="glassnav" role="navigation" aria-label="Primary">
+  <div class="nav-inner">
+    <a class="nav-logo" href="../../../index.html" aria-label="BASE home">
+      <img src="../images/logos/base-logo.png" alt="BASE" height="44" width="44" loading="lazy">
+    </a>
+
+    <ul class="nav-list">
+      <li>
+        <a class="nav-link" data-page="home" href="../../../index.html">
+          <span class="label">Home</span>
+          <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none"><path d="M6,10 Q60,2 114,10"/></svg>
+        </a>
+      </li>
+      <li>
+        <a class="nav-link" data-page="forms" href="../../../forms.html">
+          <span class="label">Forms</span>
+          <svg class="underline" viewBox="0 0 90 14" preserveAspectRatio="none"><path d="M6,10 Q45,2 84,10"/></svg>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Right-aligned page title (read-only label) -->
+    <div class="nav-page-title" aria-hidden="true" style="margin-left:auto; font-weight:700; letter-spacing:.02em;">
+      <span class="label">No Insurance</span>
+    </div>
+  </div>
+</nav>
+
   <div class="wrap">
     <!-- LEFT: CONTROLS -->
     <aside class="card panel" id="controls">
