@@ -100,11 +100,26 @@
   body.app-scroll{overflow:auto}
   header.app-head{
     position:sticky; top:0; z-index:40;
-    display:flex; align-items:center; gap:12px; padding:14px 18px;
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
+    padding:14px 18px;
     background:linear-gradient(180deg, rgba(20,26,42,0.85), rgba(20,26,42,0.55));
     backdrop-filter: blur(14px); border-bottom:1px solid var(--stroke);
   }
-  header.app-head h1{ margin:0; font-size:18px; letter-spacing:0.3px }
+  header.app-head h1{
+    margin:0; font-size:18px; letter-spacing:0.3px; text-align:center;
+  }
+  .home-link{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 12px; border-radius:10px;
+    color:var(--ink); text-decoration:none; font-weight:600; font-size:14px;
+    background:var(--glass); border:1px solid var(--stroke);
+    box-shadow:var(--shadow);
+    transition:background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .home-link:hover{ background:var(--glass-2); }
+  .home-link:focus-visible{ outline:2px solid var(--cy2); outline-offset:2px; }
+  .home-link-icon{ font-size:16px; line-height:1; }
+  .home-link--ghost{ visibility:hidden; pointer-events:none; }
   .wrap{
     display:grid; grid-template-columns: 1fr 620px; gap:18px;
     padding:18px; max-width:1600px; margin:0 auto;
@@ -194,7 +209,17 @@
 
 <!-- APP -->
 <div id="app" aria-hidden="true">
-  <header class="app-head"><h1>Locus</h1></header>
+  <header class="app-head">
+    <a class="home-link" id="homeLink" aria-label="Back to BASE home" title="Back to BASE home" href="../../../index.html">
+      <span aria-hidden="true" class="home-link-icon">←</span>
+      <span>Home</span>
+    </a>
+    <h1>Locus</h1>
+    <span class="home-link home-link--ghost" aria-hidden="true">
+      <span class="home-link-icon" aria-hidden="true">←</span>
+      <span>Home</span>
+    </span>
+  </header>
 
   <div class="wrap">
     <div id="formRoot" aria-live="polite"></div>
@@ -305,6 +330,23 @@
 const formRoot = document.getElementById('formRoot');
 const outBox = document.getElementById('outputBox');
 const tsEl = document.getElementById('timestamp');
+
+/* HOME NAVIGATION */
+const homeUrl = '../../../index.html';
+const homeLink = document.getElementById('homeLink');
+function goHome(e){
+  if(e){ e.preventDefault(); }
+  if(typeof window.openLocal === 'function'){
+    try{
+      window.openLocal(null, homeUrl);
+      return;
+    }catch(err){
+      console.warn('openLocal failed, falling back to href', err);
+    }
+  }
+  window.location.href = homeUrl;
+}
+if(homeLink){ homeLink.addEventListener('click', goHome); }
 
 /* CHIP LIBS */
 const CHIPS = {
