@@ -501,6 +501,7 @@
             <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-division" id="tab-btn-division">By Division</button>
             <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-type" id="tab-btn-type">By Type</button>
             <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-month" id="tab-btn-month">By Month</button>
+            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-manage" id="tab-btn-manage">Manage</button>
           </nav>
           <section class="tab-panel is-active" id="tab-division" role="tabpanel" aria-labelledby="tab-btn-division">
             <header class="tab-controls">
@@ -615,33 +616,263 @@
               </header>
               <div class="top3-wrapper" id="month-top3"></div>
             </section>
-            <section class="chart-card" aria-label="Seizures captured this month">
-              <header class="chart-card-head">
-                <h3>Seizure log</h3>
-                <p class="fine-print" id="month-table-label">Incident details</p>
-              </header>
-              <div class="table-wrap">
-                <table class="table table-compact" id="month-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Incident</th>
-                      <th scope="col">Type</th>
-                      <th scope="col">Division</th>
-                      <th scope="col">Value (£)</th>
-                      <th scope="col">Location</th>
-                    </tr>
-                  </thead>
-                  <tbody id="month-table-body"></tbody>
-                </table>
-                <p class="fine-print" id="month-table-empty" hidden>No seizures recorded for this period.</p>
-              </div>
-            </section>
+          <section class="chart-card" aria-label="Seizures captured this month">
+            <header class="chart-card-head">
+              <h3>Seizure log</h3>
+              <p class="fine-print" id="month-table-label">Incident details</p>
+            </header>
+            <div class="table-wrap">
+              <table class="table table-compact" id="month-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Incident</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Division</th>
+                    <th scope="col">Value (£)</th>
+                    <th scope="col">Location</th>
+                  </tr>
+                </thead>
+                <tbody id="month-table-body"></tbody>
+              </table>
+              <p class="fine-print" id="month-table-empty" hidden>No seizures recorded for this period.</p>
+            </div>
           </section>
-        </div>
+        </section>
+        <section class="tab-panel" id="tab-manage" role="tabpanel" aria-labelledby="tab-btn-manage" hidden>
+          <div class="manage-toolbar">
+            <button type="button" class="btn-primary" id="btn-add-recovery">Add new recovery</button>
+            <label class="sr-only" for="manage-search">Search</label>
+            <input type="search" id="manage-search" placeholder="Search incident, location, division" aria-label="Search">
+            <label class="sr-only" for="manage-fy">Financial year</label>
+            <select id="manage-fy" aria-label="Financial year"></select>
+          </div>
+          <div class="table-wrap">
+            <table class="manage-table" id="manage-table">
+              <caption class="sr-only">Manage recovery records</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Incident</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Division</th>
+                  <th scope="col">Value (GBP)</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="manage-table-body"></tbody>
+            </table>
+          </div>
+          <p id="manage-empty" class="fine-print" hidden>No recoveries yet. Click Add new recovery to create your first entry.</p>
+        </section>
+      </div>
       </section>
     </div>
   </main>
   <div id="save-toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="manage-modal" class="dialog" role="dialog" aria-modal="true" aria-labelledby="manage-modal-title" hidden>
+    <div class="card">
+      <header class="card-head">
+        <h3 id="manage-modal-title">Add new recovery</h3>
+      </header>
+      <form id="manage-form" class="manage-form" novalidate>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="manage-field-datetime" class="field-label">Date and time</label>
+            <input id="manage-field-datetime" data-field-ref="field-datetime" type="datetime-local" required>
+            <small class="field-error" data-error-for="field-datetime" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-incident" class="field-label">Incident number</label>
+            <input id="manage-field-incident" data-field-ref="field-incident" type="text" required>
+            <small class="field-error" data-error-for="field-incident" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-division" class="field-label">Division</label>
+            <select id="manage-field-division" data-field-ref="field-division" required>
+              <option value="">Select division…</option>
+              <option value="E">E</option>
+              <option value="J">J</option>
+              <option value="C">C</option>
+              <option value="P">P</option>
+              <option value="Other">Other</option>
+            </select>
+            <small class="field-error" data-error-for="field-division" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-type" class="field-label">Type</label>
+            <select id="manage-field-type" data-field-ref="seizure-type" required>
+              <option value="">Select type…</option>
+              <option value="Vehicle">Vehicle</option>
+              <option value="Drug">Drug</option>
+              <option value="Cash">Cash</option>
+              <option value="Counterfeit Goods">Counterfeit Goods</option>
+              <option value="Stolen Property">Stolen Property</option>
+            </select>
+            <small class="field-error" data-error-for="seizure-type" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-location" class="field-label">Location</label>
+            <input id="manage-field-location" data-field-ref="field-location" type="text" required>
+            <small class="field-error" data-error-for="field-location" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-officers" class="field-label">Officers</label>
+            <input id="manage-field-officers" data-field-ref="field-officers" type="text" placeholder="Comma-separated">
+            <small class="field-error" data-error-for="field-officers" hidden></small>
+          </div>
+          <div class="form-field">
+            <label for="manage-field-enquiry" class="field-label">Enquiry officer</label>
+            <input id="manage-field-enquiry" data-field-ref="field-enquiry" type="text">
+            <small class="field-error" data-error-for="field-enquiry" hidden></small>
+          </div>
+          <div class="form-field form-field--full">
+            <label for="manage-field-remarks" class="field-label">Remarks</label>
+            <textarea id="manage-field-remarks" data-field-ref="field-remarks" rows="3"></textarea>
+            <small class="field-error" data-error-for="field-remarks" hidden></small>
+          </div>
+        </div>
+        <div class="manage-type-panels">
+          <section class="manage-type-panel" data-manage-panel="Vehicle" hidden>
+            <h4 class="type-panel-title">Vehicle details</h4>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="manage-field-vehicle-reason" class="field-label">Reason</label>
+                <select id="manage-field-vehicle-reason" data-field-ref="field-vehicle-reason">
+                  <option value="">Select reason…</option>
+                  <option value="Seized Stolen">Seized Stolen</option>
+                  <option value="Seized Document offences">Seized Document offences</option>
+                  <option value="Seized Proceeds of crime">Seized Proceeds of crime</option>
+                  <option value="Seized as production">Seized as production</option>
+                  <option value="Seized (other)">Seized (other)</option>
+                </select>
+                <small class="field-error" data-error-for="field-vehicle-reason" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-vehicle-colour" class="field-label">Colour</label>
+                <input id="manage-field-vehicle-colour" data-field-ref="field-vehicle-colour" type="text">
+                <small class="field-error" data-error-for="field-vehicle-colour" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-vehicle-make" class="field-label">Make</label>
+                <input id="manage-field-vehicle-make" data-field-ref="field-vehicle-make" type="text">
+                <small class="field-error" data-error-for="field-vehicle-make" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-vehicle-model" class="field-label">Model</label>
+                <input id="manage-field-vehicle-model" data-field-ref="field-vehicle-model" type="text">
+                <small class="field-error" data-error-for="field-vehicle-model" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-vehicle-vrm" class="field-label">VRM</label>
+                <input id="manage-field-vehicle-vrm" data-field-ref="field-vehicle-vrm" type="text">
+                <small class="field-error" data-error-for="field-vehicle-vrm" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-vehicle-value" class="field-label">Estimated value (GBP)</label>
+                <input id="manage-field-vehicle-value" data-field-ref="field-vehicle-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                <small class="field-error" data-error-for="field-vehicle-value" hidden></small>
+              </div>
+            </div>
+          </section>
+          <section class="manage-type-panel" data-manage-panel="Drug" hidden>
+            <h4 class="type-panel-title">Drug details</h4>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="manage-field-drug-type" class="field-label">Drug type</label>
+                <select id="manage-field-drug-type" data-field-ref="field-drug-type">
+                  <option value="">Select drug…</option>
+                  <option value="Cannabis">Cannabis</option>
+                  <option value="Cocaine">Cocaine</option>
+                  <option value="Heroin">Heroin</option>
+                  <option value="Ketamine">Ketamine</option>
+                  <option value="MDMA">MDMA</option>
+                  <option value="Amphetamine">Amphetamine</option>
+                  <option value="Tablets">Tablets</option>
+                  <option value="Nitrous Oxide">Nitrous Oxide</option>
+                  <option value="Other">Other</option>
+                </select>
+                <small class="field-error" data-error-for="field-drug-type" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-drug-qty" class="field-label">Quantity/weight</label>
+                <input id="manage-field-drug-qty" data-field-ref="field-drug-qty" type="text" placeholder="e.g. 2kg">
+                <small class="field-error" data-error-for="field-drug-qty" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-drug-value" class="field-label">Estimated value (GBP)</label>
+                <input id="manage-field-drug-value" data-field-ref="field-drug-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                <small class="field-error" data-error-for="field-drug-value" hidden></small>
+              </div>
+            </div>
+          </section>
+          <section class="manage-type-panel" data-manage-panel="Cash" hidden>
+            <h4 class="type-panel-title">Cash details</h4>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="manage-field-cash-amount" class="field-label">Amount (GBP)</label>
+                <input id="manage-field-cash-amount" data-field-ref="field-cash-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                <small class="field-error" data-error-for="field-cash-amount" hidden></small>
+              </div>
+            </div>
+          </section>
+          <section class="manage-type-panel" data-manage-panel="Stolen Property" hidden>
+            <h4 class="type-panel-title">Stolen property details</h4>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="manage-field-stolen-desc" class="field-label">Description</label>
+                <input id="manage-field-stolen-desc" data-field-ref="field-stolen-desc" type="text">
+                <small class="field-error" data-error-for="field-stolen-desc" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-stolen-qty" class="field-label">Quantity</label>
+                <input id="manage-field-stolen-qty" data-field-ref="field-stolen-qty" type="number" min="0" step="1" placeholder="0">
+                <small class="field-error" data-error-for="field-stolen-qty" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-stolen-value" class="field-label">Estimated value (GBP)</label>
+                <input id="manage-field-stolen-value" data-field-ref="field-stolen-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                <small class="field-error" data-error-for="field-stolen-value" hidden></small>
+              </div>
+            </div>
+          </section>
+          <section class="manage-type-panel" data-manage-panel="Counterfeit Goods" hidden>
+            <h4 class="type-panel-title">Counterfeit goods details</h4>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="manage-field-counterfeit-desc" class="field-label">Description</label>
+                <input id="manage-field-counterfeit-desc" data-field-ref="field-counterfeit-desc" type="text">
+                <small class="field-error" data-error-for="field-counterfeit-desc" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-counterfeit-qty" class="field-label">Quantity</label>
+                <input id="manage-field-counterfeit-qty" data-field-ref="field-counterfeit-qty" type="number" min="0" step="1" placeholder="0">
+                <small class="field-error" data-error-for="field-counterfeit-qty" hidden></small>
+              </div>
+              <div class="form-field">
+                <label for="manage-field-counterfeit-value" class="field-label">Estimated value (GBP)</label>
+                <input id="manage-field-counterfeit-value" data-field-ref="field-counterfeit-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                <small class="field-error" data-error-for="field-counterfeit-value" hidden></small>
+              </div>
+            </div>
+          </section>
+        </div>
+      </form>
+      <div class="actions">
+        <button type="button" class="btn-primary" id="manage-modal-save">Save</button>
+        <button type="button" class="btn-ghost" id="manage-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="delete-confirm" class="dialog" role="dialog" aria-modal="true" hidden>
+    <div class="card">
+      <p>Delete this recovery? This can’t be undone.</p>
+      <div class="actions">
+        <button type="button" class="btn-danger" id="delete-confirm-delete">Delete</button>
+        <button type="button" class="btn-ghost" id="delete-confirm-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
   <div id="download-reminder" class="modal-reminder" hidden>
     <div class="modal-reminder__dialog" role="alertdialog" aria-modal="true" aria-labelledby="download-reminder-title" aria-describedby="download-reminder-message" tabindex="-1">
       <h3 id="download-reminder-title">Move the saved file</h3>
@@ -689,6 +920,8 @@
       getStoredHandle,
       idbPutRecord,
       idbGetAllRecords,
+      idbDeleteRecord,
+      removeFromFolder,
       downloadJson
     } from './scripts/recoveries.store.js';
 
@@ -728,6 +961,136 @@
     const typeTiles = Array.from(form.querySelectorAll('[data-type-tile]'));
     const typePanels = Array.from(form.querySelectorAll('.type-panel'));
     const tileGroup = form.querySelector('.seizure-tiles');
+
+    const manageTabButton = document.getElementById('tab-btn-manage');
+    const managePanel = document.getElementById('tab-manage');
+    const manageTableEl = document.getElementById('manage-table');
+    const manageTableBody = document.getElementById('manage-table-body');
+    const manageEmptyEl = document.getElementById('manage-empty');
+    const manageSearchInput = document.getElementById('manage-search');
+    const manageFYSelect = document.getElementById('manage-fy');
+    const addRecoveryButton = document.getElementById('btn-add-recovery');
+    const manageModal = document.getElementById('manage-modal');
+    const manageModalTitle = document.getElementById('manage-modal-title');
+    const manageModalSave = document.getElementById('manage-modal-save');
+    const manageModalCancel = document.getElementById('manage-modal-cancel');
+    const manageForm = document.getElementById('manage-form');
+    const manageTypePanels = Array.from(document.querySelectorAll('.manage-type-panel'));
+    const deleteConfirmModal = document.getElementById('delete-confirm');
+    const deleteConfirmDelete = document.getElementById('delete-confirm-delete');
+    const deleteConfirmCancel = document.getElementById('delete-confirm-cancel');
+
+    const manageInputs = manageForm ? {
+      datetime: document.getElementById('manage-field-datetime'),
+      incident: document.getElementById('manage-field-incident'),
+      division: document.getElementById('manage-field-division'),
+      type: document.getElementById('manage-field-type'),
+      location: document.getElementById('manage-field-location'),
+      officers: document.getElementById('manage-field-officers'),
+      enquiry: document.getElementById('manage-field-enquiry'),
+      remarks: document.getElementById('manage-field-remarks'),
+      vehicleReason: document.getElementById('manage-field-vehicle-reason'),
+      vehicleColour: document.getElementById('manage-field-vehicle-colour'),
+      vehicleMake: document.getElementById('manage-field-vehicle-make'),
+      vehicleModel: document.getElementById('manage-field-vehicle-model'),
+      vehicleVRM: document.getElementById('manage-field-vehicle-vrm'),
+      vehicleValue: document.getElementById('manage-field-vehicle-value'),
+      drugType: document.getElementById('manage-field-drug-type'),
+      drugQty: document.getElementById('manage-field-drug-qty'),
+      drugValue: document.getElementById('manage-field-drug-value'),
+      cashAmount: document.getElementById('manage-field-cash-amount'),
+      stolenDesc: document.getElementById('manage-field-stolen-desc'),
+      stolenQty: document.getElementById('manage-field-stolen-qty'),
+      stolenValue: document.getElementById('manage-field-stolen-value'),
+      counterfeitDesc: document.getElementById('manage-field-counterfeit-desc'),
+      counterfeitQty: document.getElementById('manage-field-counterfeit-qty'),
+      counterfeitValue: document.getElementById('manage-field-counterfeit-value')
+    } : null;
+
+    const MANAGE_FIELD_IDS = manageInputs ? [
+      'field-datetime',
+      'field-incident',
+      'field-division',
+      'seizure-type',
+      'field-location',
+      'field-officers',
+      'field-enquiry',
+      'field-remarks',
+      'field-vehicle-reason',
+      'field-vehicle-colour',
+      'field-vehicle-make',
+      'field-vehicle-model',
+      'field-vehicle-vrm',
+      'field-vehicle-value',
+      'field-drug-type',
+      'field-drug-qty',
+      'field-drug-value',
+      'field-cash-amount',
+      'field-stolen-desc',
+      'field-stolen-qty',
+      'field-stolen-value',
+      'field-counterfeit-desc',
+      'field-counterfeit-qty',
+      'field-counterfeit-value'
+    ] : [];
+
+    if (inputs) {
+      inputs.__refs = {
+        'field-datetime': inputs.datetime,
+        'field-incident': inputs.incident,
+        'field-division': inputs.division,
+        'seizure-type': null,
+        'field-location': inputs.location,
+        'field-officers': inputs.officers,
+        'field-enquiry': inputs.enquiry,
+        'field-remarks': inputs.remarks,
+        'field-vehicle-reason': inputs.vehicleReason,
+        'field-vehicle-colour': inputs.vehicleColour,
+        'field-vehicle-make': inputs.vehicleMake,
+        'field-vehicle-model': inputs.vehicleModel,
+        'field-vehicle-vrm': inputs.vehicleVRM,
+        'field-vehicle-value': inputs.vehicleValue,
+        'field-drug-type': inputs.drugType,
+        'field-drug-qty': inputs.drugQty,
+        'field-drug-value': inputs.drugValue,
+        'field-cash-amount': inputs.cashAmount,
+        'field-stolen-desc': inputs.stolenDesc,
+        'field-stolen-qty': inputs.stolenQty,
+        'field-stolen-value': inputs.stolenValue,
+        'field-counterfeit-desc': inputs.counterfeitDesc,
+        'field-counterfeit-qty': inputs.counterfeitQty,
+        'field-counterfeit-value': inputs.counterfeitValue
+      };
+    }
+
+    if (manageInputs) {
+      manageInputs.__refs = {
+        'field-datetime': manageInputs.datetime,
+        'field-incident': manageInputs.incident,
+        'field-division': manageInputs.division,
+        'seizure-type': manageInputs.type,
+        'field-location': manageInputs.location,
+        'field-officers': manageInputs.officers,
+        'field-enquiry': manageInputs.enquiry,
+        'field-remarks': manageInputs.remarks,
+        'field-vehicle-reason': manageInputs.vehicleReason,
+        'field-vehicle-colour': manageInputs.vehicleColour,
+        'field-vehicle-make': manageInputs.vehicleMake,
+        'field-vehicle-model': manageInputs.vehicleModel,
+        'field-vehicle-vrm': manageInputs.vehicleVRM,
+        'field-vehicle-value': manageInputs.vehicleValue,
+        'field-drug-type': manageInputs.drugType,
+        'field-drug-qty': manageInputs.drugQty,
+        'field-drug-value': manageInputs.drugValue,
+        'field-cash-amount': manageInputs.cashAmount,
+        'field-stolen-desc': manageInputs.stolenDesc,
+        'field-stolen-qty': manageInputs.stolenQty,
+        'field-stolen-value': manageInputs.stolenValue,
+        'field-counterfeit-desc': manageInputs.counterfeitDesc,
+        'field-counterfeit-qty': manageInputs.counterfeitQty,
+        'field-counterfeit-value': manageInputs.counterfeitValue
+      };
+    }
 
     const folderButton = document.getElementById('btn-set-folder');
     const saveButton = document.getElementById('save');
@@ -795,11 +1158,18 @@
     const deltaNoteEl = document.getElementById('analytics-ytd-delta-note');
     const compareEl = document.getElementById('analytics-ytd-compare');
 
-    const errorMap = new Map(Array.from(form.querySelectorAll('[data-error-for]')).map((node) => [node.dataset.errorFor, node]));
+    const errorMap = new Map();
+    document.querySelectorAll('[data-error-for]').forEach((node) => {
+      const key = node.dataset.errorFor;
+      if (!key) return;
+      const list = errorMap.get(key) || [];
+      list.push(node);
+      errorMap.set(key, list);
+    });
 
     const supportsIndexedDB = 'indexedDB' in window;
 
-    const fyControls = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect].filter(Boolean);
+    const fyControls = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect, manageFYSelect].filter(Boolean);
 
     function syncFYControls() {
       fyControls.forEach((select) => {
@@ -810,6 +1180,9 @@
         select.value = state.fy;
         select.setAttribute('title', state.fy);
       });
+      if (manageFYSelect) {
+        manageState.fy = manageFYSelect.value;
+      }
     }
 
     function updateFYSelection(newLabel) {
@@ -820,6 +1193,7 @@
       }
       const resolved = resolveFY(newLabel);
       state.fy = resolved ? resolved.fyLabel : newLabel;
+      manageState.fy = state.fy;
       syncFYControls();
       renderAnalytics();
     }
@@ -870,6 +1244,21 @@
       type: 'All',
       monthIdx: null
     };
+
+    const manageState = {
+      search: '',
+      fy: currentFY.fyLabel,
+      sortKey: 'date',
+      sortDir: 'desc'
+    };
+
+    let manageActiveRecord = null;
+    let manageActiveSource = null;
+    let pendingDeleteRecord = null;
+    let manageDemoRecords = [];
+    let manageDemoSeeded = false;
+    let activeDialog = null;
+    let dialogKeydownAttached = false;
 
     const reduceMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     let reduceMotionEnabled = reduceMotionQuery ? reduceMotionQuery.matches : false;
@@ -1124,6 +1513,65 @@
           reloadDataButton.addEventListener('click', reloadAllData);
         }
 
+        if (manageSearchInput) {
+          manageSearchInput.addEventListener('input', (event) => {
+            manageState.search = event.target.value;
+            renderManageTable();
+          });
+        }
+
+        if (manageFYSelect) {
+          manageFYSelect.addEventListener('change', (event) => {
+            manageState.fy = event.target.value || state.fy;
+            renderManageTable();
+          });
+        }
+
+        if (addRecoveryButton) {
+          addRecoveryButton.addEventListener('click', () => {
+            openManageModal('add');
+          });
+        }
+
+        if (manageInputs?.type) {
+          manageInputs.type.addEventListener('change', () => {
+            updateManageTypePanels(manageInputs.type.value);
+            clearManageTypeErrors();
+          });
+        }
+
+        if (manageModalCancel) {
+          manageModalCancel.addEventListener('click', closeManageModal);
+        }
+
+        if (manageModalSave) {
+          manageModalSave.addEventListener('click', handleManageSave);
+        }
+
+        if (manageModal) {
+          manageModal.addEventListener('mousedown', (event) => {
+            if (event.target === manageModal) closeManageModal();
+          });
+        }
+
+        if (deleteConfirmCancel) {
+          deleteConfirmCancel.addEventListener('click', closeDeleteConfirm);
+        }
+
+        if (deleteConfirmDelete) {
+          deleteConfirmDelete.addEventListener('click', handleDeleteConfirm);
+        }
+
+        if (deleteConfirmModal) {
+          deleteConfirmModal.addEventListener('mousedown', (event) => {
+            if (event.target === deleteConfirmModal) closeDeleteConfirm();
+          });
+        }
+
+        if (manageTableBody) {
+          manageTableBody.addEventListener('click', handleManageTableClick);
+        }
+
         listenersWired = true;
       }
 
@@ -1219,6 +1667,9 @@
 
       window.__REC_DATA = Array.from(map.values());
       window.__REC_INVALID = (fsPrimary.skipped || 0) + (fsLegacy.skipped || 0);
+      if (window.__REC_DATA.length) {
+        manageDemoRecords = [];
+      }
 
       if (typeof populateFYSelects === 'function') {
         populateFYSelects(window.__REC_DATA);
@@ -1252,6 +1703,7 @@
       }
 
       const { payload, filename } = buildPayload(dt);
+      payload.fileName = filename;
       const json = JSON.stringify(payload, null, 2);
 
       if (!saveButton) return;
@@ -1367,20 +1819,44 @@
       errorMap.forEach((_, id) => clearFieldError(id));
     }
 
+    function clearManageErrors() {
+      MANAGE_FIELD_IDS.forEach((id) => clearFieldError(id));
+    }
+
+    function getFieldTargets(id) {
+      const targets = new Set();
+      if (inputs?.__refs && inputs.__refs[id]) targets.add(inputs.__refs[id]);
+      if (manageInputs?.__refs && manageInputs.__refs[id]) targets.add(manageInputs.__refs[id]);
+      const direct = document.getElementById(id);
+      if (direct) targets.add(direct);
+      document.querySelectorAll(`[data-field-ref="${id}"]`).forEach((el) => targets.add(el));
+      return Array.from(targets).filter(Boolean);
+    }
+
+    function getFieldElementForMap(fieldMap, id) {
+      if (fieldMap?.__refs && fieldMap.__refs[id]) return fieldMap.__refs[id];
+      const candidate = fieldMap && fieldMap[id];
+      if (candidate instanceof HTMLElement) return candidate;
+      const direct = document.getElementById(id);
+      if (direct) return direct;
+      return document.querySelector(`[data-field-ref="${id}"]`);
+    }
+
     function clearFieldError(id) {
-      const node = errorMap.get(id);
-      if (node) {
-        node.hidden = true;
-        node.textContent = '';
+      const nodes = errorMap.get(id);
+      if (nodes && Array.isArray(nodes)) {
+        nodes.forEach((node) => {
+          node.hidden = true;
+          node.textContent = '';
+        });
       }
       if (id === 'seizure-type' && tileGroup) {
         tileGroup.classList.remove('has-error');
       }
-      const field = document.getElementById(id);
-      if (field) {
+      getFieldTargets(id).forEach((field) => {
         field.classList.remove('is-invalid');
         field.removeAttribute('aria-invalid');
-      }
+      });
     }
 
     function clearTypeSpecificErrors() {
@@ -1389,19 +1865,20 @@
     }
 
     function setFieldError(id, message) {
-      const node = errorMap.get(id);
-      if (node) {
-        node.hidden = false;
-        node.textContent = message;
+      const nodes = errorMap.get(id);
+      if (nodes && Array.isArray(nodes)) {
+        nodes.forEach((node) => {
+          node.hidden = false;
+          node.textContent = message;
+        });
       }
       if (id === 'seizure-type' && tileGroup) {
         tileGroup.classList.add('has-error');
       }
-      const field = document.getElementById(id);
-      if (field) {
+      getFieldTargets(id).forEach((field) => {
         field.classList.add('is-invalid');
         field.setAttribute('aria-invalid', 'true');
-      }
+      });
     }
 
     function pushError(collection, id, message) {
@@ -1409,61 +1886,76 @@
       collection.push({ id, message });
     }
 
-    function validate() {
+    function validateFieldContext(fieldMap, { type, messageSetter, focusOnError = true } = {}) {
       const issues = [];
-      if (!inputs.datetime.value) pushError(issues, 'field-datetime', 'Enter the date and time.');
-      if (!inputs.incident.value.trim()) pushError(issues, 'field-incident', 'Provide the incident number.');
-      if (!inputs.division.value) pushError(issues, 'field-division', 'Select the division.');
-      if (!inputs.location.value.trim()) pushError(issues, 'field-location', 'Provide the location.');
+      const getValue = (key) => {
+        if (!fieldMap || !fieldMap[key] || typeof fieldMap[key].value !== 'string') return '';
+        return fieldMap[key].value;
+      };
 
-      const type = getSelectedType();
-      if (!type) {
+      if (!getValue('datetime')) pushError(issues, 'field-datetime', 'Enter the date and time.');
+      if (!getValue('incident').trim()) pushError(issues, 'field-incident', 'Provide the incident number.');
+      if (!getValue('division')) pushError(issues, 'field-division', 'Select the division.');
+      if (!getValue('location').trim()) pushError(issues, 'field-location', 'Provide the location.');
+
+      const resolvedType = typeof type === 'string' ? type : getTypeFromFields(fieldMap);
+      if (!resolvedType) {
         pushError(issues, 'seizure-type', 'Choose the type of seizure.');
       } else {
-        if (type === 'Vehicle') {
-          if (!inputs.vehicleReason.value) pushError(issues, 'field-vehicle-reason', 'Select the vehicle seizure reason.');
-          if (!inputs.vehicleVRM.value.trim()) pushError(issues, 'field-vehicle-vrm', 'Vehicle VRM is required.');
-        } else if (type === 'Cash') {
-          const rawAmount = inputs.cashAmount.value.trim();
+        if (resolvedType === 'Vehicle') {
+          if (!getValue('vehicleReason')) pushError(issues, 'field-vehicle-reason', 'Select the vehicle seizure reason.');
+          if (!getValue('vehicleVRM').trim()) pushError(issues, 'field-vehicle-vrm', 'Vehicle VRM is required.');
+        } else if (resolvedType === 'Cash') {
+          const rawAmount = getValue('cashAmount').trim();
           if (!rawAmount) {
             pushError(issues, 'field-cash-amount', 'Enter the amount of cash seized.');
-          } else if (toNumber(inputs.cashAmount) === null) {
+          } else if (toNumber(fieldMap?.cashAmount) === null) {
             pushError(issues, 'field-cash-amount', 'Provide a valid cash amount.');
           }
-        } else if (type === 'Drug') {
-          if (!inputs.drugType.value) {
+        } else if (resolvedType === 'Drug') {
+          if (!getValue('drugType')) {
             pushError(issues, 'field-drug-type', 'Select the drug type.');
           }
-        } else if (type === 'Stolen Property') {
-          if (!inputs.stolenDesc.value.trim()) pushError(issues, 'field-stolen-desc', 'Describe the stolen property.');
+        } else if (resolvedType === 'Stolen Property') {
+          if (!getValue('stolenDesc').trim()) pushError(issues, 'field-stolen-desc', 'Describe the stolen property.');
         }
       }
 
-      ['vehicleValue','drugValue','stolenValue','counterfeitValue'].forEach((key) => {
-        const el = inputs[key];
-        if (el && el.value.trim() !== '') {
-          const n = toNumber(el);
+      ['vehicleValue', 'drugValue', 'stolenValue', 'counterfeitValue'].forEach((key) => {
+        const field = fieldMap ? fieldMap[key] : null;
+        if (field && typeof field.value === 'string' && field.value.trim() !== '') {
+          const n = toNumber(field);
           if (n === null || n < 0) {
-            pushError(issues, el.id, 'Enter a valid, non-negative value.');
+            pushError(issues, field.id || key, 'Enter a valid, non-negative value.');
           }
         }
       });
 
       if (issues.length) {
         const first = issues[0];
-        setValidationMessage(first.message);
-        const target = document.getElementById(first.id);
-        if (target && typeof target.focus === 'function') {
-          target.focus();
-        } else if (first.id === 'seizure-type' && tileGroup) {
-          const activeTile = typeTiles.find((tile) => tile.classList.contains('is-active')) || typeTiles[0];
-          if (activeTile) activeTile.focus();
+        if (typeof messageSetter === 'function') messageSetter(first.message);
+        if (focusOnError) {
+          const target = getFieldElementForMap(fieldMap, first.id) || document.getElementById(first.id);
+          if (target && typeof target.focus === 'function') {
+            target.focus();
+          } else if (first.id === 'seizure-type' && tileGroup) {
+            const activeTile = typeTiles.find((tile) => tile.classList.contains('is-active')) || typeTiles[0];
+            if (activeTile) activeTile.focus();
+          }
         }
         return false;
       }
 
-      setValidationMessage('');
+      if (typeof messageSetter === 'function') messageSetter('');
       return true;
+    }
+
+    function validate() {
+      return validateFieldContext(inputs, {
+        type: getSelectedType(),
+        messageSetter: setValidationMessage,
+        focusOnError: true
+      });
     }
 
     function setFolderStatus(message) {
@@ -1498,65 +1990,110 @@
       }
     }
 
-    function buildPayload(datetime) {
-      const type = getSelectedType();
-      const filename = buildRecoveryFilename(inputs.incident.value, datetime);
-      const fileId = filename.replace(/\.json$/i, '');
+    function getTypeFromFields(fieldMap) {
+      if (!fieldMap) return getSelectedType();
+      if (fieldMap.type && typeof fieldMap.type.value === 'string') return fieldMap.type.value;
+      if (fieldMap.seizureType && typeof fieldMap.seizureType.value === 'string') return fieldMap.seizureType.value;
+      if (fieldMap.typeSelect && typeof fieldMap.typeSelect.value === 'string') return fieldMap.typeSelect.value;
+      return getSelectedType();
+    }
+
+    function splitList(value) {
+      if (value == null) return [];
+      return String(value)
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function buildPayload(datetime, fieldMap = inputs, options = {}) {
+      const source = fieldMap || inputs;
+      const incidentField = source?.incident;
+      const incidentValue = incidentField && typeof incidentField.value === 'string'
+        ? incidentField.value.trim()
+        : '';
+      const typeValue = options.type || getTypeFromFields(source);
+      const nowISO = new Date().toISOString();
+      const baseFilename = options.fileName || buildRecoveryFilename(incidentValue, datetime);
+      const recordId = (options.id || baseFilename.replace(/\.json$/i, '')).trim() || baseFilename.replace(/\.json$/i, '');
+      const divisionValue = source?.division && typeof source.division.value === 'string'
+        ? source.division.value
+        : '';
+      const locationValue = source?.location && typeof source.location.value === 'string'
+        ? source.location.value.trim()
+        : '';
+      const officersValue = source?.officers && typeof source.officers.value === 'string'
+        ? source.officers.value
+        : '';
+      const enquiryValue = source?.enquiry && typeof source.enquiry.value === 'string'
+        ? source.enquiry.value.trim()
+        : '';
+      const remarksValue = source?.remarks && typeof source.remarks.value === 'string'
+        ? source.remarks.value.trim()
+        : '';
+      const createdISO = options.createdAt || nowISO;
+      const updatedISO = options.updatedAt || nowISO;
 
       const payload = {
         schema: 'base.recovery.v1',
-        id: fileId,
+        id: recordId,
         datetime: datetime.toISOString(),
-        incidentNumber: inputs.incident.value.trim(),
-        division: inputs.division.value,
-        location: inputs.location.value.trim(),
-        officers: inputs.officers.value
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-        enquiryOfficer: inputs.enquiry.value.trim(),
-        type,
-        details: buildDetails(type),
-        remarks: inputs.remarks.value.trim(),
-        createdAt: new Date().toISOString(),
-        createdBy: 'BASE recoveries.html v1.0'
+        incidentNumber: incidentValue,
+        division: divisionValue,
+        location: locationValue,
+        officers: splitList(officersValue),
+        enquiryOfficer: enquiryValue,
+        type: typeValue,
+        details: buildDetails(typeValue, source),
+        remarks: remarksValue,
+        createdAt: createdISO,
+        createdBy: options.createdBy || 'BASE recoveries.html v1.0',
+        updatedAt: updatedISO
       };
 
-      return { payload, filename };
+      if (options.updatedBy) {
+        payload.updatedBy = options.updatedBy;
+      }
+      if (options.meta && typeof options.meta === 'object') {
+        Object.assign(payload, options.meta);
+      }
+
+      return { payload, filename: baseFilename };
     }
 
-    function buildDetails(type) {
+    function buildDetails(type, fieldMap = inputs) {
+      const source = fieldMap || inputs;
       switch (type) {
         case 'Vehicle':
           return {
-            reason: inputs.vehicleReason.value,
-            colour: inputs.vehicleColour.value.trim(),
-            make: inputs.vehicleMake.value.trim(),
-            model: inputs.vehicleModel.value.trim(),
-            vrm: inputs.vehicleVRM.value.trim(),
-            estimatedValueGBP: toNumber(inputs.vehicleValue)
+            reason: source?.vehicleReason ? source.vehicleReason.value : '',
+            colour: source?.vehicleColour ? source.vehicleColour.value.trim() : '',
+            make: source?.vehicleMake ? source.vehicleMake.value.trim() : '',
+            model: source?.vehicleModel ? source.vehicleModel.value.trim() : '',
+            vrm: source?.vehicleVRM ? source.vehicleVRM.value.trim() : '',
+            estimatedValueGBP: toNumber(source?.vehicleValue)
           };
         case 'Drug':
           return {
-            drugType: inputs.drugType.value,
-            quantityOrWeight: inputs.drugQty.value.trim(),
-            estimatedValueGBP: toNumber(inputs.drugValue)
+            drugType: source?.drugType ? source.drugType.value : '',
+            quantityOrWeight: source?.drugQty ? source.drugQty.value.trim() : '',
+            estimatedValueGBP: toNumber(source?.drugValue)
           };
         case 'Cash':
           return {
-            amountGBP: toNumber(inputs.cashAmount)
+            amountGBP: toNumber(source?.cashAmount)
           };
         case 'Stolen Property':
           return {
-            description: inputs.stolenDesc.value.trim(),
-            quantity: toNumber(inputs.stolenQty),
-            estimatedValueGBP: toNumber(inputs.stolenValue)
+            description: source?.stolenDesc ? source.stolenDesc.value.trim() : '',
+            quantity: toNumber(source?.stolenQty),
+            estimatedValueGBP: toNumber(source?.stolenValue)
           };
         case 'Counterfeit Goods':
           return {
-            description: inputs.counterfeitDesc.value.trim(),
-            quantity: toNumber(inputs.counterfeitQty),
-            estimatedValueGBP: toNumber(inputs.counterfeitValue)
+            description: source?.counterfeitDesc ? source.counterfeitDesc.value.trim() : '',
+            quantity: toNumber(source?.counterfeitQty),
+            estimatedValueGBP: toNumber(source?.counterfeitValue)
           };
         default:
           return {};
@@ -1690,7 +2227,7 @@
 
     function populateFYSelects(records) {
       const labels = collectFYLabelsFromRecords(records);
-      const selects = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect].filter(Boolean);
+      const selects = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect, manageFYSelect].filter(Boolean);
       selects.forEach((sel) => {
         if (!sel) return;
         const current = sel.value;
@@ -1701,6 +2238,7 @@
         sel.setAttribute('title', preferred);
       });
       if (state) state.fy = fySelect ? fySelect.value : (state.fy || labels[labels.length - 1]);
+      if (manageFYSelect) manageState.fy = manageFYSelect.value || manageState.fy;
       syncFYControls();
     }
 
@@ -1886,10 +2424,516 @@
     }
 
 
+    function getFocusableElements(container) {
+      if (!container) return [];
+      return Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'))
+        .filter((el) => !el.hasAttribute('disabled')
+          && el.getAttribute('aria-hidden') !== 'true'
+          && (el.offsetParent !== null || el.getClientRects().length > 0));
+    }
+
+    function handleDialogKeydown(event) {
+      if (!activeDialog) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (activeDialog.el === manageModal) {
+          closeManageModal();
+        } else if (activeDialog.el === deleteConfirmModal) {
+          closeDeleteConfirm();
+        } else {
+          closeDialog(activeDialog.el);
+        }
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusables = getFocusableElements(activeDialog.el);
+      if (!focusables.length) {
+        event.preventDefault();
+        return;
+      }
+      const currentIndex = focusables.indexOf(document.activeElement);
+      let nextIndex = currentIndex;
+      if (event.shiftKey) {
+        nextIndex = currentIndex <= 0 ? focusables.length - 1 : currentIndex - 1;
+      } else {
+        nextIndex = currentIndex === focusables.length - 1 ? 0 : currentIndex + 1;
+      }
+      event.preventDefault();
+      focusables[nextIndex].focus();
+    }
+
+    function openDialog(dialogEl, { initialFocus } = {}) {
+      if (!dialogEl) return;
+      const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      activeDialog = { el: dialogEl, previous: previousFocus };
+      dialogEl.hidden = false;
+      if (!dialogEl.hasAttribute('tabindex')) {
+        dialogEl.setAttribute('tabindex', '-1');
+      }
+      const focusables = getFocusableElements(dialogEl);
+      const focusTarget = initialFocus && focusables.includes(initialFocus) ? initialFocus : focusables[0];
+      if (focusTarget && typeof focusTarget.focus === 'function') {
+        focusTarget.focus();
+      } else {
+        dialogEl.focus();
+      }
+      if (!dialogKeydownAttached) {
+        document.addEventListener('keydown', handleDialogKeydown);
+        dialogKeydownAttached = true;
+      }
+    }
+
+    function closeDialog(dialogEl, { returnFocus = true } = {}) {
+      if (!dialogEl) return;
+      dialogEl.hidden = true;
+      if (activeDialog && activeDialog.el === dialogEl) {
+        if (dialogKeydownAttached) {
+          document.removeEventListener('keydown', handleDialogKeydown);
+          dialogKeydownAttached = false;
+        }
+        const previous = activeDialog.previous;
+        activeDialog = null;
+        if (returnFocus && previous && typeof previous.focus === 'function') {
+          previous.focus();
+        }
+      }
+    }
+
+    function resetManageForm() {
+      if (!manageForm || !manageInputs) return;
+      manageForm.reset();
+      if (manageInputs.datetime) {
+        manageInputs.datetime.value = formatLocalDateTime(new Date());
+      }
+      if (manageInputs.type) {
+        manageInputs.type.value = '';
+      }
+      updateManageTypePanels('');
+    }
+
+    function updateManageTypePanels(type) {
+      if (!manageTypePanels.length) return;
+      manageTypePanels.forEach((panel) => {
+        const matches = panel.dataset.managePanel === type;
+        panel.hidden = !matches;
+      });
+    }
+
+    function clearManageTypeErrors() {
+      ['field-vehicle-reason', 'field-vehicle-colour', 'field-vehicle-make', 'field-vehicle-model', 'field-vehicle-vrm', 'field-vehicle-value',
+       'field-drug-type', 'field-drug-qty', 'field-drug-value', 'field-cash-amount', 'field-stolen-desc', 'field-stolen-qty', 'field-stolen-value',
+       'field-counterfeit-desc', 'field-counterfeit-qty', 'field-counterfeit-value']
+        .forEach(clearFieldError);
+    }
+
+    function fillManageForm(record) {
+      if (!manageInputs || !record) return;
+      const dtSource = record.datetime || record.updatedAt || record.createdAt;
+      if (manageInputs.datetime) {
+        manageInputs.datetime.value = formatLocalDateTime(dtSource ? new Date(dtSource) : new Date());
+      }
+      if (manageInputs.incident) manageInputs.incident.value = record.incidentNumber || '';
+      if (manageInputs.division) manageInputs.division.value = record.division || '';
+      if (manageInputs.location) manageInputs.location.value = record.location || '';
+      if (manageInputs.officers) {
+        manageInputs.officers.value = Array.isArray(record.officers)
+          ? record.officers.join(', ')
+          : (record.officers || '');
+      }
+      if (manageInputs.enquiry) manageInputs.enquiry.value = record.enquiryOfficer || '';
+      if (manageInputs.remarks) manageInputs.remarks.value = record.remarks || '';
+      if (manageInputs.type) {
+        manageInputs.type.value = record.type || '';
+        updateManageTypePanels(manageInputs.type.value);
+      }
+      const details = record.details || {};
+      if (manageInputs.vehicleReason) manageInputs.vehicleReason.value = details.reason || '';
+      if (manageInputs.vehicleColour) manageInputs.vehicleColour.value = details.colour || '';
+      if (manageInputs.vehicleMake) manageInputs.vehicleMake.value = details.make || '';
+      if (manageInputs.vehicleModel) manageInputs.vehicleModel.value = details.model || '';
+      if (manageInputs.vehicleVRM) manageInputs.vehicleVRM.value = details.vrm || '';
+      if (manageInputs.vehicleValue && details.estimatedValueGBP != null) manageInputs.vehicleValue.value = details.estimatedValueGBP;
+      if (manageInputs.drugType) manageInputs.drugType.value = details.drugType || '';
+      if (manageInputs.drugQty) manageInputs.drugQty.value = details.quantityOrWeight || '';
+      if (manageInputs.drugValue && details.estimatedValueGBP != null) manageInputs.drugValue.value = details.estimatedValueGBP;
+      if (manageInputs.cashAmount && details.amountGBP != null) manageInputs.cashAmount.value = details.amountGBP;
+      if (manageInputs.stolenDesc) manageInputs.stolenDesc.value = details.description || '';
+      if (manageInputs.stolenQty && details.quantity != null) manageInputs.stolenQty.value = details.quantity;
+      if (manageInputs.stolenValue && details.estimatedValueGBP != null) manageInputs.stolenValue.value = details.estimatedValueGBP;
+      if (manageInputs.counterfeitDesc) manageInputs.counterfeitDesc.value = details.description || '';
+      if (manageInputs.counterfeitQty && details.quantity != null) manageInputs.counterfeitQty.value = details.quantity;
+      if (manageInputs.counterfeitValue && details.estimatedValueGBP != null) manageInputs.counterfeitValue.value = details.estimatedValueGBP;
+    }
+
+    function seedDemoDataIfNeeded() {
+      if (!window.__REC_SEE_DEMO) return;
+      if (manageDemoSeeded) return;
+      const existing = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      if (existing.length) return;
+      const now = new Date();
+      manageDemoRecords = [
+        {
+          schema: 'base.recovery.v1',
+          id: 'demo-vehicle',
+          datetime: new Date(now.getTime() - 86400000).toISOString(),
+          incidentNumber: 'DEMO-1001',
+          division: 'E',
+          location: 'Princes Street',
+          officers: ['PC Smith', 'PC Jones'],
+          enquiryOfficer: 'Sgt Demo',
+          type: 'Vehicle',
+          details: {
+            reason: 'Seized Stolen',
+            colour: 'Silver',
+            make: 'Ford',
+            model: 'Focus',
+            vrm: 'AB12 CDE',
+            estimatedValueGBP: 12000
+          },
+          remarks: 'Demo vehicle recovery.',
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          fileName: 'DEMO-vehicle.json'
+        },
+        {
+          schema: 'base.recovery.v1',
+          id: 'demo-cash',
+          datetime: new Date(now.getTime() - 172800000).toISOString(),
+          incidentNumber: 'DEMO-2001',
+          division: 'J',
+          location: 'Leith Walk',
+          officers: ['DC Brown'],
+          enquiryOfficer: 'DI Example',
+          type: 'Cash',
+          details: {
+            amountGBP: 4500
+          },
+          remarks: 'Demo cash seizure.',
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          fileName: 'DEMO-cash.json'
+        }
+      ];
+      manageDemoSeeded = true;
+    }
+
+    function renderManageTable() {
+      if (!manageTableBody) return;
+      seedDemoDataIfNeeded();
+      const realRecords = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const combined = [...realRecords, ...(manageDemoRecords || [])];
+
+      if (manageSearchInput && manageSearchInput.value !== manageState.search) {
+        manageSearchInput.value = manageState.search;
+      }
+
+      if (manageFYSelect) {
+        if (!manageState.fy) manageState.fy = state.fy;
+        const hasOption = Array.from(manageFYSelect.options).some((opt) => opt.value === manageState.fy);
+        if (hasOption) {
+          manageFYSelect.value = manageState.fy;
+        } else if (manageFYSelect.options.length) {
+          manageFYSelect.value = manageFYSelect.options[manageFYSelect.options.length - 1].value;
+          manageState.fy = manageFYSelect.value;
+        }
+        manageFYSelect.setAttribute('title', manageFYSelect.value || '');
+      }
+
+      const fyRange = resolveFY(manageState.fy || state.fy);
+      const filteredByFY = combined.filter((record) => {
+        const dt = new Date(record?.datetime || record?.updatedAt || record?.createdAt || 0);
+        if (Number.isNaN(dt.getTime())) return false;
+        if (!fyRange) return true;
+        return dt >= fyRange.start && dt <= fyRange.end;
+      });
+
+      const term = manageState.search.trim().toLowerCase();
+      const searched = term
+        ? filteredByFY.filter((record) => {
+            const values = [record?.incidentNumber, record?.division, record?.type, record?.location]
+              .map((value) => (value == null ? '' : String(value).toLowerCase()));
+            return values.some((value) => value.includes(term));
+          })
+        : filteredByFY;
+
+      const sorted = searched.slice().sort((a, b) => {
+        const timeA = new Date(a?.datetime || a?.updatedAt || a?.createdAt || 0).getTime();
+        const timeB = new Date(b?.datetime || b?.updatedAt || b?.createdAt || 0).getTime();
+        return manageState.sortDir === 'asc' ? timeA - timeB : timeB - timeA;
+      });
+
+      const rows = sorted.map((record) => {
+        const normalizedType = normalizeType(record?.type) || (record?.type || '');
+        const value = valueOf(record, normalizedType);
+        const dt = new Date(record?.datetime || record?.updatedAt || record?.createdAt || 0);
+        const dateLabel = Number.isNaN(dt.getTime()) ? '—' : formatLocalDateTime(dt).slice(0, 10);
+        const idAttr = record?.id ? escapeHTML(record.id) : '';
+        const incidentLabel = record?.incidentNumber ? escapeHTML(record.incidentNumber) : '—';
+        const typeLabel = normalizedType ? escapeHTML(normalizedType) : '—';
+        const divisionLabel = record?.division ? escapeHTML(record.division) : '—';
+        const locationLabel = record?.location ? escapeHTML(record.location) : '—';
+        const dateCell = dateLabel === '—' ? '—' : escapeHTML(dateLabel);
+        return `<tr data-id="${idAttr}">
+          <td>${incidentLabel}</td>
+          <td>${typeLabel}</td>
+          <td>${divisionLabel}</td>
+          <td>${formatGBP(value)}</td>
+          <td>${dateCell}</td>
+          <td>${locationLabel}</td>
+          <td class="manage-actions">
+            <button type="button" class="btn-ghost" data-action="edit">Edit</button>
+            <button type="button" class="btn-danger" data-action="delete">Delete</button>
+          </td>
+        </tr>`;
+      });
+
+      manageTableBody.innerHTML = rows.join('');
+
+      if (!combined.length) {
+        if (manageEmptyEl) {
+          manageEmptyEl.textContent = 'No recoveries yet. Click Add new recovery to create your first entry.';
+          manageEmptyEl.hidden = false;
+        }
+        return;
+      }
+
+      if (!sorted.length) {
+        if (manageEmptyEl) {
+          manageEmptyEl.textContent = 'Nothing to show yet.';
+          manageEmptyEl.hidden = false;
+        }
+      } else if (manageEmptyEl) {
+        manageEmptyEl.hidden = true;
+      }
+    }
+
+    function findManageRecordById(id) {
+      if (!id) return null;
+      const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const actual = records.find((record) => record.id === id);
+      if (actual) return { record: actual, source: 'data' };
+      const demo = (manageDemoRecords || []).find((record) => record.id === id);
+      if (demo) return { record: demo, source: 'demo' };
+      return null;
+    }
+
+    function openManageModal(mode, record = null, source = 'data') {
+      if (!manageModal) return;
+      clearManageErrors();
+      clearManageTypeErrors();
+      if (mode === 'edit' && record) {
+        manageModalTitle.textContent = 'Edit recovery';
+        if (manageModalSave) manageModalSave.textContent = 'Save changes';
+        resetManageForm();
+        fillManageForm(record);
+        manageActiveRecord = record;
+        manageActiveSource = source;
+      } else {
+        manageModalTitle.textContent = 'Add new recovery';
+        if (manageModalSave) manageModalSave.textContent = 'Save';
+        resetManageForm();
+        manageActiveRecord = null;
+        manageActiveSource = null;
+      }
+      manageModal.dataset.mode = mode;
+      const initialFocus = manageInputs?.incident || manageModalSave;
+      openDialog(manageModal, { initialFocus });
+    }
+
+    function closeManageModal() {
+      if (!manageModal) return;
+      manageModal.dataset.mode = '';
+      manageActiveRecord = null;
+      manageActiveSource = null;
+      if (manageModalSave) manageModalSave.textContent = 'Save';
+      clearManageErrors();
+      clearManageTypeErrors();
+      resetManageForm();
+      closeDialog(manageModal);
+    }
+
+    function handleManageTableClick(event) {
+      const button = event.target instanceof HTMLElement ? event.target.closest('button[data-action]') : null;
+      if (!button) return;
+      const action = button.dataset.action;
+      const row = button.closest('tr');
+      if (!row) return;
+      const id = row.getAttribute('data-id');
+      if (!id) return;
+      const result = findManageRecordById(id);
+      if (!result) return;
+      if (action === 'edit') {
+        openManageModal('edit', result.record, result.source);
+      } else if (action === 'delete') {
+        openDeleteConfirm(result.record, result.source);
+      }
+    }
+
+    async function handleManageSave() {
+      if (!manageInputs || !manageModalSave) return;
+      if (manageModalSave.disabled) return;
+      clearManageErrors();
+      clearManageTypeErrors();
+      const typeValue = manageInputs.type ? manageInputs.type.value : '';
+      const valid = validateFieldContext(manageInputs, { type: typeValue, focusOnError: true });
+      if (!valid) return;
+
+      const dtValue = manageInputs.datetime ? manageInputs.datetime.value : '';
+      if (!dtValue) {
+        setFieldError('field-datetime', 'Enter the date and time.');
+        const target = getFieldElementForMap(manageInputs, 'field-datetime');
+        if (target && typeof target.focus === 'function') target.focus();
+        return;
+      }
+
+      const dt = new Date(dtValue);
+      if (Number.isNaN(dt.getTime())) {
+        setFieldError('field-datetime', 'Provide a valid date and time.');
+        const target = getFieldElementForMap(manageInputs, 'field-datetime');
+        if (target && typeof target.focus === 'function') target.focus();
+        return;
+      }
+
+      const mode = manageModal?.dataset?.mode === 'edit' ? 'edit' : 'add';
+      const isDemo = manageActiveSource === 'demo';
+      const existing = mode === 'edit' && !isDemo ? manageActiveRecord : null;
+      const nowISO = new Date().toISOString();
+      const fileNameHint = existing ? (existing.fileName || `${existing.id}.json`) : undefined;
+
+      const { payload, filename } = buildPayload(dt, manageInputs, {
+        id: existing ? existing.id : undefined,
+        fileName: fileNameHint,
+        createdAt: existing ? existing.createdAt || existing.datetime || nowISO : nowISO,
+        createdBy: existing ? existing.createdBy || 'BASE recoveries.html v1.0' : 'BASE manage UI',
+        updatedAt: nowISO,
+        type: typeValue,
+        updatedBy: 'BASE Manage UI'
+      });
+
+      const fileNameToUse = fileNameHint || filename;
+      payload.fileName = fileNameToUse;
+      if (existing?.createdAt) payload.createdAt = existing.createdAt;
+      if (existing?.createdBy) payload.createdBy = existing.createdBy;
+      payload.updatedAt = nowISO;
+      payload.updatedBy = 'BASE Manage UI';
+
+      const json = JSON.stringify(payload, null, 2);
+      manageModalSave.disabled = true;
+      try {
+        try {
+          await idbPutRecord(payload);
+        } catch (err) {
+          console.warn('IDB cache failed', err);
+        }
+
+        let wroteFS = false;
+        if (primaryDirectoryHandle && supportsFS()) {
+          try {
+            const result = await writeToFolder(primaryDirectoryHandle, fileNameToUse, json);
+            if (result && result.ok) {
+              wroteFS = true;
+              primaryHasReadAccess = true;
+            }
+          } catch (err) {
+            console.error('Manage FS write failed', err);
+          }
+        }
+
+        if (!wroteFS) {
+          downloadJson(fileNameToUse, json);
+          showDownloadReminder(fileNameToUse);
+        }
+
+        if (isDemo && manageActiveRecord) {
+          manageDemoRecords = manageDemoRecords.filter((demo) => demo.id !== manageActiveRecord.id);
+        } else if (!existing && manageDemoRecords.length) {
+          manageDemoRecords = [];
+        }
+
+        const existingList = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+        const byId = new Map(existingList.map((record) => [record.id, record]));
+        byId.set(payload.id, payload);
+        window.__REC_DATA = Array.from(byId.values());
+
+        populateFYSelects(window.__REC_DATA);
+        renderAnalytics();
+        syncFYControls();
+        renderManageTable();
+
+        const message = mode === 'edit' && !isDemo ? 'Updated.' : 'Saved. You can see it in Analytics and Manage.';
+        showToast(message, { includePattern: false });
+        closeManageModal();
+
+        if (primaryDirectoryHandle && supportsFS()) {
+          await reloadAllData();
+        }
+      } catch (err) {
+        console.error('Manage save failed', err);
+        showToast('Save failed. Try again.', { includePattern: false });
+      } finally {
+        manageModalSave.disabled = false;
+      }
+    }
+
+    function openDeleteConfirm(record, source) {
+      if (!deleteConfirmModal || !record) return;
+      pendingDeleteRecord = { record, source };
+      openDialog(deleteConfirmModal, { initialFocus: deleteConfirmDelete });
+    }
+
+    function closeDeleteConfirm() {
+      if (!deleteConfirmModal) return;
+      pendingDeleteRecord = null;
+      closeDialog(deleteConfirmModal);
+    }
+
+    async function handleDeleteConfirm() {
+      if (!pendingDeleteRecord) {
+        closeDeleteConfirm();
+        return;
+      }
+      const { record, source } = pendingDeleteRecord;
+      pendingDeleteRecord = null;
+      closeDeleteConfirm();
+      if (!record) return;
+
+      if (source === 'demo') {
+        manageDemoRecords = manageDemoRecords.filter((demo) => demo.id !== record.id);
+        renderManageTable();
+        showToast('Deleted.', { includePattern: false });
+        return;
+      }
+
+      try {
+        await idbDeleteRecord(record.id);
+      } catch (err) {
+        console.warn('IDB delete failed', err);
+      }
+
+      const fileName = record.fileName || `${record.id}.json`;
+      if (supportsFS()) {
+        if (primaryDirectoryHandle) {
+          try { await removeFromFolder(primaryDirectoryHandle, fileName); } catch (err) { console.warn('Primary delete failed', err); }
+        }
+        if (legacyDirectoryHandle) {
+          try { await removeFromFolder(legacyDirectoryHandle, fileName); } catch (err) { console.warn('Legacy delete failed', err); }
+        }
+      }
+
+      window.__REC_DATA = (Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []).filter((item) => item.id !== record.id);
+      populateFYSelects(window.__REC_DATA);
+      renderAnalytics();
+      syncFYControls();
+      renderManageTable();
+      showToast('Deleted.', { includePattern: false });
+    }
+
+
     function renderAnalytics() {
       if (!overviewSection) return;
       const records = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
       syncFYControls();
+      renderManageTable();
       const fyRange = resolveFY(state.fy);
 
       if (!records.length) {
@@ -2233,6 +3277,9 @@
         renderTypeTab();
       } else if (target === 'tab-month') {
         renderMonthTab();
+      } else if (target === 'tab-manage') {
+        seedDemoDataIfNeeded();
+        renderManageTable();
       }
     }
 
