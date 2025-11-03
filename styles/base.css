@@ -1224,3 +1224,37 @@ html{
 @media (max-width:420px){
   .tab-btn{ padding:10px 14px; }
 }
+.fatal-banner{
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: #8a1111;
+  color: #fff;
+  padding: 10px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+[hidden]{
+  display: none !important;
+}
+
+.modal[hidden]{
+  display: none !important;
+}
+
+.toast:not(.is-visible){
+  pointer-events: none;
+}
+
+.is-hidden{
+  display: none !important;
+}
+
+[aria-hidden="true"]{
+  display: none !important;
+}
+
+.loader-overlay[hidden]{
+  display: none !important;
+}
