@@ -37,6 +37,17 @@ export async function idbGetAllRecords(){
   });
 }
 
+export async function idbDeleteRecord(id){
+  if(!id) return;
+  const db = await openDB();
+  await new Promise((res, rej)=>{
+    const tx = db.transaction(REC_STORE, 'readwrite');
+    tx.objectStore(REC_STORE).delete(id);
+    tx.oncomplete = ()=>{ db.close(); res(); };
+    tx.onerror = ()=>{ const err = tx.error; db.close(); rej(err); };
+  });
+}
+
 export async function storeHandle(key, handle){
   const db = await openDB();
   await new Promise((res, rej)=>{
@@ -90,6 +101,32 @@ export async function writeToFolder(dirHandle, filename, contents){
   await w.write(contents);
   await w.close();
   return { ok:true };
+}
+
+export async function removeFromFolder(dirHandle, filename){
+  if(!dirHandle || !filename) return { ok:false, error:'no-handle' };
+  const can = await ensurePerm(dirHandle, 'readwrite');
+  if(!can) return { ok:false, error:'no-permission' };
+  try{
+    if(typeof dirHandle.removeEntry === 'function'){
+      await dirHandle.removeEntry(filename);
+      return { ok:true, removed:true };
+    }
+  }catch(err){
+    return { ok:false, error: err && err.name ? err.name : 'remove-failed', details: err };
+  }
+  try{
+    const fileHandle = await dirHandle.getFileHandle(filename, { create:false });
+    if(fileHandle && fileHandle.createWritable){
+      const writer = await fileHandle.createWritable();
+      await writer.write(JSON.stringify({ deleted:true, deletedAt: new Date().toISOString() }));
+      await writer.close();
+      return { ok:true, tombstone:true };
+    }
+  }catch(err){
+    return { ok:false, error: err && err.name ? err.name : 'remove-failed', details: err };
+  }
+  return { ok:false, error:'unsupported' };
 }
 
 export async function readRecoveriesFromFolder(dirHandle){

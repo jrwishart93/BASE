@@ -1258,3 +1258,31 @@ html{
 .loader-overlay[hidden]{
   display: none !important;
 }
+
+.manage-toolbar {
+  display: grid; gap: 12px;
+  grid-template-columns: 1fr auto auto;
+  align-items: center; margin: 12px 0 16px;
+}
+.manage-toolbar button { justify-self: start; }
+.manage-toolbar input[type="search"]{
+  padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.15);
+  background: rgba(16,24,44,.6); color: #fff;
+}
+.manage-table { width: 100%; border-collapse: collapse; }
+.manage-table th, .manage-table td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.manage-actions button { margin-right: 8px; }
+.dialog[hidden]{ display:none !important; }
+.dialog {
+  position: fixed; inset: 0; display: grid; place-items: center; z-index: 1000;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(2px);
+}
+.dialog .card {
+  width: min(720px, 92vw);
+  background: rgba(18,24,40,.92); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 16px;
+}
+.dialog .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.btn-primary { background:#2b77ff; color:#fff; border:0; padding:10px 14px; border-radius:8px; }
+.btn-ghost { background: transparent; color:#fff; border:1px solid rgba(255,255,255,.25); padding:10px 14px; border-radius:8px; }
+.btn-danger { background:#a10f2a; color:#fff; border:0; padding:10px 14px; border-radius:8px; }
