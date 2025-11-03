@@ -408,7 +408,6 @@ window.AppsStore = AppsStore;
       const store = window.AppsStore;
       let apps = (store?.getAll && store.getAll()) || [];
       const status = store?.getStatus?.() || {};
-      const meta = store?.getMeta?.() || {};
       const errorBox = document.getElementById('apps-error');
       const errorMsg = document.getElementById('apps-error-message');
 
@@ -421,15 +420,8 @@ window.AppsStore = AppsStore;
         }
       }
 
-      if(typeof window.updateMetaFooter === 'function'){
-        window.updateMetaFooter(meta);
-      }
-
       if(!apps.length) apps = window.Apps || [];
-      const isFull = grid.dataset.full === 'true';
-      const list = isFull ? apps : apps.slice(0, 9);
-
-      state.apps = Array.isArray(list) ? list.slice() : [];
+      state.apps = Array.isArray(apps) ? apps.slice() : [];
       renderTiles();
     };
 
@@ -472,6 +464,8 @@ window.AppsStore = AppsStore;
     el.setAttribute('role', 'gridcell');
     el.setAttribute('aria-label', ariaLabel);
     el.title = title;
+    el.target = '_self';
+    el.rel = 'noopener';
 
     let href = action.url || app.href || '#';
     if(action.type === 'local'){
@@ -551,8 +545,8 @@ window.AppsStore = AppsStore;
     return {
       type,
       url: fallbackUrl,
-      target: app.action?.target || '_blank',
-      rel: app.action?.rel || 'noopener noreferrer',
+      target: app.action?.target || '_self',
+      rel: app.action?.rel || 'noopener',
       ariaLabel: app.action?.ariaLabel || `Open ${label}`,
       title: app.action?.title || label,
       path: app.action?.path || app.href || '',
