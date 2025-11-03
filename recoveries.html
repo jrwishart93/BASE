@@ -96,394 +96,58 @@
     </div>
   </nav>
 
-  <main class="container recoveries-layout">
-    <div class="recoveries-stack">
-      <section class="card instructions-card">
-        <details class="accordion" data-instructions>
-          <summary class="accordion-summary">
-            <span class="summary-icon" aria-hidden="true">
-              <svg class="icon icon--small" viewBox="0 0 24 24">
-                <path d="M12 17v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M12 9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/>
-              </svg>
-            </span>
-            <span>Instructions</span>
-            <span class="summary-caret" aria-hidden="true">›</span>
-          </summary>
-          <div class="accordion-body">
-            <ol class="instruction-list">
-              <li>Complete the core incident details and confirm every required field.</li>
-              <li>Select the seizure type to reveal its additional detail fields.</li>
-              <li>Provide the extra information requested for the chosen seizure type.</li>
-              <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
-              <li>Use <strong>Save seizure (JSON)</strong> to export, or <strong>Reset form</strong> to clear the page.</li>
-            </ol>
-          </div>
-        </details>
-      </section>
-
-      <form id="recovery-form" class="recoveries-form" novalidate>
-        <section class="card recover-card" data-card="incident">
-          <header class="card-head">
-            <h2>Core Incident Details</h2>
-          </header>
-          <div class="form-grid">
-            <div class="form-field">
-              <label for="field-datetime" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    <path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M4 10h16" stroke="currentColor" stroke-width="1.5"/>
-                    <path d="M12 13v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M10 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </span>
-                Date and time
-              </label>
-              <div class="field-control field-control--with-action">
-                <input id="field-datetime" name="datetime" type="datetime-local" required>
-                <button type="button" id="btn-now" class="btn ghost no-caret btn-compact">Set current time</button>
-              </div>
-              <small class="field-error" data-error-for="field-datetime" hidden></small>
-            </div>
-            <div class="form-field">
-              <label for="field-incident" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M4 12h16M4 18h16M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </span>
-                Incident number
-              </label>
-              <input id="field-incident" name="incidentNumber" type="text" required>
-              <small class="field-error" data-error-for="field-incident" hidden></small>
-            </div>
-            <div class="form-field">
-              <label for="field-division" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-                Division
-              </label>
-              <select id="field-division" name="division" required>
-                <option value="">Select division…</option>
-                <option value="E">E</option>
-                <option value="J">J</option>
-                <option value="C">C</option>
-                <option value="P">P</option>
-                <option value="Other">Other</option>
-              </select>
-              <small class="field-error" data-error-for="field-division" hidden></small>
-            </div>
-            <div class="form-field">
-              <label for="field-location" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M12 21s6-5.373 6-11a6 6 0 1 0-12 0c0 5.627 6 11 6 11z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-                  </svg>
-                </span>
-                Location
-              </label>
-              <input id="field-location" name="location" type="text" required>
-              <small class="field-error" data-error-for="field-location" hidden></small>
-            </div>
-            <div class="form-field">
-              <label for="field-officers" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M8 11a4 4 0 1 1 8 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    <path d="M5 19a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                  </svg>
-                </span>
-                Officers involved
-              </label>
-              <textarea id="field-officers" name="officers" rows="2" placeholder="PC Smith, Sgt Jones"></textarea>
-              <small class="field-note">Comma-separated</small>
-              <small class="field-error" data-error-for="field-officers" hidden></small>
-            </div>
-            <div class="form-field">
-              <label for="field-enquiry" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M12 12a4 4 0 1 0-4-4" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    <path d="M6 19a6 6 0 0 1 12 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                  </svg>
-                </span>
-                Enquiry officer
-              </label>
-              <input id="field-enquiry" name="enquiryOfficer" type="text">
-              <small class="field-error" data-error-for="field-enquiry" hidden></small>
-            </div>
-            <div class="form-field form-field--full">
-              <label for="field-remarks" class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </span>
-                Remarks
-              </label>
-              <textarea id="field-remarks" name="remarks" rows="3" placeholder="Additional context, evidence, next steps…"></textarea>
-              <small class="field-error" data-error-for="field-remarks" hidden></small>
-            </div>
-          </div>
-        </section>
-
-        <section class="card recover-card" data-card="type">
-          <header class="card-head">
-            <h2>Type of Seizure</h2>
-          </header>
-          <div class="seizure-tiles" role="radiogroup" aria-label="Type of seizure">
-            <div class="seizure-tile">
-              <input class="visually-hidden" type="radio" id="type-vehicle" name="seizure-type" value="Vehicle" required data-type-radio="Vehicle" aria-label="Vehicle">
-              <button type="button" class="tile" data-type-tile="Vehicle" role="radio" aria-checked="false">
-                <span class="tile-icon" aria-hidden="true">
-                  <img class="neon-icon" src="./lib/assets/images/icons/icon-vehicles.png" width="64" height="64" alt="">
-                </span>
-                <span class="tile-title">Vehicle</span>
-              </button>
-            </div>
-            <div class="seizure-tile">
-              <input class="visually-hidden" type="radio" id="type-drug" name="seizure-type" value="Drug" required data-type-radio="Drug" aria-label="Drug">
-              <button type="button" class="tile" data-type-tile="Drug" role="radio" aria-checked="false">
-                <span class="tile-icon" aria-hidden="true">
-                  <img class="neon-icon" src="./lib/assets/images/icons/icon-drugs.png" width="64" height="64" alt="">
-                </span>
-                <span class="tile-title">Drug</span>
-              </button>
-            </div>
-            <div class="seizure-tile">
-              <input class="visually-hidden" type="radio" id="type-cash" name="seizure-type" value="Cash" required data-type-radio="Cash" aria-label="Cash">
-              <button type="button" class="tile" data-type-tile="Cash" role="radio" aria-checked="false">
-                <span class="tile-icon" aria-hidden="true">
-                  <img class="neon-icon" src="./lib/assets/images/icons/icon-cash.png" width="64" height="64" alt="">
-                </span>
-                <span class="tile-title">Cash</span>
-              </button>
-            </div>
-            <div class="seizure-tile">
-              <input class="visually-hidden" type="radio" id="type-counterfeit" name="seizure-type" value="Counterfeit Goods" required data-type-radio="Counterfeit Goods" aria-label="Counterfeit Goods">
-              <button type="button" class="tile" data-type-tile="Counterfeit Goods" role="radio" aria-checked="false">
-                <span class="tile-icon" aria-hidden="true">
-                  <img class="neon-icon" src="./lib/assets/images/icons/icon-counterfeit.png" width="64" height="64" alt="">
-                </span>
-                <span class="tile-title">Counterfeit Goods</span>
-              </button>
-            </div>
-            <div class="seizure-tile">
-              <input class="visually-hidden" type="radio" id="type-stolen" name="seizure-type" value="Stolen Property" required data-type-radio="Stolen Property" aria-label="Stolen Property">
-              <button type="button" class="tile" data-type-tile="Stolen Property" role="radio" aria-checked="false">
-                <span class="tile-icon" aria-hidden="true">
-                  <img class="neon-icon" src="./lib/assets/images/icons/icon-stolenproperty.png" width="64" height="64" alt="">
-                </span>
-                <span class="tile-title">Stolen Property</span>
-              </button>
-            </div>
-          </div>
-          <small class="field-error" data-error-for="seizure-type" hidden></small>
-        </section>
-
-        <section class="card recover-card" data-card="details">
-          <header class="card-head">
-            <h2>Additional Details</h2>
-          </header>
-          <p class="muted fine-print">Only the fields relevant to the chosen seizure type are shown.</p>
-          <div class="type-panels">
-            <section class="type-panel" data-type-panel="Vehicle" hidden>
-              <h3 class="type-panel-title">Vehicle seizure</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="field-vehicle-reason" class="field-label">Reason</label>
-                  <select id="field-vehicle-reason">
-                    <option value="">Select reason…</option>
-                    <option value="Seized Stolen">Seized Stolen</option>
-                    <option value="Seized Document offences">Seized Document offences</option>
-                    <option value="Seized Proceeds of crime">Seized Proceeds of crime</option>
-                    <option value="Seized as production">Seized as production</option>
-                    <option value="Seized (other)">Seized (other)</option>
-                  </select>
-                  <small class="field-error" data-error-for="field-vehicle-reason" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-vehicle-colour" class="field-label">Colour</label>
-                  <input id="field-vehicle-colour" type="text" placeholder="e.g. Silver">
-                  <small class="field-error" data-error-for="field-vehicle-colour" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-vehicle-make" class="field-label">Make</label>
-                  <input id="field-vehicle-make" type="text" placeholder="e.g. Ford">
-                  <small class="field-error" data-error-for="field-vehicle-make" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-vehicle-model" class="field-label">Model</label>
-                  <input id="field-vehicle-model" type="text" placeholder="e.g. Fiesta">
-                  <small class="field-error" data-error-for="field-vehicle-model" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-vehicle-vrm" class="field-label">VRM</label>
-                  <input id="field-vehicle-vrm" type="text" placeholder="e.g. AB12 CDE">
-                  <small class="field-error" data-error-for="field-vehicle-vrm" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-vehicle-value" class="field-label">Estimated value (GBP)</label>
-                  <input id="field-vehicle-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
-                  <small class="field-error" data-error-for="field-vehicle-value" hidden></small>
-                </div>
-              </div>
-            </section>
-
-            <section class="type-panel" data-type-panel="Drug" hidden>
-              <h3 class="type-panel-title">Drug seizure</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="field-drug-type" class="field-label">Drug type</label>
-                  <select id="field-drug-type">
-                    <option value="">Select drug…</option>
-                    <option value="Cannabis">Cannabis</option>
-                    <option value="Cocaine">Cocaine</option>
-                    <option value="Heroin">Heroin</option>
-                    <option value="Ketamine">Ketamine</option>
-                    <option value="MDMA">MDMA</option>
-                    <option value="Amphetamine">Amphetamine</option>
-                    <option value="Tablets">Tablets</option>
-                    <option value="Nitrous Oxide">Nitrous Oxide</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  <small class="field-error" data-error-for="field-drug-type" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-drug-qty" class="field-label">Quantity / weight</label>
-                  <input id="field-drug-qty" type="text" placeholder="e.g. 250 g, 30 wraps">
-                  <small class="field-error" data-error-for="field-drug-qty" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-drug-value" class="field-label">Estimated value (GBP)</label>
-                  <input id="field-drug-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
-                  <small class="field-error" data-error-for="field-drug-value" hidden></small>
-                </div>
-              </div>
-            </section>
-
-            <section class="type-panel" data-type-panel="Cash" hidden>
-              <h3 class="type-panel-title">Cash seizure</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="field-cash-amount" class="field-label">Amount (GBP)</label>
-                  <input id="field-cash-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
-                  <small class="field-error" data-error-for="field-cash-amount" hidden></small>
-                </div>
-              </div>
-            </section>
-
-            <section class="type-panel" data-type-panel="Counterfeit Goods" hidden>
-              <h3 class="type-panel-title">Counterfeit goods</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="field-counterfeit-desc" class="field-label">Description</label>
-                  <textarea id="field-counterfeit-desc" rows="2" placeholder="e.g. 40 counterfeit designer handbags"></textarea>
-                  <small class="field-error" data-error-for="field-counterfeit-desc" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-counterfeit-qty" class="field-label">Quantity</label>
-                  <input id="field-counterfeit-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
-                  <small class="field-error" data-error-for="field-counterfeit-qty" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-counterfeit-value" class="field-label">Estimated value (GBP)</label>
-                  <input id="field-counterfeit-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
-                  <small class="field-error" data-error-for="field-counterfeit-value" hidden></small>
-                </div>
-              </div>
-            </section>
-
-            <section class="type-panel" data-type-panel="Stolen Property" hidden>
-              <h3 class="type-panel-title">Stolen property</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="field-stolen-desc" class="field-label">Description</label>
-                  <input id="field-stolen-desc" type="text" placeholder="e.g. Power tools with serial numbers">
-                  <small class="field-error" data-error-for="field-stolen-desc" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-stolen-qty" class="field-label">Quantity</label>
-                  <input id="field-stolen-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
-                  <small class="field-error" data-error-for="field-stolen-qty" hidden></small>
-                </div>
-                <div class="form-field">
-                  <label for="field-stolen-value" class="field-label">Estimated value (GBP)</label>
-                  <input id="field-stolen-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
-                  <small class="field-error" data-error-for="field-stolen-value" hidden></small>
-                </div>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <section class="card recover-card" data-card="actions">
-          <header class="card-head">
-            <h2>Save &amp; Export</h2>
-          </header>
-          <p id="fs-support-note" class="muted fine-print" hidden>Folder saving is not available in this browser. The JSON will download instead.</p>
-          <div class="action-bar">
-            <button type="button" id="btn-set-folder" class="btn ghost no-caret">Set Save Folder</button>
-            <button type="button" id="save" class="btn primary">Save seizure (JSON)</button>
-            <button type="reset" class="btn">Reset form</button>
-          </div>
-          <div class="action-messages">
-            <span id="folder-status" class="muted" aria-live="polite">No folder permission. Use 'Grant access to Recovery Folder' to enable direct saving; downloads will be used.</span>
-            <span id="save-status" class="muted" aria-live="polite"></span>
-          </div>
-          <span id="validation-status" class="sr-only" role="status" aria-live="polite"></span>
-        </section>
-      </form>
-
-      <section class="card recover-card" data-card="analytics">
-        <header class="card-head">
-          <div>
-            <h2>Analytics</h2>
-            <p class="fine-print">Data loads automatically from the Recovery Folder.</p>
-          </div>
-          <div class="analytics-controls">
-            <button type="button" class="btn ghost no-caret" id="grant-access">Grant access to Recovery Folder</button>
-            <button type="button" class="btn ghost no-caret" id="grant-legacy">Add legacy folder</button>
-            <button type="button" class="btn ghost no-caret" id="reload-data">Reload</button>
-            <button type="button" class="btn ghost no-caret" id="export-png">Save dashboard as PNG</button>
-            <label class="analytics-fy">
-              <span class="sr-only">Financial year</span>
-              <select id="analytics-fy" disabled></select>
-            </label>
-            <span id="legacy-status-chip" class="chip muted" hidden>Legacy folder connected</span>
+  <main id="recovery-page" class="container recovery-page recoveries-layout">
+      <section id="graphs-section" class="card graphs-section" aria-labelledby="graphs-title" data-collapsible>
+        <header class="section-header">
+          <h2 id="graphs-title">Data Graphs</h2>
+          <div class="section-actions">
+            <button type="button" id="graphs-minimise" class="btn-ghost" aria-expanded="true" aria-controls="graphs-body">Minimise</button>
+            <button type="button" id="graphs-toggle" class="btn-ghost" aria-expanded="true" aria-controls="graphs-body">Hide</button>
           </div>
         </header>
-        <p id="analytics-status" class="analytics-status muted">Permission needed. Click 'Grant access to Recovery Folder'.</p>
-        <div class="analytics-overview" id="analytics-overview" hidden>
-          <div class="analytics-overview-grid">
-            <section class="ytd-card" aria-labelledby="analytics-ytd-title">
-              <header class="ytd-card-head">
-                <h3 id="analytics-ytd-title">Total Recovered (YTD)</h3>
-                <p class="fine-print" id="analytics-ytd-label"></p>
-              </header>
-              <div class="ytd-amount" id="analytics-ytd-amount">£0</div>
-              <div class="ytd-comparison" id="analytics-ytd-compare" hidden>
-                <div class="ytd-delta" id="analytics-ytd-delta"></div>
-                <div class="ytd-delta-note" id="analytics-ytd-delta-note"></div>
-              </div>
-              <div class="ytd-chart" id="analytics-ytd-chart" role="img" aria-live="polite" aria-label="Total recovered this financial year: £0">
-                <div class="ytd-chart-track">
-                  <div class="ytd-chart-fill" id="analytics-ytd-bar" data-fill="0"></div>
+        <div id="graphs-body" class="section-body">
+          <section class="card recover-card" data-card="analytics">
+          <header class="card-head">
+            <div>
+              <h2>Analytics</h2>
+              <p class="fine-print">Data loads automatically from the Recovery Folder.</p>
+            </div>
+            <div class="analytics-controls">
+              <button type="button" class="btn ghost no-caret" id="grant-access">Grant access to Recovery Folder</button>
+              <button type="button" class="btn ghost no-caret" id="grant-legacy">Add legacy folder</button>
+              <button type="button" class="btn ghost no-caret" id="reload-data">Reload</button>
+              <button type="button" class="btn ghost no-caret" id="export-png">Save dashboard as PNG</button>
+              <label class="analytics-fy">
+                <span class="sr-only">Financial year</span>
+                <select id="analytics-fy" disabled></select>
+              </label>
+              <span id="legacy-status-chip" class="chip muted" hidden>Legacy folder connected</span>
+            </div>
+          </header>
+          <p id="analytics-status" class="analytics-status muted">Permission needed. Click 'Grant access to Recovery Folder'.</p>
+          <div class="analytics-overview" id="analytics-overview" hidden>
+            <div class="analytics-overview-grid">
+              <section class="ytd-card" aria-labelledby="analytics-ytd-title">
+                <header class="ytd-card-head">
+                  <h3 id="analytics-ytd-title">Total Recovered (YTD)</h3>
+                  <p class="fine-print" id="analytics-ytd-label"></p>
+                </header>
+                <div class="ytd-amount" id="analytics-ytd-amount">£0</div>
+                <div class="ytd-comparison" id="analytics-ytd-compare" hidden>
+                  <div class="ytd-delta" id="analytics-ytd-delta"></div>
+                  <div class="ytd-delta-note" id="analytics-ytd-delta-note"></div>
                 </div>
-                <div class="ytd-chart-track prev" id="analytics-prev-track" hidden>
-                  <div class="ytd-chart-fill prev" id="analytics-prev-bar" data-fill="0"></div>
-                  <span class="ytd-prev-label" id="analytics-prev-label">Prev FY</span>
-                </div>
-              </div>
+                <div class="ytd-chart" id="analytics-ytd-chart" role="img" aria-live="polite" aria-label="Total recovered this financial year: £0">
+                  <div class="ytd-chart-track">
+                    <div class="ytd-chart-fill" id="analytics-ytd-bar" data-fill="0"></div>
+                  </div>
+                  <div class="ytd-chart-track prev" id="analytics-prev-track" hidden>
+                    <div class="ytd-chart-fill prev" id="analytics-prev-bar" data-fill="0"></div>
+                    <span class="ytd-prev-label" id="analytics-prev-label">Prev FY</span>
+                  </div>
             </section>
+          </div>
+      </section>
             <section class="overview-right">
               <section class="quick-tiles" id="analytics-quick-tiles" aria-label="Recovered totals by type"></section>
               <section class="sparkline-card" aria-label="Monthly recovery counts">
@@ -501,7 +165,6 @@
             <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" aria-controls="tab-division" id="tab-btn-division">By Division</button>
             <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-type" id="tab-btn-type">By Type</button>
             <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-month" id="tab-btn-month">By Month</button>
-            <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-manage" id="tab-btn-manage">Manage</button>
           </nav>
           <section class="tab-panel is-active" id="tab-division" role="tabpanel" aria-labelledby="tab-btn-division">
             <header class="tab-controls">
@@ -638,37 +301,365 @@
             </div>
           </section>
         </section>
-        <section class="tab-panel" id="tab-manage" role="tabpanel" aria-labelledby="tab-btn-manage" hidden>
-          <div class="manage-toolbar">
-            <button type="button" class="btn-primary" id="btn-add-recovery">Add new recovery</button>
-            <label class="sr-only" for="manage-search">Search</label>
-            <input type="search" id="manage-search" placeholder="Search incident, location, division" aria-label="Search">
-            <label class="sr-only" for="manage-fy">Financial year</label>
-            <select id="manage-fy" aria-label="Financial year"></select>
-          </div>
-          <div class="table-wrap">
-            <table class="manage-table" id="manage-table">
-              <caption class="sr-only">Manage recovery records</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Incident</th>
-                  <th scope="col">Type</th>
-                  <th scope="col">Division</th>
-                  <th scope="col">Value (GBP)</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Location</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="manage-table-body"></tbody>
-            </table>
-          </div>
-          <p id="manage-empty" class="fine-print" hidden>No recoveries yet. Click Add new recovery to create your first entry.</p>
-        </section>
       </div>
       </section>
-    </div>
+
+    <section id="manage-section" class="card manage-section" aria-labelledby="manage-title">
+      <header class="section-header">
+        <h2 id="manage-title">Manage Recoveries</h2>
+        <div class="manage-toolbar">
+          <input id="manage-search" type="search" placeholder="Search incident, location, division" aria-label="Search recoveries">
+          <select id="manage-fy" aria-label="Financial year"></select>
+          <button type="button" id="btn-add-recovery" class="btn-primary">Add new recovery</button>
+        </div>
+      </header>
+      <div class="section-body">
+        <div id="manage-empty" class="empty" hidden>No recoveries yet. Click <strong>Add new recovery</strong> to create your first entry.</div>
+        <div class="table-wrap table-wrapper">
+          <table class="manage-table" id="manage-table" aria-describedby="manage-title">
+            <caption class="sr-only">Manage recovery records</caption>
+            <thead>
+              <tr>
+                <th scope="col">Incident</th>
+                <th scope="col">Type</th>
+                <th scope="col">Division</th>
+                <th scope="col">Value (GBP)</th>
+                <th scope="col">Date</th>
+                <th scope="col">Location</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="manage-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="add-section" class="card add-section" aria-labelledby="add-title">
+      <header class="section-header">
+        <h2 id="add-title">Record new recovery</h2>
+      </header>
+      <div class="section-body">
+        <section class="card instructions-card">
+          <details class="accordion" data-instructions>
+            <summary class="accordion-summary">
+              <span class="summary-icon" aria-hidden="true">
+                <svg class="icon icon--small" viewBox="0 0 24 24">
+                  <path d="M12 17v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M12 9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+              </span>
+              <span>Instructions</span>
+              <span class="summary-caret" aria-hidden="true">›</span>
+            </summary>
+            <div class="accordion-body">
+              <ol class="instruction-list">
+                <li>Complete the core incident details and confirm every required field.</li>
+                <li>Select the seizure type to reveal its additional detail fields.</li>
+                <li>Provide the extra information requested for the chosen seizure type.</li>
+                <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
+                <li>Use <strong>Save seizure (JSON)</strong> to export, or <strong>Reset form</strong> to clear the page.</li>
+              </ol>
+            </div>
+          </details>
+        </section>
+
+        <form id="recovery-form" class="recoveries-form" novalidate>
+        <section class="card recover-card" data-card="incident">
+          <header class="card-head">
+            <h2>Core Incident Details</h2>
+          </header>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="field-datetime" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 10h16" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 13v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M10 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Date and time
+              </label>
+              <div class="field-control field-control--with-action">
+                <input id="field-datetime" name="datetime" type="datetime-local" required>
+                <button type="button" id="btn-now" class="btn ghost no-caret btn-compact">Set current time</button>
+              </div>
+              <small class="field-error" data-error-for="field-datetime" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-incident" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 12h16M4 18h16M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Incident number
+              </label>
+              <input id="field-incident" name="incidentNumber" type="text" required>
+              <small class="field-error" data-error-for="field-incident" hidden></small>
+            </div>
+            <div class="form-field">
+              <label for="field-division" class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 12h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Division
+              </label>
+              <select id="field-division" name="division" required>
+                <option value="">Select division…</option>
+                <option value="E">Division E</option>
+                <option value="J">Division J</option>
+                <option value="C">Division C</option>
+                <option value="P">Division P</option>
+                <option value="Other">Other</option>
+              </select>
+              <small class="field-error" data-error-for="field-division" hidden></small>
+            </div>
+            <div class="form-field">
+              <label class="field-label">
+                <span class="field-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 12h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Seizure type
+              </label>
+              <div class="seizure-tiles" role="radiogroup" aria-label="Select seizure type">
+                <button type="button" class="seizure-tile" data-type-tile="Vehicle" data-type-value="Vehicle">
+                  <span class="seizure-icon" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M3 13h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M6 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M16 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M5 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M22 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M5.34 6.94A2 2 0 0 1 7.25 6h9.5a2 2 0 0 1 1.9 1.4l1.27 4.1A2 2 0 0 1 18.02 14H5.98a2 2 0 0 1-1.9-2.5l1.26-4.56Z" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                  </span>
+                  <span class="seizure-label">Vehicle</span>
+                  <input type="radio" name="seizure-type" value="Vehicle" class="sr-only">
+                </button>
+                <button type="button" class="seizure-tile" data-type-tile="Drug" data-type-value="Drug">
+                  <span class="seizure-icon" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="m11 11 9-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M4 18h2l10-10a2 2 0 0 1 0 2.83L6.83 20H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                      <path d="M12 6 6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                  <span class="seizure-label">Drug</span>
+                  <input type="radio" name="seizure-type" value="Drug" class="sr-only">
+                </button>
+                <button type="button" class="seizure-tile" data-type-tile="Cash" data-type-value="Cash">
+                  <span class="seizure-icon" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <rect x="3" y="7" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                      <path d="M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M12 11v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M10 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                  <span class="seizure-label">Cash</span>
+                  <input type="radio" name="seizure-type" value="Cash" class="sr-only">
+                </button>
+                <button type="button" class="seizure-tile" data-type-tile="Counterfeit Goods" data-type-value="Counterfeit Goods">
+                  <span class="seizure-icon" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                      <path d="m8 16 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M11 8h5v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                  <span class="seizure-label">Counterfeit</span>
+                  <input type="radio" name="seizure-type" value="Counterfeit Goods" class="sr-only">
+                </button>
+                <button type="button" class="seizure-tile" data-type-tile="Stolen Property" data-type-value="Stolen Property">
+                  <span class="seizure-icon" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M12 4.5c2.485 0 4.5 2.015 4.5 4.5a4.5 4.5 0 1 1-9 0c0-2.485 2.015-4.5 4.5-4.5Zm0 9.5c3.59 0 6.5 2.91 6.5 6.5H5.5c0-3.59 2.91-6.5 6.5-6.5Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    </svg>
+                  </span>
+                  <span class="seizure-label">Stolen property</span>
+                  <input type="radio" name="seizure-type" value="Stolen Property" class="sr-only">
+                </button>
+              </div>
+              <small class="field-error" data-error-for="seizure-type" hidden></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="card recover-card" data-card="type">
+          <header class="card-head">
+            <h2>Seizure Details</h2>
+          </header>
+          <div class="type-panels">
+            <section class="type-panel is-active" data-type-panel="Vehicle">
+              <h3 class="type-panel-title">Vehicle seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-vehicle-reason" class="field-label">Reason</label>
+                  <select id="field-vehicle-reason">
+                    <option value="">Select reason…</option>
+                    <option value="Seized Section 165">Seized Section 165</option>
+                    <option value="Seized Section 19">Seized Section 19</option>
+                    <option value="Seized Section 23">Seized Section 23</option>
+                    <option value="Seized Section 60">Seized Section 60</option>
+                    <option value="Seized Section 41">Seized Section 41</option>
+                    <option value="Seized Section 137">Seized Section 137</option>
+                    <option value="Seized Section 138">Seized Section 138</option>
+                    <option value="Seized Section 19(2)">Seized Section 19(2)</option>
+                    <option value="Seized Section 165A">Seized Section 165A</option>
+                    <option value="Recovered (other)">Recovered (other)</option>
+                  </select>
+                  <small class="field-error" data-error-for="field-vehicle-reason" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-colour" class="field-label">Colour</label>
+                  <input id="field-vehicle-colour" type="text" placeholder="e.g. Blue">
+                  <small class="field-error" data-error-for="field-vehicle-colour" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-make" class="field-label">Make</label>
+                  <input id="field-vehicle-make" type="text" placeholder="e.g. Ford">
+                  <small class="field-error" data-error-for="field-vehicle-make" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-model" class="field-label">Model</label>
+                  <input id="field-vehicle-model" type="text" placeholder="e.g. Fiesta">
+                  <small class="field-error" data-error-for="field-vehicle-model" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-vrm" class="field-label">VRM</label>
+                  <input id="field-vehicle-vrm" type="text" placeholder="e.g. AB12 CDE">
+                  <small class="field-error" data-error-for="field-vehicle-vrm" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-vehicle-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-vehicle-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-vehicle-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Drug" hidden>
+              <h3 class="type-panel-title">Drug seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-drug-type" class="field-label">Drug type</label>
+                  <select id="field-drug-type">
+                    <option value="">Select drug…</option>
+                    <option value="Cannabis">Cannabis</option>
+                    <option value="Cocaine">Cocaine</option>
+                    <option value="Heroin">Heroin</option>
+                    <option value="Ketamine">Ketamine</option>
+                    <option value="MDMA">MDMA</option>
+                    <option value="Amphetamine">Amphetamine</option>
+                    <option value="Tablets">Tablets</option>
+                    <option value="Nitrous Oxide">Nitrous Oxide</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <small class="field-error" data-error-for="field-drug-type" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-drug-qty" class="field-label">Quantity / weight</label>
+                  <input id="field-drug-qty" type="text" placeholder="e.g. 250 g, 30 wraps">
+                  <small class="field-error" data-error-for="field-drug-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-drug-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-drug-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-drug-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Cash" hidden>
+              <h3 class="type-panel-title">Cash seizure</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-cash-amount" class="field-label">Amount (GBP)</label>
+                  <input id="field-cash-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-cash-amount" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Counterfeit Goods" hidden>
+              <h3 class="type-panel-title">Counterfeit goods</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-counterfeit-desc" class="field-label">Description</label>
+                  <textarea id="field-counterfeit-desc" rows="2" placeholder="e.g. 40 counterfeit designer handbags"></textarea>
+                  <small class="field-error" data-error-for="field-counterfeit-desc" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-counterfeit-qty" class="field-label">Quantity</label>
+                  <input id="field-counterfeit-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+                  <small class="field-error" data-error-for="field-counterfeit-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-counterfeit-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-counterfeit-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-counterfeit-value" hidden></small>
+                </div>
+              </div>
+            </section>
+
+            <section class="type-panel" data-type-panel="Stolen Property" hidden>
+              <h3 class="type-panel-title">Stolen property</h3>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="field-stolen-desc" class="field-label">Description</label>
+                  <input id="field-stolen-desc" type="text" placeholder="e.g. Power tools with serial numbers">
+                  <small class="field-error" data-error-for="field-stolen-desc" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-stolen-qty" class="field-label">Quantity</label>
+                  <input id="field-stolen-qty" type="number" inputmode="numeric" min="0" step="1" placeholder="0">
+                  <small class="field-error" data-error-for="field-stolen-qty" hidden></small>
+                </div>
+                <div class="form-field">
+                  <label for="field-stolen-value" class="field-label">Estimated value (GBP)</label>
+                  <input id="field-stolen-value" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                  <small class="field-error" data-error-for="field-stolen-value" hidden></small>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="card recover-card" data-card="actions">
+          <header class="card-head">
+            <h2>Save &amp; Export</h2>
+          </header>
+          <p id="fs-support-note" class="muted fine-print" hidden>Folder saving is not available in this browser. The JSON will download instead.</p>
+          <div class="action-bar">
+            <button type="button" id="btn-set-folder" class="btn ghost no-caret">Set Save Folder</button>
+            <button type="button" id="save" class="btn primary">Save seizure (JSON)</button>
+            <button type="reset" class="btn">Reset form</button>
+          </div>
+          <div class="action-messages">
+            <span id="folder-status" class="muted" aria-live="polite">No folder permission. Use 'Grant access to Recovery Folder' to enable direct saving; downloads will be used.</span>
+            <span id="save-status" class="muted" aria-live="polite"></span>
+          </div>
+          <span id="validation-status" class="sr-only" role="status" aria-live="polite"></span>
+        </section>
+        </form>
+      </div>
+    </section>
+
   </main>
+
   <div id="save-toast" class="toast" role="status" aria-live="polite" hidden></div>
   <div id="manage-modal" class="dialog" role="dialog" aria-modal="true" aria-labelledby="manage-modal-title" hidden>
     <div class="card">
@@ -928,6 +919,37 @@
     (function () {
     'use strict';
 
+    (function setupGraphsCollapsible(){
+      const section = document.getElementById('graphs-section');
+      const body = document.getElementById('graphs-body');
+      const btnToggle = document.getElementById('graphs-toggle');
+      const btnMinimise = document.getElementById('graphs-minimise');
+      if (!section || !body || !btnToggle || !btnMinimise) return;
+
+      const KEY = 'recovery.graphs.collapsed';
+      const apply = (collapsed) => {
+        const isCollapsed = !!collapsed;
+        section.classList.toggle('minimised', isCollapsed);
+        body.hidden = isCollapsed;
+        btnToggle.setAttribute('aria-expanded', String(!isCollapsed));
+        btnMinimise.setAttribute('aria-expanded', String(!isCollapsed));
+        btnToggle.textContent = isCollapsed ? 'Show' : 'Hide';
+        btnMinimise.textContent = isCollapsed ? 'Expand' : 'Minimise';
+      };
+
+      const saved = localStorage.getItem(KEY) === '1';
+      apply(saved);
+
+      const toggle = () => {
+        const next = !(localStorage.getItem(KEY) === '1');
+        localStorage.setItem(KEY, next ? '1' : '0');
+        apply(next);
+      };
+
+      btnToggle.addEventListener('click', toggle);
+      btnMinimise.addEventListener('click', toggle);
+    })();
+
     const form = document.getElementById('recovery-form');
     if (!form) return;
 
@@ -962,8 +984,6 @@
     const typePanels = Array.from(form.querySelectorAll('.type-panel'));
     const tileGroup = form.querySelector('.seizure-tiles');
 
-    const manageTabButton = document.getElementById('tab-btn-manage');
-    const managePanel = document.getElementById('tab-manage');
     const manageTableEl = document.getElementById('manage-table');
     const manageTableBody = document.getElementById('manage-table-body');
     const manageEmptyEl = document.getElementById('manage-empty');
@@ -2691,7 +2711,7 @@
 
       if (!combined.length) {
         if (manageEmptyEl) {
-          manageEmptyEl.textContent = 'No recoveries yet. Click Add new recovery to create your first entry.';
+          manageEmptyEl.innerHTML = 'No recoveries yet. Click <strong>Add new recovery</strong> to create your first entry.';
           manageEmptyEl.hidden = false;
         }
         return;
@@ -3277,9 +3297,6 @@
         renderTypeTab();
       } else if (target === 'tab-month') {
         renderMonthTab();
-      } else if (target === 'tab-manage') {
-        seedDemoDataIfNeeded();
-        renderManageTable();
       }
     }
 
