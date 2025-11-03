@@ -432,7 +432,7 @@
           <p id="fs-support-note" class="muted fine-print" hidden>Folder saving is not available in this browser. The JSON will download instead.</p>
           <div class="action-bar">
             <button type="button" id="btn-set-folder" class="btn ghost no-caret">Set Save Folder</button>
-            <button type="button" id="btn-save" class="btn primary">Save seizure (JSON)</button>
+            <button type="button" id="save" class="btn primary">Save seizure (JSON)</button>
             <button type="reset" class="btn">Reset form</button>
           </div>
           <div class="action-messages">
@@ -450,10 +450,10 @@
             <p class="fine-print">Data loads automatically from the Recovery Folder.</p>
           </div>
           <div class="analytics-controls">
-            <button type="button" class="btn ghost no-caret" id="btn-grant-recovery-folder">Grant access to Recovery Folder</button>
-            <button type="button" class="btn ghost no-caret" id="btn-grant-legacy-folder">Add legacy folder</button>
-            <button type="button" class="btn ghost no-caret" id="btn-reload-data">Reload</button>
-            <button type="button" class="btn ghost no-caret" id="btn-export-dashboard">Save dashboard as PNG</button>
+            <button type="button" class="btn ghost no-caret" id="grant-access">Grant access to Recovery Folder</button>
+            <button type="button" class="btn ghost no-caret" id="grant-legacy">Add legacy folder</button>
+            <button type="button" class="btn ghost no-caret" id="reload-data">Reload</button>
+            <button type="button" class="btn ghost no-caret" id="export-png">Save dashboard as PNG</button>
             <label class="analytics-fy">
               <span class="sr-only">Financial year</span>
               <select id="analytics-fy" disabled></select>
@@ -655,8 +655,44 @@
     </div>
   </div>
 
+  <div id="fatal-banner" hidden class="fatal-banner"></div>
   <script>
-  (function () {
+    function showFatalBanner(msg) {
+      const b = document.getElementById('fatal-banner');
+      if (!b) return;
+      b.textContent = msg;
+      b.hidden = false;
+    }
+  </script>
+  <script type="module" src="./scripts/recoveries.store.js"></script>
+  <script>
+    (function () {
+      if (window.__REC_BOOTED__) return;
+      window.__REC_BOOTED__ = true;
+      document.addEventListener('DOMContentLoaded', () => {
+        try {
+          window.__recoveriesBoot && window.__recoveriesBoot();
+        } catch (e) {
+          console.error('Recoveries boot failed', e);
+          showFatalBanner('Recoveries failed to start. See console for details.');
+        }
+      });
+    })();
+  </script>
+  <script type="module">
+    import {
+      supportsFS,
+      pickFolder,
+      writeToFolder,
+      readRecoveriesFromFolder,
+      storeHandle,
+      getStoredHandle,
+      idbPutRecord,
+      idbGetAllRecords,
+      downloadJson
+    } from './scripts/recoveries.store.js';
+
+    (function () {
     'use strict';
 
     const form = document.getElementById('recovery-form');
@@ -694,7 +730,7 @@
     const tileGroup = form.querySelector('.seizure-tiles');
 
     const folderButton = document.getElementById('btn-set-folder');
-    const saveButton = document.getElementById('btn-save');
+    const saveButton = document.getElementById('save');
     const setNowButton = document.getElementById('btn-now');
     const folderStatus = document.getElementById('folder-status');
     const saveStatus = document.getElementById('save-status');
@@ -709,10 +745,10 @@
     const downloadReminder = document.getElementById('download-reminder');
     const downloadReminderFile = document.getElementById('download-reminder-file');
     const downloadReminderClose = document.getElementById('download-reminder-close');
-    const grantPrimaryButton = document.getElementById('btn-grant-recovery-folder');
-    const reloadDataButton = document.getElementById('btn-reload-data');
-    const grantLegacyButton = document.getElementById('btn-grant-legacy-folder');
-    const exportButton = document.getElementById('btn-export-dashboard');
+    const grantPrimaryButton = document.getElementById('grant-access');
+    const reloadDataButton = document.getElementById('reload-data');
+    const grantLegacyButton = document.getElementById('grant-legacy');
+    const exportButton = document.getElementById('export-png');
     const analyticsStatusEl = document.getElementById('analytics-status');
     const fySelect = document.getElementById('analytics-fy');
     const overviewSection = document.getElementById('analytics-overview');
@@ -761,14 +797,6 @@
 
     const errorMap = new Map(Array.from(form.querySelectorAll('[data-error-for]')).map((node) => [node.dataset.errorFor, node]));
 
-    const supportsDirectoryPicker = typeof window.showDirectoryPicker === 'function';
-    if (!supportsDirectoryPicker) {
-      if (fsSupportNote) fsSupportNote.hidden = false;
-      setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
-      if (grantPrimaryButton) grantPrimaryButton.disabled = true;
-      if (reloadDataButton) reloadDataButton.disabled = true;
-    }
-
     const supportsIndexedDB = 'indexedDB' in window;
 
     const fyControls = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect].filter(Boolean);
@@ -796,74 +824,7 @@
       renderAnalytics();
     }
 
-    syncFYControls();
-
-    if (fySelect) {
-      fySelect.addEventListener('change', (event) => {
-        updateFYSelection(event.target.value);
-      });
-    }
-
-    if (divisionFYSelect) {
-      divisionFYSelect.addEventListener('change', (event) => {
-        updateFYSelection(event.target.value);
-      });
-    }
-    if (divisionFilter) {
-      divisionFilter.value = state.division === 'All' ? 'ALL' : state.division;
-      divisionFilter.addEventListener('change', (event) => {
-        const value = event.target.value;
-        state.division = value === 'ALL' ? 'All' : value;
-        renderDivisionChart();
-      });
-    }
-
-    if (typeFYSelect) {
-      typeFYSelect.addEventListener('change', (event) => {
-        updateFYSelection(event.target.value);
-      });
-    }
-    if (typeFilter) {
-      typeFilter.value = state.type === 'All' ? 'ALL' : state.type;
-      typeFilter.addEventListener('change', (event) => {
-        const value = event.target.value;
-        state.type = value === 'ALL' ? 'All' : value;
-        renderTypeTab();
-      });
-    }
-
-    if (monthFYSelect) {
-      monthFYSelect.addEventListener('change', (event) => {
-        updateFYSelection(event.target.value);
-      });
-    }
-    if (monthFilter) {
-      const today = new Date();
-      const idx = monthIndexAprMar(today);
-      const defaultIdx = idx != null ? idx : 0;
-      monthFilter.value = String(defaultIdx);
-      state.monthIdx = defaultIdx;
-      monthFilter.addEventListener('change', (event) => {
-        state.monthIdx = Number(event.target.value);
-        renderMonthTab();
-      });
-    }
-
-    if (tabButtons.length) {
-      tabButtons.forEach((btn, idx) => {
-        const isActive = idx === 0;
-        btn.classList.toggle('is-active', isActive);
-        btn.setAttribute('aria-selected', String(isActive));
-        btn.addEventListener('click', () => activateTab(btn));
-      });
-      tabPanels.forEach((panel, idx) => {
-        const isActive = idx === 0;
-        panel.classList.toggle('is-active', isActive);
-        panel.hidden = !isActive;
-      });
-    }
-
-    let directoryHandle = null;
+    let listenersWired = false;
     let toastTimer = (typeof window !== 'undefined' && typeof window.toastTimer !== 'undefined')
       ? window.toastTimer
       : null;
@@ -930,220 +891,432 @@
       return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
-    typeTiles.forEach((tile) => {
-      tile.addEventListener('click', () => activateType(tile.dataset.typeTile));
-      tile.addEventListener('keydown', (event) => {
-        if (event.key === ' ' || event.key === 'Enter') {
-          event.preventDefault();
-          activateType(tile.dataset.typeTile);
+    window.__recoveriesBoot = async function () {
+      ['grant-access', 'grant-legacy', 'save', 'reload-data', 'export-png'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn && !btn.getAttribute('type')) btn.setAttribute('type', 'button');
+      });
+
+      if (!listenersWired) {
+        typeTiles.forEach((tile) => {
+          if (!tile.hasAttribute('tabindex')) tile.setAttribute('tabindex', '0');
+          tile.addEventListener('click', () => activateType(tile.dataset.typeTile));
+          tile.addEventListener('keydown', (event) => {
+            if (event.key === ' ' || event.key === 'Enter') {
+              event.preventDefault();
+              activateType(tile.dataset.typeTile);
+            }
+          });
+        });
+
+        typeRadios.forEach((radio) => {
+          radio.addEventListener('change', () => {
+            syncTiles();
+            showSectionForType();
+            clearTypeSpecificErrors();
+            clearFieldError('seizure-type');
+            setValidationMessage('');
+          });
+        });
+
+        if (setNowButton) {
+          setNowButton.addEventListener('click', () => {
+            inputs.datetime.value = formatLocalDateTime(new Date());
+            inputs.datetime.dispatchEvent(new Event('input', { bubbles: true }));
+            inputs.datetime.focus();
+          });
         }
-      });
-    });
 
-    typeRadios.forEach((radio) => {
-      radio.addEventListener('change', () => {
-        syncTiles();
-        showSectionForType();
-        clearTypeSpecificErrors();
-        clearFieldError('seizure-type');
-        setValidationMessage('');
-      });
-    });
+        if (form) {
+          form.addEventListener('reset', () => {
+            window.requestAnimationFrame(() => {
+              clearErrors();
+              typePanels.forEach((panel) => {
+                panel.classList.remove('is-active');
+                panel.hidden = true;
+              });
+              typeRadios.forEach((radio) => { radio.checked = false; });
+              syncTiles();
+              showSectionForType();
+              setSaveMessage('');
+              setValidationMessage('');
+            });
+            if (inputs.datetime) {
+              inputs.datetime.value = formatLocalDateTime(new Date());
+            }
+          });
+        }
 
-    if (setNowButton) {
-      setNowButton.addEventListener('click', () => {
+        if (fySelect) {
+          fySelect.addEventListener('change', (event) => {
+            updateFYSelection(event.target.value);
+          });
+        }
+        if (divisionFYSelect) {
+          divisionFYSelect.addEventListener('change', (event) => {
+            updateFYSelection(event.target.value);
+          });
+        }
+        if (divisionFilter) {
+          divisionFilter.addEventListener('change', (event) => {
+            const value = event.target.value;
+            state.division = value === 'ALL' ? 'All' : value;
+            renderDivisionChart();
+          });
+        }
+        if (typeFYSelect) {
+          typeFYSelect.addEventListener('change', (event) => {
+            updateFYSelection(event.target.value);
+          });
+        }
+        if (typeFilter) {
+          typeFilter.addEventListener('change', (event) => {
+            const value = event.target.value;
+            state.type = value === 'ALL' ? 'All' : value;
+            renderTypeTab();
+          });
+        }
+        if (monthFYSelect) {
+          monthFYSelect.addEventListener('change', (event) => {
+            updateFYSelection(event.target.value);
+          });
+        }
+        if (monthFilter) {
+          const today = new Date();
+          const idx = monthIndexAprMar(today);
+          const defaultIdx = idx != null ? idx : 0;
+          monthFilter.value = String(defaultIdx);
+          state.monthIdx = defaultIdx;
+          monthFilter.addEventListener('change', (event) => {
+            state.monthIdx = Number(event.target.value);
+            renderMonthTab();
+          });
+        }
+
+        if (tabButtons.length) {
+          tabButtons.forEach((btn, idx) => {
+            const isActive = idx === 0;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-selected', String(isActive));
+            btn.addEventListener('click', () => activateTab(btn));
+          });
+          tabPanels.forEach((panel, idx) => {
+            const isActive = idx === 0;
+            panel.classList.toggle('is-active', isActive);
+            panel.hidden = !isActive;
+          });
+        }
+
+        if (exportButton) {
+          exportButton.addEventListener('click', async () => {
+            if (exportButton.disabled) return;
+            const previousStatus = analyticsStatusEl ? analyticsStatusEl.textContent : '';
+            exportButton.disabled = true;
+            try {
+              if (analyticsStatusEl) setAnalyticsStatus('Exporting dashboard…');
+              await exportCurrentPanelAsPNG();
+              if (analyticsStatusEl) setAnalyticsStatus(previousStatus);
+            } catch (err) {
+              console.error('Dashboard export failed', err);
+              if (analyticsStatusEl) setAnalyticsStatus('Unable to export dashboard. Try again.');
+            } finally {
+              exportButton.disabled = false;
+            }
+          });
+        }
+
+        if (downloadReminder && downloadReminderClose) {
+          downloadReminderClose.addEventListener('click', hideDownloadReminder);
+          downloadReminder.addEventListener('click', (event) => {
+            if (event.target === downloadReminder) {
+              hideDownloadReminder();
+            }
+          });
+          document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !downloadReminder.hidden) {
+              hideDownloadReminder();
+            }
+          });
+        }
+
+        if (grantPrimaryButton) {
+          grantPrimaryButton.addEventListener('click', async () => {
+            if (!supportsFS()) {
+              setAnalyticsStatus('Your browser does not support Recovery Folder access.');
+              return;
+            }
+            try {
+              const handle = await pickFolder('base-recoveries-primary');
+              if (!handle) {
+                setAnalyticsStatus('Permission denied.');
+                return;
+              }
+              primaryDirectoryHandle = handle;
+              primaryHasReadAccess = true;
+              await storeHandle('primary', handle);
+              setAnalyticsStatus('Recovery Folder connected.');
+              setFolderStatus('Saving directly to Recovery Folder.');
+              await reloadAllData();
+            } catch (err) {
+              if (err && err.name === 'AbortError') return;
+              console.error(err);
+              setAnalyticsStatus('Selection failed. Try again.');
+            }
+          });
+        }
+
+        if (grantLegacyButton) {
+          grantLegacyButton.addEventListener('click', async () => {
+            if (!supportsFS()) {
+              setAnalyticsStatus('Browser not supported.');
+              return;
+            }
+            try {
+              const handle = await pickFolder('base-recoveries-legacy');
+              if (!handle) {
+                setAnalyticsStatus('Legacy permission denied.');
+                return;
+              }
+              legacyDirectoryHandle = handle;
+              legacyHasReadAccess = true;
+              await storeHandle('legacy', handle);
+              setAnalyticsStatus('Legacy folder connected.');
+              refreshLegacyUI();
+              await reloadAllData();
+            } catch (err) {
+              if (err && err.name === 'AbortError') return;
+              console.error(err);
+              setAnalyticsStatus('Legacy selection failed.');
+            }
+          });
+        }
+
+        if (folderButton) {
+          folderButton.addEventListener('click', async () => {
+            if (!supportsFS()) {
+              setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
+              return;
+            }
+            try {
+              const handle = await pickFolder('base-recoveries-primary');
+              if (!handle) {
+                setFolderStatus('Permission denied. Downloads will be used.');
+                return;
+              }
+              primaryDirectoryHandle = handle;
+              primaryHasReadAccess = true;
+              await storeHandle('primary', handle);
+              setFolderStatus(`Saving directly to ${handle.name || 'Recovery Folder'}.`);
+              await reloadAllData();
+            } catch (err) {
+              if (err && err.name === 'AbortError') return;
+              console.error(err);
+              setFolderStatus('Selection failed. Downloads will be used.');
+            }
+          });
+        }
+
+        if (saveButton) {
+          saveButton.addEventListener('click', handleSave);
+        }
+
+        if (reloadDataButton) {
+          reloadDataButton.addEventListener('click', reloadAllData);
+        }
+
+        listenersWired = true;
+      }
+
+      if (divisionFilter) {
+        divisionFilter.value = state.division === 'All' ? 'ALL' : state.division;
+      }
+      if (typeFilter) {
+        typeFilter.value = state.type === 'All' ? 'ALL' : state.type;
+      }
+
+      if (!supportsFS()) {
+        if (fsSupportNote) fsSupportNote.hidden = false;
+        setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
+        if (grantPrimaryButton) grantPrimaryButton.disabled = true;
+        if (grantLegacyButton) grantLegacyButton.disabled = true;
+        if (reloadDataButton) reloadDataButton.disabled = true;
+        setAnalyticsStatus('File System Access not supported in this browser. Downloads will be used.');
+      } else {
+        if (fsSupportNote) fsSupportNote.hidden = true;
+        if (grantPrimaryButton) grantPrimaryButton.disabled = false;
+        if (grantLegacyButton) grantLegacyButton.disabled = false;
+        if (reloadDataButton) reloadDataButton.disabled = false;
+      }
+
+      try {
+        if (supportsFS()) {
+          primaryDirectoryHandle = await getStoredHandle('primary');
+          legacyDirectoryHandle = await getStoredHandle('legacy');
+          primaryHasReadAccess = !!primaryDirectoryHandle;
+          legacyHasReadAccess = !!legacyDirectoryHandle;
+        } else {
+          primaryDirectoryHandle = null;
+          primaryHasReadAccess = false;
+          legacyDirectoryHandle = null;
+          legacyHasReadAccess = false;
+        }
+      } catch (err) {
+        console.warn('Handle restore failed', err);
+      }
+
+      refreshLegacyUI();
+
+      if (inputs?.datetime && !inputs.datetime.value) {
         inputs.datetime.value = formatLocalDateTime(new Date());
-        inputs.datetime.dispatchEvent(new Event('input', { bubbles: true }));
-        inputs.datetime.focus();
+      }
+
+      syncTiles();
+      showSectionForType();
+
+      await reloadAllData();
+    };
+
+    async function reloadAllData() {
+      setAnalyticsStatus('Loading…');
+
+      let fsPrimary = { records: [], skipped: 0 };
+      if (primaryDirectoryHandle && primaryHasReadAccess && supportsFS()) {
+        try {
+          fsPrimary = await readRecoveriesFromFolder(primaryDirectoryHandle);
+        } catch (err) {
+          console.error('Primary folder read failed', err);
+          fsPrimary = { records: [], skipped: 0 };
+          primaryHasReadAccess = false;
+        }
+      }
+
+      let fsLegacy = { records: [], skipped: 0 };
+      if (legacyDirectoryHandle && legacyHasReadAccess && supportsFS()) {
+        try {
+          fsLegacy = await readRecoveriesFromFolder(legacyDirectoryHandle);
+        } catch (err) {
+          console.error('Legacy folder read failed', err);
+          fsLegacy = { records: [], skipped: 0 };
+          legacyHasReadAccess = false;
+        }
+      }
+
+      let idbRecords = [];
+      try {
+        idbRecords = await idbGetAllRecords();
+      } catch (err) {
+        console.warn('IndexedDB read failed', err);
+        idbRecords = [];
+      }
+
+      const map = new Map();
+      const feed = (arr) => arr.forEach((record) => {
+        if (record && record.id) map.set(record.id, record);
       });
-    }
+      feed(fsPrimary.records);
+      feed(fsLegacy.records);
+      feed(idbRecords);
 
-    if (inputs.datetime && !inputs.datetime.value) {
-      inputs.datetime.value = formatLocalDateTime(new Date());
-    }
+      window.__REC_DATA = Array.from(map.values());
+      window.__REC_INVALID = (fsPrimary.skipped || 0) + (fsLegacy.skipped || 0);
 
-    form.addEventListener('reset', () => {
-      window.requestAnimationFrame(() => {
-        clearErrors();
-        typePanels.forEach((panel) => {
-          panel.classList.remove('is-active');
-          panel.hidden = true;
-        });
-        typeRadios.forEach((radio) => { radio.checked = false; });
-        syncTiles();
-        showSectionForType();
-        setSaveMessage('');
-        setValidationMessage('');
-      });
-      if (inputs.datetime) {
-        inputs.datetime.value = formatLocalDateTime(new Date());
+      if (typeof populateFYSelects === 'function') {
+        populateFYSelects(window.__REC_DATA);
       }
-    });
 
-    if (supportsDirectoryPicker && supportsIndexedDB) {
-      if (grantPrimaryButton) {
-        grantPrimaryButton.addEventListener('click', pickPrimaryDirectory);
-      }
-      if (grantLegacyButton) {
-        grantLegacyButton.addEventListener('click', pickLegacyDirectory);
-      }
-      if (reloadDataButton) {
-        reloadDataButton.addEventListener('click', async () => {
-          await loadRecoveriesFromPrimary();
-        });
-      }
-      initRecoveryData();
-    } else {
-      if (analyticsStatusEl) {
-        setAnalyticsStatus('File System Access or IndexedDB is not supported in this browser.');
-      }
-      if (grantLegacyButton) {
-        grantLegacyButton.disabled = true;
-      }
       renderAnalytics();
-      populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
-    }
-    refreshLegacyUI();
+      syncFYControls();
 
-    if (exportButton) {
-      exportButton.addEventListener('click', async () => {
-        if (exportButton.disabled) return;
-        const previousStatus = analyticsStatusEl ? analyticsStatusEl.textContent : '';
-        exportButton.disabled = true;
+      const total = window.__REC_DATA.length;
+      const message = total
+        ? `Loaded ${total} record${total === 1 ? '' : 's'}${fsPrimary.records.length ? ` · primary:${fsPrimary.records.length}` : ''}${fsLegacy.records.length ? ` · legacy:${fsLegacy.records.length}` : ''}${window.__REC_INVALID ? ` · skipped:${window.__REC_INVALID}` : ''}.`
+        : 'No recovery files found. You can still save; entries will be cached locally.';
+      setAnalyticsStatus(message);
+      refreshLegacyUI();
+    }
+
+    async function handleSave() {
+      clearErrors();
+      setSaveMessage('');
+      setValidationMessage('');
+
+      if (!validate()) return;
+
+      const dt = new Date(inputs.datetime.value);
+      if (Number.isNaN(dt.getTime())) {
+        const message = 'Provide a valid date and time.';
+        setFieldError('field-datetime', message);
+        setValidationMessage(message);
+        inputs.datetime.focus();
+        return;
+      }
+
+      const { payload, filename } = buildPayload(dt);
+      const json = JSON.stringify(payload, null, 2);
+
+      if (!saveButton) return;
+      saveButton.disabled = true;
+      try {
         try {
-          if (analyticsStatusEl) setAnalyticsStatus('Exporting dashboard…');
-          await exportCurrentPanelAsPNG();
-          if (analyticsStatusEl) setAnalyticsStatus(previousStatus);
+          await idbPutRecord(payload);
         } catch (err) {
-          console.error('Dashboard export failed', err);
-          if (analyticsStatusEl) setAnalyticsStatus('Unable to export dashboard. Try again.');
-        } finally {
-          exportButton.disabled = false;
-        }
-      });
-    }
-
-    if (folderButton) {
-      folderButton.addEventListener('click', async () => {
-        if (!supportsDirectoryPicker) {
-          setFolderStatus('Folder picker unavailable. Downloads will be used.');
-          return;
-        }
-        try {
-          const handle = await window.showDirectoryPicker();
-          if (!handle) return;
-          const granted = await ensurePermission(handle);
-          if (!granted) {
-            setFolderStatus('Permission denied. Downloads will be used.');
-            return;
-          }
-          directoryHandle = handle;
-          setFolderStatus(`Folder: ${handle.name}`);
-          setSaveMessage('');
-        } catch (err) {
-          if (err && err.name === 'AbortError') return;
-          console.error('Folder selection failed', err);
-          setFolderStatus('Unable to access folder. Downloads will be used.');
-        }
-      });
-    }
-
-    if (saveButton) {
-      saveButton.addEventListener('click', async () => {
-        clearErrors();
-        setSaveMessage('');
-        setValidationMessage('');
-
-        if (!validate()) return;
-
-        const datetimeValue = inputs.datetime.value;
-        const datetime = new Date(datetimeValue);
-        if (Number.isNaN(datetime.getTime())) {
-          const message = 'Provide a valid date and time.';
-          setFieldError('field-datetime', message);
-          setValidationMessage(message);
-          inputs.datetime.focus();
-          return;
+          console.warn('IDB cache failed', err);
         }
 
-        const { payload, filename } = buildPayload(datetime);
-        const json = JSON.stringify(payload, null, 2);
-
-        saveButton.disabled = true;
-        try {
-          let savedToPrimary = false;
-          let primaryResult = null;
-          if (supportsIndexedDB) {
-            primaryResult = await writeToPrimaryFolder(filename, json);
-            if (primaryResult && primaryResult.ok) {
-              savedToPrimary = true;
+        let wroteFS = false;
+        if (primaryDirectoryHandle && supportsFS()) {
+          try {
+            const result = await writeToFolder(primaryDirectoryHandle, filename, json);
+            if (result && result.ok) {
+              wroteFS = true;
+              primaryHasReadAccess = true;
+              setFolderStatus('Saving directly to Recovery Folder.');
               const message = `Saved to Recovery Folder: ${filename}`;
               setSaveMessage(message);
               showToast(message);
+            } else if (result && result.error === 'no-permission') {
+              setFolderStatus('Recovery Folder read-only. Download used.');
             }
+          } catch (err) {
+            console.error('Folder write failed', err);
           }
-
-          if (!savedToPrimary) {
-            if (primaryResult && primaryResult.error) {
-              console.warn('Primary folder save failed', primaryResult.error);
-            }
-            const method = await saveJson(filename, json);
-            if (method === 'download') {
-              const message = `Downloaded: ${filename}. To save directly, click 'Grant access to Recovery Folder'.`;
-              setSaveMessage(message);
-              showToast(message);
-              showDownloadReminder(filename);
-            } else if (method === 'folder') {
-              const message = `Saved ${filename} to ${directoryHandle ? directoryHandle.name : 'selected folder'}.`;
-              setSaveMessage(message);
-              showToast(message);
-            }
-          }
-
-          form.reset();
-          syncTiles();
-          showSectionForType();
-          setValidationMessage('');
-
-          if (typeof loadRecoveriesFromPrimary === 'function' && primaryHasReadAccess) {
-            await loadRecoveriesFromPrimary();
-          } else {
-            try {
-              const parsed = JSON.parse(json);
-              if (Array.isArray(window.__REC_DATA)) {
-                window.__REC_DATA.push(parsed);
-              }
-              populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
-              renderAnalytics();
-            } catch (_) {
-              renderAnalytics();
-            }
-          }
-        } catch (err) {
-          console.error('Save failed', err);
-          setSaveMessage('Error: saving failed. Check permissions and try again.');
-        } finally {
-          saveButton.disabled = false;
         }
-      });
+
+        if (!wroteFS) {
+          downloadJson(filename, json);
+          const message = `Downloaded: ${filename}. To save directly, click “Grant access to Recovery Folder”.`;
+          setSaveMessage(message);
+          showToast(message);
+          showDownloadReminder(filename);
+        }
+
+        form.reset();
+        if (inputs?.datetime) {
+          inputs.datetime.value = formatLocalDateTime(new Date());
+        }
+        syncTiles();
+        showSectionForType();
+        setValidationMessage('');
+
+        if (!Array.isArray(window.__REC_DATA)) window.__REC_DATA = [];
+        const byId = new Map(window.__REC_DATA.map((record) => [record.id, record]));
+        byId.set(payload.id, payload);
+        window.__REC_DATA = Array.from(byId.values());
+        renderAnalytics();
+        syncFYControls();
+
+        if (primaryDirectoryHandle && supportsFS()) {
+          await reloadAllData();
+        }
+      } catch (err) {
+        console.error('Save failed', err);
+        setSaveMessage('Error: saving failed. Check permissions and try again.');
+      } finally {
+        saveButton.disabled = false;
+      }
     }
 
-    if (downloadReminder && downloadReminderClose) {
-      downloadReminderClose.addEventListener('click', hideDownloadReminder);
-      downloadReminder.addEventListener('click', (event) => {
-        if (event.target === downloadReminder) {
-          hideDownloadReminder();
-        }
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !downloadReminder.hidden) {
-          hideDownloadReminder();
-        }
-      });
-    }
-
-    syncTiles();
-    showSectionForType();
+    // Initial tile sync happens during boot once listeners are wired.
 
     function getSelectedType() {
       const selected = typeRadios.find((radio) => radio.checked);
@@ -1307,7 +1480,7 @@
 
     function refreshLegacyUI() {
       if (!grantLegacyButton || !legacyStatusChip) return;
-      if (!supportsDirectoryPicker || !supportsIndexedDB) {
+      if (!supportsFS() || !supportsIndexedDB) {
         grantLegacyButton.disabled = true;
         grantLegacyButton.hidden = true;
         legacyStatusChip.hidden = true;
@@ -1428,97 +1601,6 @@
       const offset = date.getTimezoneOffset();
       const local = new Date(date.getTime() - offset * 60000);
       return local.toISOString().slice(0, 16);
-    }
-
-    async function saveJson(filename, contents) {
-      if (directoryHandle) {
-        try {
-          const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
-          const writable = await fileHandle.createWritable();
-          await writable.write(contents);
-          await writable.close();
-          return 'folder';
-        } catch (err) {
-          console.error('Failed to write to folder, falling back to download', err);
-          if (err && err.name === 'NotAllowedError') {
-            directoryHandle = null;
-            setFolderStatus('Folder access revoked. Downloads will be used.');
-          }
-        }
-      }
-      downloadJson(filename, contents);
-      return 'download';
-    }
-
-    async function writeToPrimaryFolder(filename, contents) {
-      if (!supportsDirectoryPicker) return { error: 'unsupported' };
-      try {
-        if (!primaryDirectoryHandle && supportsIndexedDB) {
-          const stored = await getStoredHandle('primary');
-          if (stored) {
-            let hasRead = await ensurePermission(stored, 'read', false);
-            if (!hasRead) {
-              hasRead = await ensurePermission(stored, 'read', true);
-            }
-            if (hasRead) {
-              primaryDirectoryHandle = stored;
-              primaryHasReadAccess = true;
-            }
-          }
-        }
-        if (!primaryDirectoryHandle) {
-          return { error: 'no-handle' };
-        }
-        const hasWrite = await ensurePermission(primaryDirectoryHandle, 'readwrite', true);
-        if (!hasWrite) {
-          primaryHasReadAccess = false;
-          primaryDirectoryHandle = null;
-          refreshLegacyUI();
-          setFolderStatus('Recovery Folder access lost. Downloads will be used until permission is granted again.');
-          return { error: 'no-permission' };
-        }
-        const fileHandle = await primaryDirectoryHandle.getFileHandle(filename, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(contents);
-        await writable.close();
-        directoryHandle = primaryDirectoryHandle;
-        primaryHasReadAccess = true;
-        setFolderStatus('Saving directly to Recovery Folder.');
-        return { ok: true };
-      } catch (error) {
-        console.error('writeToPrimaryFolder failed', error);
-        return { error };
-      }
-    }
-
-    function downloadJson(filename, contents) {
-      const blob = new Blob([contents], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.rel = 'noopener';
-      link.click();
-      URL.revokeObjectURL(url);
-    }
-
-    async function ensurePermission(handle, mode = 'readwrite', allowRequest = true) {
-      if (!handle) return false;
-      const opts = { mode };
-      try {
-        if (handle.queryPermission) {
-          const query = await handle.queryPermission(opts);
-          if (query === 'granted') return true;
-          if (query === 'denied' && !allowRequest) return false;
-        }
-        if (allowRequest && handle.requestPermission) {
-          const request = await handle.requestPermission(opts);
-          return request === 'granted';
-        }
-      } catch (err) {
-        console.error('Permission check failed', err);
-      }
-      return false;
     }
 
     function setAnalyticsStatus(message) {
@@ -1803,331 +1885,6 @@
       };
     }
 
-    async function restoreStoredDirectory(key) {
-      if (!supportsIndexedDB) return false;
-      try {
-        const storedHandle = await getStoredHandle(key);
-        if (!storedHandle) return false;
-        let hasRead = await ensurePermission(storedHandle, 'read', false);
-        if (!hasRead) {
-          hasRead = await ensurePermission(storedHandle, 'read', true);
-        }
-        if (!hasRead) {
-          if (key === 'primary') {
-            primaryDirectoryHandle = null;
-            primaryHasReadAccess = false;
-            if (reloadDataButton) reloadDataButton.disabled = true;
-          } else if (key === 'legacy') {
-            legacyDirectoryHandle = null;
-            legacyHasReadAccess = false;
-          }
-          return false;
-        }
-        if (key === 'primary') {
-          primaryDirectoryHandle = storedHandle;
-          primaryHasReadAccess = true;
-        } else if (key === 'legacy') {
-          legacyDirectoryHandle = storedHandle;
-          legacyHasReadAccess = true;
-        }
-        return true;
-      } catch (err) {
-        console.error(`Failed to restore ${key} handle`, err);
-        return false;
-      }
-    }
-
-    async function initRecoveryData() {
-      if (!supportsDirectoryPicker) {
-        setAnalyticsStatus('File System Access not supported in this browser. Downloads will be used.');
-        renderAnalytics();
-        populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
-        return;
-      }
-      setAnalyticsStatus('Checking folder access…');
-      try {
-        let primaryRestored = false;
-        let legacyRestored = false;
-        if (supportsIndexedDB) {
-          primaryRestored = await restoreStoredDirectory('primary');
-          legacyRestored = await restoreStoredDirectory('legacy');
-        }
-        refreshLegacyUI();
-
-        if (!primaryRestored && !legacyRestored) {
-          primaryDirectoryHandle = null;
-          primaryHasReadAccess = false;
-          legacyDirectoryHandle = null;
-          legacyHasReadAccess = false;
-          setAnalyticsStatus('Permission needed. Click "Grant access to Recovery Folder".');
-          renderAnalytics();
-          populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
-          return;
-        }
-
-        await loadRecoveriesFromPrimary();
-      } catch (err) {
-        console.error('Failed to restore Recovery Folder access', err);
-        setAnalyticsStatus('Unable to restore Recovery Folder access. Please grant permission again.');
-      }
-    }
-
-    async function pickPrimaryDirectory() {
-      if (!supportsDirectoryPicker) {
-        setAnalyticsStatus('File System Access not supported in this browser.');
-        return;
-      }
-      try {
-        const handle = await window.showDirectoryPicker({ id: 'base-recoveries-primary' });
-        if (!handle) return;
-        const hasRead = await ensurePermission(handle, 'read', true);
-        if (!hasRead) {
-          setAnalyticsStatus('Permission denied. Please grant access to the Recovery Folder.');
-          return;
-        }
-        primaryDirectoryHandle = handle;
-        primaryHasReadAccess = true;
-        if (supportsIndexedDB) {
-          await storeHandle('primary', handle);
-        }
-        setAnalyticsStatus(supportsIndexedDB
-          ? 'Permission granted. Loading records…'
-          : 'Permission granted for this session. Loading records…');
-        await loadRecoveriesFromPrimary();
-      } catch (err) {
-        if (err && err.name === 'AbortError') return;
-        console.error('Primary folder selection failed', err);
-        setAnalyticsStatus('Unable to access the selected folder. Please try again.');
-      }
-    }
-
-    async function pickLegacyDirectory() {
-      if (!supportsDirectoryPicker) {
-        setAnalyticsStatus('File System Access not supported in this browser.');
-        return;
-      }
-      try {
-        const handle = await window.showDirectoryPicker({ id: 'base-recoveries-legacy' });
-        if (!handle) return;
-        const hasRead = await ensurePermission(handle, 'read', true);
-        if (!hasRead) {
-          setAnalyticsStatus('Permission denied. Please grant access to the legacy folder.');
-          return;
-        }
-        legacyDirectoryHandle = handle;
-        legacyHasReadAccess = true;
-        if (supportsIndexedDB) {
-          await storeHandle('legacy', handle);
-        }
-        refreshLegacyUI();
-        setAnalyticsStatus(supportsIndexedDB
-          ? 'Legacy folder connected. Loading records…'
-          : 'Legacy folder connected for this session. Loading records…');
-        await loadRecoveriesFromPrimary();
-      } catch (err) {
-        if (err && err.name === 'AbortError') return;
-        console.error('Legacy folder selection failed', err);
-        setAnalyticsStatus('Unable to access the legacy folder. Please try again.');
-      }
-    }
-
-    async function loadRecoveriesFromPrimary() {
-      if (!supportsDirectoryPicker || !supportsIndexedDB) {
-        return;
-      }
-
-      const filenameMap = new Map();
-      const mergedRecords = [];
-      let primaryCount = 0;
-      let legacyCount = 0;
-      let skippedTotal = 0;
-
-      async function processHandle(handle, key) {
-        if (!handle) return;
-        const isPrimary = key === 'primary';
-        let hasRead = await ensurePermission(handle, 'read', false);
-        if (!hasRead) {
-          hasRead = await ensurePermission(handle, 'read', true);
-        }
-        if (!hasRead) {
-          if (isPrimary) {
-            primaryHasReadAccess = false;
-            primaryDirectoryHandle = null;
-            setFolderStatus('Recovery Folder access lost. Downloads will be used until permission is granted again.');
-            if (reloadDataButton) reloadDataButton.disabled = true;
-          } else {
-            legacyHasReadAccess = false;
-            legacyDirectoryHandle = null;
-          }
-          return;
-        }
-
-        try {
-          const { entries, skipped } = await readRecoveriesFromHandle(handle);
-          skippedTotal += skipped;
-          entries.forEach((entry) => {
-            const { filename, record, raw } = entry;
-            const bucket = filenameMap.get(filename);
-            if (bucket) {
-              const duplicate = bucket.find((existing) => existing.raw === raw);
-              if (duplicate) {
-                skippedTotal += 1;
-                return;
-              }
-              bucket.push(entry);
-            } else {
-              filenameMap.set(filename, [entry]);
-            }
-            mergedRecords.push(record);
-            if (isPrimary) {
-              primaryCount += 1;
-            } else {
-              legacyCount += 1;
-            }
-          });
-          if (isPrimary) {
-            primaryHasReadAccess = true;
-          } else {
-            legacyHasReadAccess = true;
-          }
-        } catch (err) {
-          console.error(`Failed to read ${key} folder`, err);
-          skippedTotal += 1;
-        }
-      }
-
-      setAnalyticsStatus('Loading records…');
-
-      await processHandle(primaryDirectoryHandle, 'primary');
-      await processHandle(legacyDirectoryHandle, 'legacy');
-
-      window.__REC_DATA = mergedRecords;
-      populateFYSelects(window.__REC_DATA);
-      window.__REC_INVALID = skippedTotal;
-
-      const totalCount = mergedRecords.length;
-      let statusMessage = '';
-
-      if (primaryCount && legacyCount) {
-        statusMessage = `Loaded ${primaryCount} primary + ${legacyCount} legacy, skipped ${skippedTotal} invalid.`;
-      } else if (primaryCount) {
-        statusMessage = `Loaded ${primaryCount} record${primaryCount === 1 ? '' : 's'} from Recovery Folder, skipped ${skippedTotal} invalid.`;
-      } else if (legacyCount) {
-        statusMessage = `Loaded ${legacyCount} record${legacyCount === 1 ? '' : 's'} from legacy Recovery Folder, skipped ${skippedTotal} invalid.`;
-      } else if (!primaryDirectoryHandle && !legacyDirectoryHandle) {
-        statusMessage = 'Permission needed. Click "Grant access to Recovery Folder".';
-      } else if (totalCount === 0) {
-        statusMessage = skippedTotal
-          ? `No recovery files found in connected folders (skipped ${skippedTotal} invalid).`
-          : 'No recovery files found in connected folders.';
-      } else {
-        statusMessage = 'Unable to read recovery folders. Please re-grant access.';
-      }
-
-      setAnalyticsStatus(statusMessage);
-      refreshLegacyUI();
-
-      if (primaryDirectoryHandle && primaryHasReadAccess) {
-        await updateFolderSaveStatus();
-      }
-      renderAnalytics();
-    }
-
-    async function readRecoveriesFromHandle(handle) {
-      const entries = [];
-      let skipped = 0;
-      for await (const entry of handle.values()) {
-        try {
-          if (entry.kind !== 'file') continue;
-          if (!entry.name.toLowerCase().endsWith('.json')) continue;
-          const file = await entry.getFile();
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (data && data.schema === 'base.recovery.v1') {
-            entries.push({ filename: entry.name, record: data, raw: text });
-          } else {
-            skipped += 1;
-          }
-        } catch (err) {
-          skipped += 1;
-        }
-      }
-      return { entries, skipped };
-    }
-
-    async function updateFolderSaveStatus() {
-      if (!primaryDirectoryHandle || !primaryHasReadAccess) return;
-      try {
-        const hasWrite = await ensurePermission(primaryDirectoryHandle, 'readwrite', false);
-        if (hasWrite) {
-          directoryHandle = primaryDirectoryHandle;
-          setFolderStatus('Saving directly to Recovery Folder.');
-        } else {
-          if (directoryHandle === primaryDirectoryHandle) {
-            directoryHandle = null;
-          }
-          if (!directoryHandle) {
-            setFolderStatus('Recovery Folder ready for reading. Saving will download until write permission is granted.');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to verify write permission', err);
-      }
-      refreshLegacyUI();
-      if (reloadDataButton) {
-        reloadDataButton.disabled = !(primaryDirectoryHandle && primaryHasReadAccess);
-      }
-    }
-
-    async function openHandlesDB() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open('base-recoveries', 1);
-        request.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains('handles')) {
-            db.createObjectStore('handles');
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function getStoredHandle(key) {
-      try {
-        const db = await openHandlesDB();
-        return await new Promise((resolve, reject) => {
-          const tx = db.transaction('handles', 'readonly');
-          const store = tx.objectStore('handles');
-          const request = store.get(key);
-          request.onsuccess = () => resolve(request.result || null);
-          request.onerror = () => reject(request.error);
-          tx.oncomplete = () => db.close();
-          tx.onabort = () => db.close();
-        });
-      } catch (err) {
-        console.error('IndexedDB read failed', err);
-        return null;
-      }
-    }
-
-    async function storeHandle(key, handle) {
-      if (!supportsIndexedDB) return;
-      try {
-        const db = await openHandlesDB();
-        await new Promise((resolve, reject) => {
-          const tx = db.transaction('handles', 'readwrite');
-          const store = tx.objectStore('handles');
-          const request = store.put(handle, key);
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-          tx.oncomplete = () => db.close();
-          tx.onabort = () => db.close();
-        });
-      } catch (err) {
-        console.error('IndexedDB write failed', err);
-      }
-    }
 
     function renderAnalytics() {
       if (!overviewSection) return;
@@ -3575,6 +3332,20 @@
         toast.hidden = true;
       }, 4200);
     }
+
+    document.addEventListener('keydown', (event) => {
+      if (!event.shiftKey) return;
+      if (!event.key || event.key.toLowerCase() !== 'd') return;
+      const recs = (window.__REC_DATA || []).length;
+      console.table({
+        supportsFS: supportsFS(),
+        primaryHandle: !!primaryDirectoryHandle,
+        legacyHandle: !!legacyDirectoryHandle,
+        recCount: recs,
+        skipped: window.__REC_INVALID || 0
+      });
+      showToast(`Diagnostics: ${recs} records loaded.`, { includePattern: false });
+    });
 
     function showDownloadReminder(fileName) {
       if (!downloadReminder || !downloadReminderClose || !downloadReminderFile) return;
