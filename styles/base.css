@@ -1286,3 +1286,40 @@ html{
 .btn-primary { background:#2b77ff; color:#fff; border:0; padding:10px 14px; border-radius:8px; }
 .btn-ghost { background: transparent; color:#fff; border:1px solid rgba(255,255,255,.25); padding:10px 14px; border-radius:8px; }
 .btn-danger { background:#a10f2a; color:#fff; border:0; padding:10px 14px; border-radius:8px; }
+.recovery-page { display: grid; gap: 16px; }
+.card {
+  background: rgba(18,24,40,.92);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 12px 12px 16px;
+}
+.section-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 8px;
+}
+.section-header h2 { font-size: 18px; margin: 0; }
+.section-actions { display: flex; gap: 8px; }
+.section-body[hidden] { display: none !important; }
+.table-wrapper { overflow-x: auto; }
+.manage-toolbar {
+  display: grid; gap: 10px;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}
+@media (max-width: 640px){
+  .manage-toolbar { grid-template-columns: 1fr; }
+}
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.btn-primary {
+  background:#2b77ff; color:#fff; border:0;
+  padding: 9px 14px; border-radius: 8px;
+}
+.empty { opacity: .8; padding: 8px 0; }
+.graphs-section.minimised .section-body { display: none !important; }
+.graphs-section.minimised .section-header { border-bottom: 0; }
