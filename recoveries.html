@@ -958,6 +958,10 @@
       });
     }
 
+    if (inputs.datetime && !inputs.datetime.value) {
+      inputs.datetime.value = formatLocalDateTime(new Date());
+    }
+
     form.addEventListener('reset', () => {
       window.requestAnimationFrame(() => {
         clearErrors();
@@ -971,6 +975,9 @@
         setSaveMessage('');
         setValidationMessage('');
       });
+      if (inputs.datetime) {
+        inputs.datetime.value = formatLocalDateTime(new Date());
+      }
     });
 
     if (supportsDirectoryPicker && supportsIndexedDB) {
@@ -993,6 +1000,8 @@
       if (grantLegacyButton) {
         grantLegacyButton.disabled = true;
       }
+      renderAnalytics();
+      populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
     }
     refreshLegacyUI();
 
@@ -1099,7 +1108,16 @@
           if (typeof loadRecoveriesFromPrimary === 'function' && primaryHasReadAccess) {
             await loadRecoveriesFromPrimary();
           } else {
-            renderAnalytics();
+            try {
+              const parsed = JSON.parse(json);
+              if (Array.isArray(window.__REC_DATA)) {
+                window.__REC_DATA.push(parsed);
+              }
+              populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
+              renderAnalytics();
+            } catch (_) {
+              renderAnalytics();
+            }
           }
         } catch (err) {
           console.error('Save failed', err);
@@ -1247,6 +1265,16 @@
           if (!inputs.stolenDesc.value.trim()) pushError(issues, 'field-stolen-desc', 'Describe the stolen property.');
         }
       }
+
+      ['vehicleValue','drugValue','stolenValue','counterfeitValue'].forEach((key) => {
+        const el = inputs[key];
+        if (el && el.value.trim() !== '') {
+          const n = toNumber(el);
+          if (n === null || n < 0) {
+            pushError(issues, el.id, 'Enter a valid, non-negative value.');
+          }
+        }
+      });
 
       if (issues.length) {
         const first = issues[0];
@@ -1562,6 +1590,38 @@
       return previous;
     }
 
+    function collectFYLabelsFromRecords(records) {
+      const set = new Set();
+      records.forEach((r) => {
+        const dt = new Date(r?.datetime || r?.createdAt || r?.updatedAt || 0);
+        if (!Number.isNaN(dt.getTime())) {
+          const fy = getCurrentFY(dt);
+          set.add(fy.fyLabel);
+        }
+      });
+      const cur = getCurrentFY(new Date()).fyLabel;
+      const prev = getPreviousFY(cur)?.fyLabel;
+      set.add(cur);
+      if (prev) set.add(prev);
+      return Array.from(set).sort();
+    }
+
+    function populateFYSelects(records) {
+      const labels = collectFYLabelsFromRecords(records);
+      const selects = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect].filter(Boolean);
+      selects.forEach((sel) => {
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = labels.map((l) => `<option value="${l}">${l}</option>`).join('');
+        const preferred = (state && state.fy && labels.includes(state.fy)) ? state.fy
+                        : (labels.includes(current) ? current : labels[labels.length - 1]);
+        sel.value = preferred;
+        sel.setAttribute('title', preferred);
+      });
+      if (state) state.fy = fySelect ? fySelect.value : (state.fy || labels[labels.length - 1]);
+      syncFYControls();
+    }
+
     function monthIndexAprMar(date) {
       if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
       const month = date.getMonth();
@@ -1615,7 +1675,7 @@
       return Number.isFinite(num) ? Math.max(num, 0) : 0;
     }
 
-    function bucketByMonthFY(records, { division = 'All', type = 'All' } = {}, fyRange) {
+    function bucketByMonthFYCanonical(records, { division = 'All', type = 'All' } = {}, fyRange) {
       const buckets = zeroBuckets();
       const normalizedDivision = division ? String(division).toUpperCase() : 'ALL';
       const normalizedType = type === 'All' ? 'All' : type;
@@ -1649,6 +1709,23 @@
           value: buckets.values[index]
         }))
       };
+    }
+
+    window.__bucketByMonthFYCanonical = bucketByMonthFYCanonical;
+    window.__bucketByMonthFY = bucketByMonthFYCanonical;
+
+    // ---- CANONICAL helper exists above: bucketByMonthFYCanonical(records, { division, type } = {}, fyRange) ----
+    // Replace the later duplicate with a wrapper that calls the canonical version:
+    function bucketByMonthFY(records, { division = 'ALL', type = 'ALL' } = {}, fyRange) {
+      const normalizedDivision = division === 'ALL' ? 'All' : division;
+      const normalizedType = type === 'ALL' ? 'All' : type;
+      return (typeof window.__bucketByMonthFYCanonical === 'function')
+        ? window.__bucketByMonthFYCanonical(records, { division: normalizedDivision, type: normalizedType }, fyRange)
+        : (function() {
+            // Fallback: call the earlier defined function directly if we can detect it
+            try { return window.__bucketByMonthFY(records, { division: normalizedDivision, type: normalizedType }, fyRange); }
+            catch (_) { return { months: [], counts: [], values: [] }; }
+          })();
     }
 
     function aggregateFYByType(records, fyRange) {
@@ -1709,7 +1786,7 @@
       const range = resolveFY(fyRange || state.fy);
       const filtered = filterByFY(records, range);
       const aggregate = aggregateFYByType(filtered, range);
-      const bucket = bucketByMonthFY(filtered, {}, range);
+      const bucket = bucketByMonthFYCanonical(filtered, {}, range);
 
       const maxTypeValue = Math.max(...TYPE_CONFIG.map((cfg) => aggregate.perType[cfg.key].value), 0);
       const reference = Math.max(aggregate.totalValue, maxTypeValue, 1);
@@ -1739,6 +1816,7 @@
           if (key === 'primary') {
             primaryDirectoryHandle = null;
             primaryHasReadAccess = false;
+            if (reloadDataButton) reloadDataButton.disabled = true;
           } else if (key === 'legacy') {
             legacyDirectoryHandle = null;
             legacyHasReadAccess = false;
@@ -1763,6 +1841,7 @@
       if (!supportsDirectoryPicker) {
         setAnalyticsStatus('File System Access not supported in this browser. Downloads will be used.');
         renderAnalytics();
+        populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
         return;
       }
       setAnalyticsStatus('Checking folder access…');
@@ -1782,6 +1861,7 @@
           legacyHasReadAccess = false;
           setAnalyticsStatus('Permission needed. Click "Grant access to Recovery Folder".');
           renderAnalytics();
+          populateFYSelects(Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []);
           return;
         }
 
@@ -1874,6 +1954,7 @@
             primaryHasReadAccess = false;
             primaryDirectoryHandle = null;
             setFolderStatus('Recovery Folder access lost. Downloads will be used until permission is granted again.');
+            if (reloadDataButton) reloadDataButton.disabled = true;
           } else {
             legacyHasReadAccess = false;
             legacyDirectoryHandle = null;
@@ -1921,6 +2002,7 @@
       await processHandle(legacyDirectoryHandle, 'legacy');
 
       window.__REC_DATA = mergedRecords;
+      populateFYSelects(window.__REC_DATA);
       window.__REC_INVALID = skippedTotal;
 
       const totalCount = mergedRecords.length;
@@ -1992,6 +2074,9 @@
         console.error('Failed to verify write permission', err);
       }
       refreshLegacyUI();
+      if (reloadDataButton) {
+        reloadDataButton.disabled = !(primaryDirectoryHandle && primaryHasReadAccess);
+      }
     }
 
     async function openHandlesDB() {
@@ -2422,7 +2507,7 @@
         return;
       }
 
-      const bucket = bucketByMonthFY(records, { division: state.division }, fyRange);
+      const bucket = bucketByMonthFYCanonical(records, { division: state.division }, fyRange);
       const divisionKey = state.division === 'All' ? 'ALL' : String(state.division).toUpperCase();
       const divisionLabel = divisionKey === 'ALL' ? 'All divisions' : (divisionKey === 'OTHER' ? 'Other' : `Division ${divisionKey}`);
 
@@ -2475,7 +2560,7 @@
         return;
       }
 
-      const bucket = bucketByMonthFY(records, { type: state.type }, fyRange);
+      const bucket = bucketByMonthFYCanonical(records, { type: state.type }, fyRange);
       const selectedType = state.type === 'All' ? 'All types' : state.type;
 
       renderColumn(typeCountChartEl, {

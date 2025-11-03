@@ -748,6 +748,11 @@ html{
   background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.18));
   box-shadow:none;
 }
+
+/* Recoveries analytics small fixes */
+.ytd-chart-fill {
+  transform-origin: bottom;
+}
 .ytd-comparison{
   display:flex; flex-direction:column; gap:6px;
 }
