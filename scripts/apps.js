@@ -365,3 +365,364 @@ const AppsStore = (() => {
   };
 })();
 window.AppsStore = AppsStore;
+
+/* ------------------------------------------------------------------ */
+/* Applications grid enhancements (search + density + compact tiles)  */
+/* ------------------------------------------------------------------ */
+(function(){
+  const DENSITY_STORAGE_KEY = 'base_apps_density';
+  const SEARCH_DEBOUNCE_MS = 80;
+  const state = {
+    apps: [],
+    searchTerm: '',
+    density: null,
+    eventsBound: false,
+    countEl: null,
+    searchInput: null,
+    controlsReady: false
+  };
+
+  function init(){
+    const grid = document.getElementById('apps-grid');
+    if(!grid) return;
+    setupControls();
+    overrideRenderer();
+  }
+
+  function setupControls(){
+    if(state.controlsReady) return;
+    state.controlsReady = true;
+    state.searchInput = document.getElementById('apps-search');
+    const compactBtn = document.getElementById('mode-compact');
+    const comfortBtn = document.getElementById('mode-comfort');
+
+    state.density = readStoredDensity();
+    applyDensity(state.density, { persist:false });
+
+    if(state.searchInput){
+      const handler = debounce(value => {
+        state.searchTerm = (value || '').trim();
+        renderTiles();
+      }, SEARCH_DEBOUNCE_MS);
+      state.searchInput.addEventListener('input', event => handler(event.target.value));
+    }
+
+    compactBtn?.addEventListener('click', () => {
+      setDensity('compact', { persist:true, rerender:true });
+    });
+
+    comfortBtn?.addEventListener('click', () => {
+      setDensity('comfort', { persist:true, rerender:true });
+    });
+  }
+
+  function overrideRenderer(){
+    const customRender = () => {
+      const grid = document.getElementById('apps-grid');
+      if(!grid) return;
+
+      const store = window.AppsStore;
+      let apps = (store?.getAll && store.getAll()) || [];
+      const status = store?.getStatus?.() || {};
+      const meta = store?.getMeta?.() || {};
+      const errorBox = document.getElementById('apps-error');
+      const errorMsg = document.getElementById('apps-error-message');
+
+      if(errorBox){
+        if(status.error){
+          errorBox.hidden = false;
+          if(errorMsg) errorMsg.textContent = status.error;
+        }else{
+          errorBox.hidden = true;
+        }
+      }
+
+      if(typeof window.updateMetaFooter === 'function'){
+        window.updateMetaFooter(meta);
+      }
+
+      if(!apps.length) apps = window.Apps || [];
+      const isFull = grid.dataset.full === 'true';
+      const list = isFull ? apps : apps.slice(0, 9);
+
+      state.apps = Array.isArray(list) ? list.slice() : [];
+      renderTiles();
+    };
+
+    window.renderApps = customRender;
+    customRender();
+  }
+
+  function renderTiles(){
+    const grid = document.getElementById('apps-grid');
+    if(!grid) return;
+
+    ensureDensity();
+
+    const query = (state.searchTerm || '').toLowerCase();
+    const apps = Array.isArray(state.apps) ? state.apps : [];
+    const filtered = query ? apps.filter(app => matchesQuery(app, query)) : apps.slice();
+
+    const fragment = document.createDocumentFragment();
+    filtered.forEach(app => {
+      const tile = buildTile(app);
+      if(tile) fragment.appendChild(tile);
+    });
+
+    grid.innerHTML = '';
+    grid.appendChild(fragment);
+
+    bindTileEvents(grid);
+    updateResultCount(filtered.length, apps.length);
+    updateGridMetrics(grid, filtered.length);
+    grid.classList.toggle('is-empty', filtered.length === 0);
+  }
+
+  function buildTile(app = {}){
+    const action = normalizeAction(app);
+    const label = app.label || 'Application';
+    const key = app.key || label.toLowerCase().replace(/\s+/g,'-');
+    const ariaLabel = action.ariaLabel || `Open ${label}`;
+    const title = action.title || label;
+
+    let el;
+    if(action.type === 'link'){
+      el = document.createElement('a');
+      el.href = action.url || '#';
+      if(action.target) el.target = action.target;
+      if(action.rel) el.rel = action.rel;
+    }else{
+      el = document.createElement('button');
+      el.type = 'button';
+      el.dataset.action = action.type;
+      if(action.type === 'local'){
+        if(action.path) el.dataset.path = action.path;
+        if(action.relPath) el.dataset.rel = action.relPath;
+      }
+      if(action.type === 'modal' && action.modalId){
+        el.dataset.modalId = action.modalId;
+      }
+      if(action.type === 'disabled'){
+        el.disabled = true;
+        el.setAttribute('aria-disabled', 'true');
+      }
+    }
+
+    el.className = 'app-tile';
+    el.dataset.key = key;
+    el.setAttribute('role', 'gridcell');
+    el.setAttribute('aria-label', ariaLabel);
+    el.title = title;
+
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'app-icon-wrap';
+    const icon = buildIcon(app);
+    if(icon) iconWrap.appendChild(icon);
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'app-label';
+    labelEl.textContent = label;
+
+    el.append(iconWrap, labelEl);
+    return el;
+  }
+
+  function buildIcon(app = {}){
+    const icon = (app.icon || '').trim();
+    if(icon){
+      const direct = /^(data:|https?:|\.\.?\/)/i.test(icon);
+      const src = direct ? icon : `./lib/assets/images/icons/${icon}`;
+      const img = document.createElement('img');
+      img.className = 'app-icon';
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      return img;
+    }
+    const fallback = document.createElement('span');
+    fallback.className = 'app-fallback';
+    fallback.textContent = (app.label || '?').slice(0,2).toUpperCase();
+    return fallback;
+  }
+
+  function matchesQuery(app = {}, query = ''){
+    if(!query) return true;
+    const haystack = [];
+    if(app.label) haystack.push(String(app.label));
+    if(app.key) haystack.push(String(app.key));
+    const tags = app.tags;
+    if(Array.isArray(tags)) haystack.push(...tags.map(tag => String(tag)));
+    else if(typeof tags === 'string') haystack.push(tags);
+    return haystack.some(value => value && value.toLowerCase().includes(query));
+  }
+
+  function normalizeAction(app = {}){
+    const type = app.action?.type || 'link';
+    const label = app.label || 'Application';
+    const fallbackUrl = app.action?.url || app.href || `https://placeholder.local/${app.key || 'app'}`;
+    return {
+      type,
+      url: fallbackUrl,
+      target: app.action?.target || '_blank',
+      rel: app.action?.rel || 'noopener noreferrer',
+      ariaLabel: app.action?.ariaLabel || `Open ${label}`,
+      title: app.action?.title || label,
+      path: app.action?.path || app.href || '',
+      relPath: app.action?.relPath || '',
+      modalId: app.action?.modalId || null
+    };
+  }
+
+  function bindTileEvents(grid){
+    if(state.eventsBound){
+      return;
+    }
+    grid.addEventListener('click', event => {
+      const target = event.target.closest('.app-tile[data-action]');
+      if(!target) return;
+      const action = target.dataset.action;
+      if(action === 'disabled'){
+        event.preventDefault();
+        return;
+      }
+      if(action === 'local'){
+        event.preventDefault();
+        const abs = target.dataset.path || '';
+        const rel = target.dataset.rel || '';
+        if(typeof window.openLocal === 'function'){
+          if(!window.openLocal(abs, rel)){
+            alert('Unable to open this application. Please verify the local path.');
+          }
+        }else if(abs || rel){
+          window.open(abs || rel, '_blank', 'noopener');
+        }
+      }
+      if(action === 'modal'){
+        event.preventDefault();
+        const modalId = target.dataset.modalId || '';
+        if(typeof window.triggerModal === 'function'){
+          window.triggerModal(modalId);
+        }else if(modalId){
+          const modal = document.getElementById(modalId);
+          if(modal){
+            modal.hidden = false;
+            modal.focus?.();
+          }
+        }
+      }
+    });
+    state.eventsBound = true;
+  }
+
+  function updateResultCount(visible, total){
+    const wrap = document.getElementById('apps-meta');
+    if(!wrap) return;
+    let el = state.countEl;
+    if(!el){
+      el = document.createElement('span');
+      el.id = 'apps-meta-count';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      wrap.appendChild(el);
+      state.countEl = el;
+    }
+    const suffix = visible === 1 ? 'app' : 'apps';
+    el.textContent = `${visible} ${suffix} shown` + (visible !== total ? ` of ${total}` : '');
+    el.hidden = false;
+    wrap.hidden = false;
+  }
+
+  function updateGridMetrics(grid, count){
+    if(!grid) return;
+    const columns = getColumnCount(grid);
+    if(columns){
+      grid.setAttribute('aria-colcount', String(columns));
+      const rows = count ? Math.ceil(count / columns) : 0;
+      grid.setAttribute('aria-rowcount', String(rows));
+    }else{
+      grid.removeAttribute('aria-colcount');
+      grid.removeAttribute('aria-rowcount');
+    }
+  }
+
+  function getColumnCount(grid){
+    try{
+      const styles = window.getComputedStyle(grid);
+      const template = styles.gridTemplateColumns;
+      if(!template || template === 'none') return null;
+      if(/repeat\(\s*\d+/i.test(template)){
+        const match = template.match(/repeat\(\s*(\d+)/i);
+        if(match){
+          const value = parseInt(match[1], 10);
+          if(Number.isFinite(value) && value > 0) return value;
+        }
+      }
+      const cols = template.trim().split(/\s+/).filter(Boolean).length;
+      return cols || null;
+    }catch(_){
+      return null;
+    }
+  }
+
+  function ensureDensity(){
+    if(!state.density){
+      state.density = readStoredDensity();
+    }
+    applyDensity(state.density, { persist:false });
+  }
+
+  function setDensity(mode, { persist = false, rerender = false } = {}){
+    if(mode !== 'compact' && mode !== 'comfort') return;
+    state.density = mode;
+    applyDensity(mode, { persist });
+    if(rerender) renderTiles();
+  }
+
+  function applyDensity(mode, { persist = false } = {}){
+    const grid = document.getElementById('apps-grid');
+    if(grid){
+      grid.classList.toggle('compact', mode === 'compact');
+      grid.classList.toggle('comfort', mode === 'comfort');
+    }
+    const compactBtn = document.getElementById('mode-compact');
+    const comfortBtn = document.getElementById('mode-comfort');
+    if(compactBtn) compactBtn.setAttribute('aria-pressed', mode === 'compact' ? 'true' : 'false');
+    if(comfortBtn) comfortBtn.setAttribute('aria-pressed', mode === 'comfort' ? 'true' : 'false');
+    if(persist){
+      try{
+        localStorage.setItem(DENSITY_STORAGE_KEY, mode);
+      }catch(err){
+        console.warn('Unable to persist density preference', err);
+      }
+    }
+  }
+
+  function readStoredDensity(){
+    let stored = null;
+    try{
+      stored = localStorage.getItem(DENSITY_STORAGE_KEY);
+    }catch(err){
+      console.warn('Unable to read density preference', err);
+    }
+    if(stored === 'compact' || stored === 'comfort'){
+      return stored;
+    }
+    const prefersCompact = window.matchMedia ? window.matchMedia('(max-width: 480px)').matches : false;
+    return prefersCompact ? 'compact' : 'comfort';
+  }
+
+  function debounce(fn, wait){
+    let timer = null;
+    return function(value){
+      if(timer) clearTimeout(timer);
+      timer = setTimeout(() => fn.call(this, value), wait);
+    };
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, { once:true });
+  }else{
+    init();
+  }
+})();

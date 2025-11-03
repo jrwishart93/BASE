@@ -110,6 +110,16 @@
       <span id="apps-meta-updated-by"></span>
     </div>
 
+    <!-- Controls: search + density toggle -->
+    <section class="apps-controls" aria-label="Application controls">
+      <input id="apps-search" class="apps-search" type="search" inputmode="search"
+             placeholder="Search applications…" aria-label="Search applications">
+      <div class="density-toggle" role="group" aria-label="Tile density">
+        <button id="mode-compact"  class="toggle-btn" data-mode="compact"  aria-pressed="false" title="Compact grid">Compact</button>
+        <button id="mode-comfort"  class="toggle-btn" data-mode="comfort"  aria-pressed="false" title="Comfortable cards">Comfort</button>
+      </div>
+    </section>
+
     <section class="icon-grid" id="apps-grid" data-full="true" role="grid" aria-label="Applications"></section>
   </main>
 </body>
