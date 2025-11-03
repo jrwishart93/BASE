@@ -376,8 +376,12 @@ window.AppsStore = AppsStore;
     searchTerm: '',
     eventsBound: false,
     searchInput: null,
-    controlsReady: false
+    controlsReady: false,
+    tiles: new Map(),
+    appLookup: new Map()
   };
+
+  const BLANK_ICON_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
   function init(){
     const grid = document.getElementById('apps-grid');
@@ -422,109 +426,182 @@ window.AppsStore = AppsStore;
 
       if(!apps.length) apps = window.Apps || [];
       state.apps = Array.isArray(apps) ? apps.slice() : [];
-      renderTiles();
+      renderTiles({ sync:true });
     };
 
     window.renderApps = customRender;
     customRender();
   }
 
-  function renderTiles(){
+  function renderTiles(options = {}){
     const grid = document.getElementById('apps-grid');
     if(!grid) return;
 
-    const query = (state.searchTerm || '').toLowerCase();
-    const apps = Array.isArray(state.apps) ? state.apps : [];
-    const filtered = query ? apps.filter(app => matchesQuery(app, query)) : apps.slice();
+    if(options.sync) syncTiles(grid);
 
+    const visibleCount = applySearchFilter(grid);
+    grid.classList.toggle('is-empty', visibleCount === 0);
+  }
+
+  function syncTiles(grid){
+    const apps = Array.isArray(state.apps) ? state.apps : [];
     const fragment = document.createDocumentFragment();
-    filtered.forEach(app => {
-      const tile = buildTile(app);
-      if(tile) fragment.appendChild(tile);
+    const seen = new Set();
+    const lookup = new Map();
+
+    apps.forEach(app => {
+      const key = getAppKey(app);
+      lookup.set(key, app);
+      let tile = state.tiles.get(key);
+      if(!tile){
+        tile = buildTile(app);
+        state.tiles.set(key, tile);
+      }else{
+        updateTile(tile, app);
+      }
+      fragment.appendChild(tile);
+      seen.add(key);
+    });
+
+    state.tiles.forEach((tile, key) => {
+      if(!seen.has(key)){
+        tile.remove();
+        state.tiles.delete(key);
+      }
     });
 
     grid.innerHTML = '';
     grid.appendChild(fragment);
-
+    state.appLookup = lookup;
     bindTileEvents(grid);
-    updateGridMetrics(grid, filtered.length);
-    grid.classList.toggle('is-empty', filtered.length === 0);
+  }
+
+  function applySearchFilter(grid){
+    const query = (state.searchTerm || '').toLowerCase();
+    let visibleCount = 0;
+
+    state.tiles.forEach((tile, key) => {
+      const app = state.appLookup.get(key) || {};
+      const matches = matchesQuery(app, query);
+      tile.classList.toggle('is-hidden', !matches);
+      if(matches) visibleCount++;
+    });
+
+    updateGridMetrics(grid, visibleCount);
+    return visibleCount;
   }
 
   function buildTile(app = {}){
-    const action = normalizeAction(app);
-    const label = app.label || 'Application';
-    const key = app.key || label.toLowerCase().replace(/\s+/g,'-');
-    const ariaLabel = action.ariaLabel || `Open ${label}`;
-    const title = action.title || label;
-
     const el = document.createElement('a');
     el.className = 'app-tile';
-    el.dataset.key = key;
     el.setAttribute('role', 'gridcell');
-    el.setAttribute('aria-label', ariaLabel);
-    el.title = title;
     el.target = '_self';
     el.rel = 'noopener';
-
-    let href = action.url || app.href || '#';
-    if(action.type === 'local'){
-      href = action.path || action.relPath || href || '#';
-    }
-    if(action.type === 'modal' || action.type === 'disabled'){
-      href = '#';
-    }
-
-    el.href = href || '#';
-
-    if(action.type === 'link'){
-      if(action.target) el.target = action.target;
-      if(action.rel) el.rel = action.rel;
-    }else{
-      el.dataset.action = action.type;
-      if(action.type === 'local'){
-        if(action.path) el.dataset.path = action.path;
-        if(action.relPath) el.dataset.rel = action.relPath;
-      }
-      if(action.type === 'modal' && action.modalId){
-        el.dataset.modalId = action.modalId;
-      }
-      if(action.type === 'disabled'){
-        el.setAttribute('aria-disabled', 'true');
-        el.classList.add('is-disabled');
-      }
-    }
+    el.href = '#';
 
     const iconWrap = document.createElement('span');
     iconWrap.className = 'app-icon-wrap';
-    const icon = buildIcon(app);
-    if(icon) iconWrap.appendChild(icon);
+    iconWrap.appendChild(buildIcon(app));
 
     const labelEl = document.createElement('span');
     labelEl.className = 'app-label';
-    labelEl.textContent = label;
 
     el.append(iconWrap, labelEl);
+    updateTile(el, app);
     return el;
   }
 
-  function buildIcon(app = {}){
-    const icon = (app.icon || '').trim();
-    if(icon){
-      const direct = /^(data:|https?:|\.\.?\/)/i.test(icon);
-      const src = direct ? icon : `./lib/assets/images/icons/${icon}`;
-      const img = document.createElement('img');
-      img.className = 'app-icon';
-      img.src = src;
-      img.alt = '';
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      return img;
+  function updateTile(tile, app = {}){
+    const action = normalizeAction(app);
+    const label = app.label || 'Application';
+    const key = getAppKey(app);
+    const ariaLabel = action.ariaLabel || `Open ${label}`;
+    const title = action.title || label;
+
+    tile.dataset.key = key;
+    tile.setAttribute('aria-label', ariaLabel);
+    tile.title = title;
+
+    applyActionAttributes(tile, action);
+
+    const labelEl = tile.querySelector('.app-label');
+    if(labelEl) labelEl.textContent = label;
+
+    const iconWrap = tile.querySelector('.app-icon-wrap');
+    if(iconWrap){
+      let img = iconWrap.querySelector('.app-icon');
+      const nextSrc = resolveIconSrc(app.icon);
+      if(!img){
+        img = buildIcon(app);
+        iconWrap.innerHTML = '';
+        iconWrap.appendChild(img);
+      }else if(img.getAttribute('src') !== nextSrc){
+        img.src = nextSrc;
+      }
     }
-    const fallback = document.createElement('span');
-    fallback.className = 'app-fallback';
-    fallback.textContent = (app.label || '?').slice(0,2).toUpperCase();
-    return fallback;
+  }
+
+  function applyActionAttributes(tile, action){
+    tile.removeAttribute('data-action');
+    tile.removeAttribute('data-path');
+    tile.removeAttribute('data-rel');
+    tile.removeAttribute('data-modal-id');
+    tile.removeAttribute('aria-disabled');
+    tile.classList.remove('is-disabled');
+
+    tile.target = action.target || '_self';
+    tile.rel = action.rel || 'noopener';
+
+    let href = action.url || '#';
+
+    if(action.type === 'local'){
+      href = action.path || action.relPath || href || '#';
+      tile.target = '_self';
+      tile.rel = 'noopener';
+      tile.dataset.action = 'local';
+      if(action.path) tile.dataset.path = action.path;
+      if(action.relPath) tile.dataset.rel = action.relPath;
+    }else if(action.type === 'modal'){
+      href = '#';
+      tile.target = '_self';
+      tile.rel = 'noopener';
+      tile.dataset.action = 'modal';
+      if(action.modalId) tile.dataset.modalId = action.modalId;
+    }else if(action.type === 'disabled'){
+      href = '#';
+      tile.target = '_self';
+      tile.rel = 'noopener';
+      tile.dataset.action = 'disabled';
+      tile.setAttribute('aria-disabled', 'true');
+      tile.classList.add('is-disabled');
+    }
+
+    tile.href = href || '#';
+  }
+
+  function buildIcon(app = {}){
+    const img = document.createElement('img');
+    img.className = 'app-icon';
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.width = 56;
+    img.height = 56;
+    img.src = resolveIconSrc(app.icon);
+    return img;
+  }
+
+  function resolveIconSrc(iconPath){
+    const icon = (iconPath || '').trim();
+    if(!icon) return BLANK_ICON_SRC;
+    const direct = /^(data:|https?:|\.\.?\/)/i.test(icon);
+    return direct ? icon : `./lib/assets/images/icons/${icon}`;
+  }
+
+  function getAppKey(app = {}){
+    if(app.key) return app.key;
+    const label = app.label || 'application';
+    return label.toLowerCase().replace(/\s+/g,'-');
   }
 
   function matchesQuery(app = {}, query = ''){
