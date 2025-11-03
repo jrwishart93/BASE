@@ -367,17 +367,14 @@ const AppsStore = (() => {
 window.AppsStore = AppsStore;
 
 /* ------------------------------------------------------------------ */
-/* Applications grid enhancements (search + density + compact tiles)  */
+/* Applications grid enhancements (search + rendering)                 */
 /* ------------------------------------------------------------------ */
 (function(){
-  const DENSITY_STORAGE_KEY = 'base_apps_density';
   const SEARCH_DEBOUNCE_MS = 80;
   const state = {
     apps: [],
     searchTerm: '',
-    density: null,
     eventsBound: false,
-    countEl: null,
     searchInput: null,
     controlsReady: false
   };
@@ -393,11 +390,6 @@ window.AppsStore = AppsStore;
     if(state.controlsReady) return;
     state.controlsReady = true;
     state.searchInput = document.getElementById('apps-search');
-    const compactBtn = document.getElementById('mode-compact');
-    const comfortBtn = document.getElementById('mode-comfort');
-
-    state.density = readStoredDensity();
-    applyDensity(state.density, { persist:false });
 
     if(state.searchInput){
       const handler = debounce(value => {
@@ -406,14 +398,6 @@ window.AppsStore = AppsStore;
       }, SEARCH_DEBOUNCE_MS);
       state.searchInput.addEventListener('input', event => handler(event.target.value));
     }
-
-    compactBtn?.addEventListener('click', () => {
-      setDensity('compact', { persist:true, rerender:true });
-    });
-
-    comfortBtn?.addEventListener('click', () => {
-      setDensity('comfort', { persist:true, rerender:true });
-    });
   }
 
   function overrideRenderer(){
@@ -457,8 +441,6 @@ window.AppsStore = AppsStore;
     const grid = document.getElementById('apps-grid');
     if(!grid) return;
 
-    ensureDensity();
-
     const query = (state.searchTerm || '').toLowerCase();
     const apps = Array.isArray(state.apps) ? state.apps : [];
     const filtered = query ? apps.filter(app => matchesQuery(app, query)) : apps.slice();
@@ -473,7 +455,6 @@ window.AppsStore = AppsStore;
     grid.appendChild(fragment);
 
     bindTileEvents(grid);
-    updateResultCount(filtered.length, apps.length);
     updateGridMetrics(grid, filtered.length);
     grid.classList.toggle('is-empty', filtered.length === 0);
   }
@@ -485,15 +466,27 @@ window.AppsStore = AppsStore;
     const ariaLabel = action.ariaLabel || `Open ${label}`;
     const title = action.title || label;
 
-    let el;
+    const el = document.createElement('a');
+    el.className = 'app-tile';
+    el.dataset.key = key;
+    el.setAttribute('role', 'gridcell');
+    el.setAttribute('aria-label', ariaLabel);
+    el.title = title;
+
+    let href = action.url || app.href || '#';
+    if(action.type === 'local'){
+      href = action.path || action.relPath || href || '#';
+    }
+    if(action.type === 'modal' || action.type === 'disabled'){
+      href = '#';
+    }
+
+    el.href = href || '#';
+
     if(action.type === 'link'){
-      el = document.createElement('a');
-      el.href = action.url || '#';
       if(action.target) el.target = action.target;
       if(action.rel) el.rel = action.rel;
     }else{
-      el = document.createElement('button');
-      el.type = 'button';
       el.dataset.action = action.type;
       if(action.type === 'local'){
         if(action.path) el.dataset.path = action.path;
@@ -503,16 +496,10 @@ window.AppsStore = AppsStore;
         el.dataset.modalId = action.modalId;
       }
       if(action.type === 'disabled'){
-        el.disabled = true;
         el.setAttribute('aria-disabled', 'true');
+        el.classList.add('is-disabled');
       }
     }
-
-    el.className = 'app-tile';
-    el.dataset.key = key;
-    el.setAttribute('role', 'gridcell');
-    el.setAttribute('aria-label', ariaLabel);
-    el.title = title;
 
     const iconWrap = document.createElement('span');
     iconWrap.className = 'app-icon-wrap';
@@ -615,24 +602,6 @@ window.AppsStore = AppsStore;
     state.eventsBound = true;
   }
 
-  function updateResultCount(visible, total){
-    const wrap = document.getElementById('apps-meta');
-    if(!wrap) return;
-    let el = state.countEl;
-    if(!el){
-      el = document.createElement('span');
-      el.id = 'apps-meta-count';
-      el.setAttribute('role', 'status');
-      el.setAttribute('aria-live', 'polite');
-      wrap.appendChild(el);
-      state.countEl = el;
-    }
-    const suffix = visible === 1 ? 'app' : 'apps';
-    el.textContent = `${visible} ${suffix} shown` + (visible !== total ? ` of ${total}` : '');
-    el.hidden = false;
-    wrap.hidden = false;
-  }
-
   function updateGridMetrics(grid, count){
     if(!grid) return;
     const columns = getColumnCount(grid);
@@ -663,53 +632,6 @@ window.AppsStore = AppsStore;
     }catch(_){
       return null;
     }
-  }
-
-  function ensureDensity(){
-    if(!state.density){
-      state.density = readStoredDensity();
-    }
-    applyDensity(state.density, { persist:false });
-  }
-
-  function setDensity(mode, { persist = false, rerender = false } = {}){
-    if(mode !== 'compact' && mode !== 'comfort') return;
-    state.density = mode;
-    applyDensity(mode, { persist });
-    if(rerender) renderTiles();
-  }
-
-  function applyDensity(mode, { persist = false } = {}){
-    const grid = document.getElementById('apps-grid');
-    if(grid){
-      grid.classList.toggle('compact', mode === 'compact');
-      grid.classList.toggle('comfort', mode === 'comfort');
-    }
-    const compactBtn = document.getElementById('mode-compact');
-    const comfortBtn = document.getElementById('mode-comfort');
-    if(compactBtn) compactBtn.setAttribute('aria-pressed', mode === 'compact' ? 'true' : 'false');
-    if(comfortBtn) comfortBtn.setAttribute('aria-pressed', mode === 'comfort' ? 'true' : 'false');
-    if(persist){
-      try{
-        localStorage.setItem(DENSITY_STORAGE_KEY, mode);
-      }catch(err){
-        console.warn('Unable to persist density preference', err);
-      }
-    }
-  }
-
-  function readStoredDensity(){
-    let stored = null;
-    try{
-      stored = localStorage.getItem(DENSITY_STORAGE_KEY);
-    }catch(err){
-      console.warn('Unable to read density preference', err);
-    }
-    if(stored === 'compact' || stored === 'comfort'){
-      return stored;
-    }
-    const prefersCompact = window.matchMedia ? window.matchMedia('(max-width: 480px)').matches : false;
-    return prefersCompact ? 'compact' : 'comfort';
   }
 
   function debounce(fn, wait){
