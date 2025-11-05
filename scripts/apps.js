@@ -367,137 +367,106 @@ const AppsStore = (() => {
 window.AppsStore = AppsStore;
 
 /* ------------------------------------------------------------------ */
-/* Applications grid enhancements (search + rendering)                 */
+/* Applications grid hydration (single render + search filtering)      */
 /* ------------------------------------------------------------------ */
 (function(){
-  const SEARCH_DEBOUNCE_MS = 80;
-  const state = {
-    apps: [],
-    searchTerm: '',
-    eventsBound: false,
-    searchInput: null,
-    controlsReady: false,
-    tiles: new Map(),
-    appLookup: new Map()
-  };
-
   const BLANK_ICON_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  const state = {
+    grid: null,
+    entries: [],
+    searchTerm: '',
+    searchInput: null
+  };
 
   function init(){
     const grid = document.getElementById('apps-grid');
     if(!grid) return;
-    setupControls();
-    overrideRenderer();
+    state.grid = grid;
+    bindSearch();
+    installRenderer();
   }
 
-  function setupControls(){
-    if(state.controlsReady) return;
-    state.controlsReady = true;
-    state.searchInput = document.getElementById('apps-search');
+  function bindSearch(){
+    const input = document.getElementById('apps-search');
+    state.searchInput = input || null;
+    if(!input) return;
+    input.addEventListener('input', event => {
+      state.searchTerm = ((event.target.value || '').trim()).toLowerCase();
+      applySearch();
+    });
+  }
 
-    if(state.searchInput){
-      const handler = debounce(value => {
-        state.searchTerm = (value || '').trim();
-        renderTiles();
-      }, SEARCH_DEBOUNCE_MS);
-      state.searchInput.addEventListener('input', event => handler(event.target.value));
+  function installRenderer(){
+    function renderApps(){
+      console.log('renderApps');
+      if(window.BASE?.appsRendered) return;
+      const hydrated = hydrateGrid();
+      if(hydrated){
+        window.BASE = window.BASE || {};
+        window.BASE.appsRendered = true;
+      }
+    }
+
+    window.renderApps = renderApps;
+    renderApps();
+  }
+
+  function hydrateGrid(){
+    const grid = state.grid || document.getElementById('apps-grid');
+    if(!grid || grid.dataset.hydrated === 'true') return false;
+
+    const store = window.AppsStore;
+    let apps = (store?.getAll && store.getAll()) || [];
+    const status = store?.getStatus?.() || {};
+    syncErrorState(status);
+
+    if(!apps.length) apps = window.Apps || [];
+
+    const fragment = document.createDocumentFragment();
+    const entries = [];
+
+    apps.forEach(app => {
+      const tile = buildTile(app);
+      fragment.appendChild(tile);
+      entries.push({
+        key: getAppKey(app),
+        element: tile,
+        terms: buildSearchTerms(app)
+      });
+    });
+
+    grid.replaceChildren(fragment);
+    grid.dataset.hydrated = 'true';
+    state.entries = entries;
+
+    bindTileEvents(grid);
+    applySearch();
+    return true;
+  }
+
+  function syncErrorState(status){
+    const errorBox = document.getElementById('apps-error');
+    const errorMsg = document.getElementById('apps-error-message');
+    if(!errorBox) return;
+    if(status?.error){
+      errorBox.hidden = false;
+      if(errorMsg) errorMsg.textContent = status.error;
+    }else{
+      errorBox.hidden = true;
     }
   }
 
-  function overrideRenderer(){
-    const customRender = () => {
-      const grid = document.getElementById('apps-grid');
-      if(!grid) return;
-
-      const store = window.AppsStore;
-      let apps = (store?.getAll && store.getAll()) || [];
-      const status = store?.getStatus?.() || {};
-      const errorBox = document.getElementById('apps-error');
-      const errorMsg = document.getElementById('apps-error-message');
-
-      if(errorBox){
-        if(status.error){
-          errorBox.hidden = false;
-          if(errorMsg) errorMsg.textContent = status.error;
-        }else{
-          errorBox.hidden = true;
-        }
-      }
-
-      if(!apps.length) apps = window.Apps || [];
-      state.apps = Array.isArray(apps) ? apps.slice() : [];
-      renderTiles({ sync:true });
-    };
-
-    window.renderApps = customRender;
-    customRender();
-  }
-
-  function renderTiles(options = {}){
-    const grid = document.getElementById('apps-grid');
-    if(!grid) return;
-
-    if(options.sync) syncTiles(grid);
-
-    const visibleCount = applySearchFilter(grid);
-    grid.classList.toggle('is-empty', visibleCount === 0);
-  }
-
-  function syncTiles(grid){
-    const apps = Array.isArray(state.apps) ? state.apps : [];
-    const fragment = document.createDocumentFragment();
-    const seen = new Set();
-    const lookup = new Map();
-
-    apps.forEach(app => {
-      const key = getAppKey(app);
-      lookup.set(key, app);
-      let tile = state.tiles.get(key);
-      if(!tile){
-        tile = buildTile(app);
-        state.tiles.set(key, tile);
-      }else{
-        updateTile(tile, app);
-      }
-      fragment.appendChild(tile);
-      seen.add(key);
-    });
-
-    state.tiles.forEach((tile, key) => {
-      if(!seen.has(key)){
-        tile.remove();
-        state.tiles.delete(key);
-      }
-    });
-
-    grid.innerHTML = '';
-    grid.appendChild(fragment);
-    state.appLookup = lookup;
-    bindTileEvents(grid);
-  }
-
-  function applySearchFilter(grid){
-    const query = (state.searchTerm || '').toLowerCase();
-    let visibleCount = 0;
-
-    state.tiles.forEach((tile, key) => {
-      const app = state.appLookup.get(key) || {};
-      const matches = matchesQuery(app, query);
-      tile.classList.toggle('is-hidden', !matches);
-      if(matches) visibleCount++;
-    });
-
-    updateGridMetrics(grid, visibleCount);
-    return visibleCount;
-  }
-
   function buildTile(app = {}){
-    const el = document.createElement('a');
-    el.className = 'app-tile';
-    el.setAttribute('role', 'gridcell');
-    el.target = '_self';
-    el.rel = 'noopener';
-    el.href = '#';
+    const action = normalizeAction(app);
+    const tile = document.createElement('a');
+    tile.className = 'app-tile';
+    tile.setAttribute('role', 'gridcell');
+    tile.href = action.url || '#';
+    tile.target = '_self';
+    tile.rel = 'noopener';
+    tile.dataset.key = getAppKey(app);
+    tile.setAttribute('aria-label', action.ariaLabel || `Open ${app.label || 'application'}`);
+    tile.title = action.title || app.label || '';
 
     const iconWrap = document.createElement('span');
     iconWrap.className = 'app-icon-wrap';
@@ -505,78 +474,11 @@ window.AppsStore = AppsStore;
 
     const labelEl = document.createElement('span');
     labelEl.className = 'app-label';
+    labelEl.textContent = app.label || '';
 
-    el.append(iconWrap, labelEl);
-    updateTile(el, app);
-    return el;
-  }
-
-  function updateTile(tile, app = {}){
-    const action = normalizeAction(app);
-    const label = app.label || 'Application';
-    const key = getAppKey(app);
-    const ariaLabel = action.ariaLabel || `Open ${label}`;
-    const title = action.title || label;
-
-    tile.dataset.key = key;
-    tile.setAttribute('aria-label', ariaLabel);
-    tile.title = title;
-
+    tile.append(iconWrap, labelEl);
     applyActionAttributes(tile, action);
-
-    const labelEl = tile.querySelector('.app-label');
-    if(labelEl) labelEl.textContent = label;
-
-    const iconWrap = tile.querySelector('.app-icon-wrap');
-    if(iconWrap){
-      let img = iconWrap.querySelector('.app-icon');
-      const nextSrc = resolveIconSrc(app.icon);
-      if(!img){
-        img = buildIcon(app);
-        iconWrap.innerHTML = '';
-        iconWrap.appendChild(img);
-      }else if(img.getAttribute('src') !== nextSrc){
-        img.src = nextSrc;
-      }
-    }
-  }
-
-  function applyActionAttributes(tile, action){
-    tile.removeAttribute('data-action');
-    tile.removeAttribute('data-path');
-    tile.removeAttribute('data-rel');
-    tile.removeAttribute('data-modal-id');
-    tile.removeAttribute('aria-disabled');
-    tile.classList.remove('is-disabled');
-
-    tile.target = action.target || '_self';
-    tile.rel = action.rel || 'noopener';
-
-    let href = action.url || '#';
-
-    if(action.type === 'local'){
-      href = action.path || action.relPath || href || '#';
-      tile.target = '_self';
-      tile.rel = 'noopener';
-      tile.dataset.action = 'local';
-      if(action.path) tile.dataset.path = action.path;
-      if(action.relPath) tile.dataset.rel = action.relPath;
-    }else if(action.type === 'modal'){
-      href = '#';
-      tile.target = '_self';
-      tile.rel = 'noopener';
-      tile.dataset.action = 'modal';
-      if(action.modalId) tile.dataset.modalId = action.modalId;
-    }else if(action.type === 'disabled'){
-      href = '#';
-      tile.target = '_self';
-      tile.rel = 'noopener';
-      tile.dataset.action = 'disabled';
-      tile.setAttribute('aria-disabled', 'true');
-      tile.classList.add('is-disabled');
-    }
-
-    tile.href = href || '#';
+    return tile;
   }
 
   function buildIcon(app = {}){
@@ -591,28 +493,31 @@ window.AppsStore = AppsStore;
     return img;
   }
 
-  function resolveIconSrc(iconPath){
-    const icon = (iconPath || '').trim();
-    if(!icon) return BLANK_ICON_SRC;
-    const direct = /^(data:|https?:|\.\.?\/)/i.test(icon);
-    return direct ? icon : `./lib/assets/images/icons/${icon}`;
-  }
+  function applyActionAttributes(tile, action){
+    tile.removeAttribute('data-action');
+    tile.removeAttribute('data-path');
+    tile.removeAttribute('data-rel');
+    tile.removeAttribute('data-modal-id');
+    tile.removeAttribute('aria-disabled');
+    tile.classList.remove('is-disabled');
 
-  function getAppKey(app = {}){
-    if(app.key) return app.key;
-    const label = app.label || 'application';
-    return label.toLowerCase().replace(/\s+/g,'-');
-  }
-
-  function matchesQuery(app = {}, query = ''){
-    if(!query) return true;
-    const haystack = [];
-    if(app.label) haystack.push(String(app.label));
-    if(app.key) haystack.push(String(app.key));
-    const tags = app.tags;
-    if(Array.isArray(tags)) haystack.push(...tags.map(tag => String(tag)));
-    else if(typeof tags === 'string') haystack.push(tags);
-    return haystack.some(value => value && value.toLowerCase().includes(query));
+    if(action.type === 'local'){
+      tile.href = action.path || action.relPath || '#';
+      tile.dataset.action = 'local';
+      if(action.path) tile.dataset.path = action.path;
+      if(action.relPath) tile.dataset.rel = action.relPath;
+    }else if(action.type === 'modal'){
+      tile.href = '#';
+      tile.dataset.action = 'modal';
+      if(action.modalId) tile.dataset.modalId = action.modalId;
+    }else if(action.type === 'disabled'){
+      tile.href = '#';
+      tile.dataset.action = 'disabled';
+      tile.setAttribute('aria-disabled', 'true');
+      tile.classList.add('is-disabled');
+    }else{
+      tile.href = action.url || '#';
+    }
   }
 
   function normalizeAction(app = {}){
@@ -622,8 +527,6 @@ window.AppsStore = AppsStore;
     return {
       type,
       url: fallbackUrl,
-      target: app.action?.target || '_self',
-      rel: app.action?.rel || 'noopener',
       ariaLabel: app.action?.ariaLabel || `Open ${label}`,
       title: app.action?.title || label,
       path: app.action?.path || app.href || '',
@@ -632,22 +535,27 @@ window.AppsStore = AppsStore;
     };
   }
 
+  function resolveIconSrc(iconPath){
+    const icon = (iconPath || '').trim();
+    if(!icon) return BLANK_ICON_SRC;
+    const direct = /^(data:|https?:|\.\.?\/)/i.test(icon);
+    return direct ? icon : `./lib/assets/images/icons/${icon}`;
+  }
+
   function bindTileEvents(grid){
-    if(state.eventsBound){
-      return;
-    }
+    if(grid.dataset.boundAppEvents === 'true') return;
     grid.addEventListener('click', event => {
-      const target = event.target.closest('.app-tile[data-action]');
-      if(!target) return;
-      const action = target.dataset.action;
+      const tile = event.target.closest('.app-tile[data-action]');
+      if(!tile) return;
+      const action = tile.dataset.action;
       if(action === 'disabled'){
         event.preventDefault();
         return;
       }
       if(action === 'local'){
         event.preventDefault();
-        const abs = target.dataset.path || '';
-        const rel = target.dataset.rel || '';
+        const abs = tile.dataset.path || '';
+        const rel = tile.dataset.rel || '';
         if(typeof window.openLocal === 'function'){
           if(!window.openLocal(abs, rel)){
             alert('Unable to open this application. Please verify the local path.');
@@ -658,7 +566,7 @@ window.AppsStore = AppsStore;
       }
       if(action === 'modal'){
         event.preventDefault();
-        const modalId = target.dataset.modalId || '';
+        const modalId = tile.dataset.modalId || '';
         if(typeof window.triggerModal === 'function'){
           window.triggerModal(modalId);
         }else if(modalId){
@@ -670,7 +578,38 @@ window.AppsStore = AppsStore;
         }
       }
     });
-    state.eventsBound = true;
+    grid.dataset.boundAppEvents = 'true';
+  }
+
+  function applySearch(){
+    const grid = state.grid || document.getElementById('apps-grid');
+    if(!grid) return 0;
+    const query = state.searchTerm;
+    let visible = 0;
+    state.entries.forEach(entry => {
+      const matches = !query || entry.terms.some(term => term.includes(query));
+      entry.element.classList.toggle('is-hidden', !matches);
+      if(matches) visible++;
+    });
+    updateGridMetrics(grid, visible);
+    grid.classList.toggle('is-empty', visible === 0 && state.entries.length > 0);
+    return visible;
+  }
+
+  function buildSearchTerms(app = {}){
+    const terms = [];
+    if(app.label) terms.push(String(app.label).toLowerCase());
+    if(app.key) terms.push(String(app.key).toLowerCase());
+    const tags = app.tags;
+    if(Array.isArray(tags)) terms.push(...tags.map(tag => String(tag).toLowerCase()));
+    else if(typeof tags === 'string') terms.push(String(tags).toLowerCase());
+    return terms;
+  }
+
+  function getAppKey(app = {}){
+    if(app.key) return app.key;
+    const label = app.label || 'application';
+    return label.toLowerCase().replace(/\s+/g, '-');
   }
 
   function updateGridMetrics(grid, count){
@@ -705,17 +644,10 @@ window.AppsStore = AppsStore;
     }
   }
 
-  function debounce(fn, wait){
-    let timer = null;
-    return function(value){
-      if(timer) clearTimeout(timer);
-      timer = setTimeout(() => fn.call(this, value), wait);
-    };
-  }
-
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init, { once:true });
   }else{
     init();
   }
 })();
+
