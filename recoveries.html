@@ -423,77 +423,54 @@
               </select>
               <small class="field-error" data-error-for="field-division" hidden></small>
             </div>
-            <div class="form-field">
-              <label class="field-label">
-                <span class="field-icon" aria-hidden="true">
-                  <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M4 12h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </span>
-                Seizure type
-              </label>
-              <div class="seizure-tiles" role="radiogroup" aria-label="Select seizure type">
-                <button type="button" class="seizure-tile" data-type-tile="Vehicle" data-type-value="Vehicle">
-                  <span class="seizure-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="M3 13h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M6 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M16 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M5 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="currentColor" stroke-width="1.5"/>
-                      <path d="M22 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="currentColor" stroke-width="1.5"/>
-                      <path d="M5.34 6.94A2 2 0 0 1 7.25 6h9.5a2 2 0 0 1 1.9 1.4l1.27 4.1A2 2 0 0 1 18.02 14H5.98a2 2 0 0 1-1.9-2.5l1.26-4.56Z" stroke="currentColor" stroke-width="1.5"/>
-                    </svg>
-                  </span>
-                  <span class="seizure-label">Vehicle</span>
-                  <input type="radio" name="seizure-type" value="Vehicle" class="sr-only">
+            <!-- Core Incident Details: Seizure Type -->
+            <div class="form-field field">
+              <label class="field-label" for="type-picker-first">Seizure type</label>
+
+              <!-- Error line (keep this id for existing validation) -->
+              <div id="seizure-type" class="field-error" data-error-for="seizure-type" hidden></div>
+
+              <!-- Radiogroup wrapper that the existing JS can discover -->
+              <div id="type-picker"
+                   class="type-picker"
+                   role="radiogroup"
+                   aria-labelledby="type-picker-legend"
+                   data-type-group>
+                <span id="type-picker-legend" class="visually-hidden">Choose seizure type</span>
+
+                <!-- Keep radios for logic and a11y, visually hidden -->
+                <input class="sr-only" type="radio" name="seizureType" id="type-vehicle" value="Vehicle" data-type-radio="Vehicle" aria-hidden="true">
+                <input class="sr-only" type="radio" name="seizureType" id="type-drug" value="Drug" data-type-radio="Drug" aria-hidden="true">
+                <input class="sr-only" type="radio" name="seizureType" id="type-cash" value="Cash" data-type-radio="Cash" aria-hidden="true">
+                <input class="sr-only" type="radio" name="seizureType" id="type-counterfeit" value="Counterfeit Goods" data-type-radio="Counterfeit Goods" aria-hidden="true">
+                <input class="sr-only" type="radio" name="seizureType" id="type-stolen" value="Stolen Property" data-type-radio="Stolen Property" aria-hidden="true">
+
+                <!-- Image tiles. Update src paths to match repo -->
+                <button type="button" class="type-tile" data-type-tile="Vehicle" role="radio" aria-checked="false" id="type-picker-first">
+                  <img src="./lib/assets/images/icons/icon-vehicles.png" alt="" width="48" height="48">
+                  <span>Vehicle</span>
                 </button>
-                <button type="button" class="seizure-tile" data-type-tile="Drug" data-type-value="Drug">
-                  <span class="seizure-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="m11 11 9-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M4 18h2l10-10a2 2 0 0 1 0 2.83L6.83 20H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                      <path d="M12 6 6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                  </span>
-                  <span class="seizure-label">Drug</span>
-                  <input type="radio" name="seizure-type" value="Drug" class="sr-only">
+
+                <button type="button" class="type-tile" data-type-tile="Drug" role="radio" aria-checked="false">
+                  <img src="./lib/assets/images/icons/icon-drug.png" alt="" width="48" height="48">
+                  <span>Drug</span>
                 </button>
-                <button type="button" class="seizure-tile" data-type-tile="Cash" data-type-value="Cash">
-                  <span class="seizure-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <rect x="3" y="7" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                      <path d="M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/>
-                      <path d="M12 11v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M10 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                  </span>
-                  <span class="seizure-label">Cash</span>
-                  <input type="radio" name="seizure-type" value="Cash" class="sr-only">
+
+                <button type="button" class="type-tile" data-type-tile="Cash" role="radio" aria-checked="false">
+                  <img src="./lib/assets/images/icons/icon-cash.png" alt="" width="48" height="48">
+                  <span>Cash</span>
                 </button>
-                <button type="button" class="seizure-tile" data-type-tile="Counterfeit Goods" data-type-value="Counterfeit Goods">
-                  <span class="seizure-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                      <path d="m8 16 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M11 8h5v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                  </span>
-                  <span class="seizure-label">Counterfeit</span>
-                  <input type="radio" name="seizure-type" value="Counterfeit Goods" class="sr-only">
+
+                <button type="button" class="type-tile" data-type-tile="Counterfeit Goods" role="radio" aria-checked="false">
+                  <img src="./lib/assets/images/icons/icon-counterfeit.png" alt="" width="48" height="48">
+                  <span>Counterfeit</span>
                 </button>
-                <button type="button" class="seizure-tile" data-type-tile="Stolen Property" data-type-value="Stolen Property">
-                  <span class="seizure-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24">
-                      <path d="M12 4.5c2.485 0 4.5 2.015 4.5 4.5a4.5 4.5 0 1 1-9 0c0-2.485 2.015-4.5 4.5-4.5Zm0 9.5c3.59 0 6.5 2.91 6.5 6.5H5.5c0-3.59 2.91-6.5 6.5-6.5Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    </svg>
-                  </span>
-                  <span class="seizure-label">Stolen property</span>
-                  <input type="radio" name="seizure-type" value="Stolen Property" class="sr-only">
+
+                <button type="button" class="type-tile" data-type-tile="Stolen Property" role="radio" aria-checked="false">
+                  <img src="./lib/assets/images/icons/icon-stolenproperty.png" alt="" width="48" height="48">
+                  <span>Stolen Property</span>
                 </button>
               </div>
-              <small class="field-error" data-error-for="seizure-type" hidden></small>
             </div>
           </div>
         </section>
@@ -979,10 +956,39 @@
       counterfeitValue: document.getElementById('field-counterfeit-value')
     };
 
-    const typeRadios = Array.from(form.querySelectorAll('input[name="seizure-type"]'));
+    const typeRadios = Array.from(form.querySelectorAll('input[data-type-radio]'));
     const typeTiles = Array.from(form.querySelectorAll('[data-type-tile]'));
     const typePanels = Array.from(form.querySelectorAll('.type-panel'));
-    const tileGroup = form.querySelector('.seizure-tiles');
+    const tileGroup = form.querySelector('[data-type-group]');
+
+    if (tileGroup) {
+      tileGroup.addEventListener('click', (event) => {
+        const tile = event.target.closest('.type-tile');
+        if (!tile || !tileGroup.contains(tile)) return;
+        const type = tile.getAttribute('data-type-tile');
+        if (type) activateType(type);
+      });
+
+      tileGroup.addEventListener('keydown', (event) => {
+        const tiles = Array.from(tileGroup.querySelectorAll('.type-tile'));
+        if (!tiles.length) return;
+        const currentIndex = tiles.findIndex((tile) => tile.classList.contains('is-active') || tile.getAttribute('aria-checked') === 'true');
+        const move = (delta) => {
+          const next = tiles[(currentIndex + delta + tiles.length) % tiles.length];
+          if (!next) return;
+          const type = next.getAttribute('data-type-tile');
+          if (type) activateType(type);
+        };
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          move(1);
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          move(-1);
+        }
+      });
+    }
 
     const manageTableEl = document.getElementById('manage-table');
     const manageTableBody = document.getElementById('manage-table-body');
