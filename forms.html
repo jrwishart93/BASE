@@ -56,7 +56,7 @@
     margin:22px 0 0;
     display:grid;
     gap:clamp(16px, 2vw, 24px);
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
   }
   .icon-grid .icon-btn{
     display:flex;
@@ -83,6 +83,8 @@
     outline:none;
   }
   .icon-grid .icon-ring{
+    position:relative;
+    isolation:isolate;
     width:96px;
     height:96px;
     border-radius:24px;
@@ -93,10 +95,21 @@
       rgba(255,255,255,.08);
     box-shadow:0 0 0 1px rgba(124,199,255,.25), 0 0 22px rgba(124,199,255,.35), 0 10px 26px rgba(0,0,0,.4);
   }
+  .icon-grid .icon-ring::before{
+    content:"";
+    position:absolute;
+    inset:-16px;
+    border-radius:32px;
+    background:radial-gradient(circle, rgba(124,199,255,.45) 0%, rgba(124,199,255,0) 70%);
+    opacity:.85;
+    z-index:-1;
+  }
   .icon-grid .icon-img{
+    position:relative;
+    z-index:1;
     width:52px;
     height:52px;
-    filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+    filter:drop-shadow(0 0 14px rgba(124,199,255,.55)) drop-shadow(0 6px 14px rgba(0,0,0,.45));
   }
   .icon-desc{
     display:block;
@@ -167,6 +180,29 @@
   @media (max-width:700px){
     .forms-toolbar{ justify-content:flex-start; }
     #forms-search{ width:100%; }
+  }
+  @media (max-width:620px){
+    .icon-grid.forms-grid{
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:18px;
+    }
+    .icon-grid .icon-btn{
+      padding:16px 12px;
+      gap:10px;
+    }
+    .icon-grid .icon-ring{
+      width:84px;
+      height:84px;
+      border-radius:20px;
+    }
+    .icon-grid .icon-ring::before{
+      inset:-12px;
+      border-radius:28px;
+    }
+    .icon-grid .icon-img{
+      width:44px;
+      height:44px;
+    }
   }
   </style>
 
