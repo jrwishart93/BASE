@@ -12,6 +12,7 @@
   <script defer src="./Applications/JSON/app-registry.js"></script>
   <script defer src="./scripts/data.js"></script>
   <script defer src="./scripts/apps.js"></script>
+  <script defer src="./scripts/settings.js"></script>
   <script defer src="./scripts/main.js"></script>
   <script defer src="./scripts/nav.js"></script>
 </head>
@@ -94,50 +95,66 @@
   </nav>
 
   <main class="container">
-    <section class="card">
-      <div class="card-head">
-        <h2>Manage Applications</h2>
-        <span id="apps-source-chip" class="chip" hidden>Loaded: defaults</span>
-      </div>
+    <section class="card settings-card">
+      <header class="card-head">
+        <h2>Settings</h2>
+      </header>
 
-      <div class="row gap8" style="justify-content:flex-end; flex-wrap:wrap;">
-        <input id="apps-file-input" type="file" accept=".json,application/json" style="display:none">
-        <button id="btn-reload-links-settings" class="btn ghost no-caret" type="button">Reload links</button>
-        <button id="btn-add-app" class="btn success" type="button">Add Application</button>
-        <button id="btn-save-apps" class="btn" type="button">Save Apps</button>
-        <button id="btn-export-apps" class="btn primary" type="button">Validate &amp; Export JSON</button>
-      </div>
+      <div class="settings-accordion" data-settings-accordion>
+        <details class="settings-panel" id="settings-applications">
+          <summary class="settings-panel-summary">
+            <span class="settings-panel-icon" aria-hidden="true"></span>
+            <span class="settings-panel-title">Applications</span>
+            <span class="settings-panel-status" data-settings-status>Collapsed</span>
+          </summary>
 
-      <div class="meta-grid" id="apps-meta-form">
-        <label>Version
-          <input id="apps-meta-version" type="text" placeholder="v2024.09">
-        </label>
-        <label>Last Updated
-          <input id="apps-meta-updated" type="text" placeholder="2024-09-01 08:30">
-        </label>
-        <label>Updated By
-          <input id="apps-meta-updated-by" type="text" placeholder="Inspector McRae">
-        </label>
-      </div>
+          <div class="settings-panel-body">
+            <div class="settings-panel-head">
+              <h3>Manage Applications</h3>
+              <span id="apps-source-chip" class="chip" hidden>Loaded: defaults</span>
+            </div>
 
-      <div id="apps-errors" class="notice danger" hidden>
-        <strong>Validation issues detected.</strong>
-        <ul id="apps-errors-list"></ul>
-      </div>
+            <div class="row gap8 settings-panel-actions" style="justify-content:flex-end; flex-wrap:wrap;">
+              <input id="apps-file-input" type="file" accept=".json,application/json" style="display:none">
+              <button id="btn-reload-links-settings" class="btn ghost no-caret" type="button">Reload links</button>
+              <button id="btn-add-app" class="btn success" type="button">Add Application</button>
+              <button id="btn-save-apps" class="btn" type="button">Save Apps</button>
+              <button id="btn-export-apps" class="btn primary" type="button">Validate &amp; Export JSON</button>
+            </div>
 
-      <div id="apps-file-warning" class="notice" hidden>
-        <strong>Local file access:</strong> Couldn’t read <span class="kbd">Applications/JSON/app-registry.js</span>.
-        <div class="mt8">
-          <label class="btn ghost" for="apps-file-input">Load registry…</label>
-        </div>
-      </div>
+            <div class="meta-grid" id="apps-meta-form">
+              <label>Version
+                <input id="apps-meta-version" type="text" placeholder="v2024.09">
+              </label>
+              <label>Last Updated
+                <input id="apps-meta-updated" type="text" placeholder="2024-09-01 08:30">
+              </label>
+              <label>Updated By
+                <input id="apps-meta-updated-by" type="text" placeholder="Inspector McRae">
+              </label>
+            </div>
 
-      <table class="table" id="tbl-apps">
-        <thead>
-          <tr><th>Name</th><th>URL</th><th>Icon Preview</th><th>Actions</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+            <div id="apps-errors" class="notice danger" hidden>
+              <strong>Validation issues detected.</strong>
+              <ul id="apps-errors-list"></ul>
+            </div>
+
+            <div id="apps-file-warning" class="notice" hidden>
+              <strong>Local file access:</strong> Couldn’t read <span class="kbd">Applications/JSON/app-registry.js</span>.
+              <div class="mt8">
+                <label class="btn ghost" for="apps-file-input">Load registry…</label>
+              </div>
+            </div>
+
+            <table class="table" id="tbl-apps">
+              <thead>
+                <tr><th>Name</th><th>URL</th><th>Icon Preview</th><th>Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
     </section>
   </main>
 
