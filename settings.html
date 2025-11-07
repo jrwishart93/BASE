@@ -105,6 +105,8 @@
           <summary class="settings-panel-summary">
             <span class="settings-panel-icon" aria-hidden="true"></span>
             <span class="settings-panel-title">Applications</span>
+            <span class="settings-panel-spacer" aria-hidden="true"></span>
+            <span class="settings-panel-meta" data-settings-summary="applications">Registry controls</span>
             <span class="settings-panel-status" data-settings-status>Collapsed</span>
           </summary>
 
@@ -152,6 +154,115 @@
               </thead>
               <tbody></tbody>
             </table>
+          </div>
+        </details>
+
+        <details class="settings-panel" id="settings-personalization">
+          <summary class="settings-panel-summary">
+            <span class="settings-panel-icon" aria-hidden="true"></span>
+            <span class="settings-panel-title">Personalization</span>
+            <span class="settings-panel-spacer" aria-hidden="true"></span>
+            <span class="settings-panel-meta" data-settings-summary="personalization">Follows system defaults</span>
+            <span class="settings-panel-status" data-settings-status>Collapsed</span>
+          </summary>
+
+          <div class="settings-panel-body">
+            <div class="settings-panel-head">
+              <h3>Adjust your interface</h3>
+              <button class="btn ghost no-caret" type="button" data-reset-personalization>Reset to defaults</button>
+            </div>
+
+            <form class="settings-form" data-personalization-form>
+              <fieldset class="settings-fieldset">
+                <legend>Theme</legend>
+                <label class="option">
+                  <input type="radio" name="theme" value="system" checked>
+                  <span>Match system preference</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="theme" value="dark">
+                  <span>Dark mode</span>
+                </label>
+                <label class="option">
+                  <input type="radio" name="theme" value="light">
+                  <span>Light mode</span>
+                </label>
+              </fieldset>
+
+              <div class="settings-control" data-font-scale-control>
+                <div class="settings-control-label">
+                  <label for="personalization-font-scale">Interface scale</label>
+                  <p class="muted">Adjusts typography and spacing across the console.</p>
+                </div>
+                <input id="personalization-font-scale" class="settings-slider" type="range" min="90" max="120" step="5" value="100" data-font-scale>
+                <output id="font-scale-output" class="settings-output" for="personalization-font-scale" data-font-scale-output>100%</output>
+              </div>
+
+              <label class="select-control" for="personalization-motion">
+                <span class="select-label">Animation preference</span>
+                <select id="personalization-motion" name="motion">
+                  <option value="system" selected>Follow system setting</option>
+                  <option value="reduce">Reduce motion</option>
+                  <option value="default">Allow animations</option>
+                </select>
+              </label>
+            </form>
+
+            <div id="personalization-storage-warning" class="notice info" hidden>
+              <strong>Preferences won't be saved.</strong>
+              <p>Your browser blocked local storage, so these options will reset next time.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="settings-panel" id="settings-notifications">
+          <summary class="settings-panel-summary">
+            <span class="settings-panel-icon" aria-hidden="true"></span>
+            <span class="settings-panel-title">Notifications</span>
+            <span class="settings-panel-spacer" aria-hidden="true"></span>
+            <span class="settings-panel-meta" data-settings-summary="notifications">Email and desktop alerts</span>
+            <span class="settings-panel-status" data-settings-status>Collapsed</span>
+          </summary>
+
+          <div class="settings-panel-body">
+            <div class="settings-panel-head">
+              <h3>Stay informed</h3>
+            </div>
+
+            <form class="settings-form" data-notifications-form>
+              <fieldset class="settings-fieldset">
+                <legend>Alert channels</legend>
+                <label class="option">
+                  <input type="checkbox" name="email" checked>
+                  <span>Email updates</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="desktop" checked>
+                  <span>Desktop push notifications</span>
+                </label>
+                <label class="option">
+                  <input type="checkbox" name="sms">
+                  <span>SMS alerts</span>
+                </label>
+              </fieldset>
+
+              <label class="select-control" for="notifications-digest">
+                <span class="select-label">Daily digest</span>
+                <select id="notifications-digest" name="digest">
+                  <option value="off">Disabled</option>
+                  <option value="06:00">06:00</option>
+                  <option value="08:00" selected>08:00</option>
+                  <option value="12:00">12:00</option>
+                  <option value="17:00">17:00</option>
+                </select>
+              </label>
+
+              <div class="settings-panel-actions" style="justify-content:flex-start;">
+                <button class="btn" type="button" data-send-test>Send test alert</button>
+              </div>
+            </form>
+
+            <div id="notifications-toast" class="notice info" hidden></div>
           </div>
         </details>
       </div>
