@@ -473,14 +473,25 @@ html{
 .form-card:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.4); }
 
 .form-card__icon{
-  appearance:none; border:none; background:rgba(255,255,255,.06);
+  appearance:none; border:none;
+  background:
+    radial-gradient(120% 120% at 50% 28%, rgba(124,199,255,.18), rgba(124,199,255,0) 68%),
+    rgba(255,255,255,.06);
   border-radius:24px; width:clamp(110px, 34vw, 140px); height:clamp(110px, 34vw, 140px); display:flex; align-items:center; justify-content:center;
-  padding:18px; border:1px solid rgba(255,255,255,.16); cursor:pointer;
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease; color:inherit;
+  padding:18px; border:1px solid rgba(255,255,255,.18); cursor:pointer;
+  box-shadow:0 0 0 1px rgba(124,199,255,.18), 0 0 22px rgba(124,199,255,.26), 0 12px 26px rgba(0,0,0,.38);
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease; color:inherit;
 }
-.form-card__icon:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.35); background:rgba(255,255,255,.08); }
+.form-card__icon:hover{
+  transform:translateY(-2px);
+  border-color:rgba(124,199,255,.35);
+  background:
+    radial-gradient(130% 130% at 50% 26%, rgba(124,199,255,.26), rgba(124,199,255,0) 70%),
+    rgba(255,255,255,.08);
+  box-shadow:0 0 0 1px rgba(124,199,255,.3), 0 0 28px rgba(124,199,255,.32), 0 16px 32px rgba(0,0,0,.42);
+}
 .form-card__icon:focus-visible{ outline:none; box-shadow:0 0 0 2px rgba(124,199,255,.35); }
-.form-card__icon img{ max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45)); }
+.form-card__icon img{ max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 6px 16px rgba(0,0,0,.45)) brightness(1.05); }
 .form-card__icon .app-fallback{ width:72px; height:72px; font-size:1.1rem; }
 
 .form-card__title{ font-size:1rem; font-weight:700; letter-spacing:.01em; }

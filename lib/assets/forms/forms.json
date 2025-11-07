@@ -22,7 +22,7 @@
       "id": "drug-driving",
       "title": "Drug Driving (S5)",
       "type": "html",
-      "icon": "./lib/assets/images/icons/icon-drug-driving.svg",
+      "icon": "./lib/assets/images/icons/icon-drug.png",
       "href": "./lib/assets/forms/drug-driving.html",
       "hrefAbs": "",
       "desc": "Pro-forma builder for Section 5 drug driving."
