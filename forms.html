@@ -50,6 +50,54 @@
     padding:16px;
     margin-top:18px;
   }
+  .icon-grid.forms-grid{
+    list-style:none;
+    padding:0;
+    margin:22px 0 0;
+    display:grid;
+    gap:clamp(16px, 2vw, 24px);
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .icon-grid .icon-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    text-align:center;
+    text-decoration:none;
+    color:#E9EEFB;
+    padding:20px 16px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.05);
+    box-shadow:0 10px 28px rgba(0,0,0,.38);
+    transition:transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+  }
+  .icon-grid .icon-btn:hover,
+  .icon-grid .icon-btn:focus-visible{
+    transform:translateY(-3px);
+    border-color:rgba(124,199,255,.35);
+    background:rgba(255,255,255,.08);
+    box-shadow:0 16px 34px rgba(0,0,0,.42), 0 0 24px rgba(124,199,255,.28);
+    outline:none;
+  }
+  .icon-grid .icon-ring{
+    width:96px;
+    height:96px;
+    border-radius:24px;
+    display:grid;
+    place-items:center;
+    background:
+      radial-gradient(70% 70% at 50% 32%, rgba(124,199,255,.26), rgba(124,199,255,0) 72%),
+      rgba(255,255,255,.08);
+    box-shadow:0 0 0 1px rgba(124,199,255,.25), 0 0 22px rgba(124,199,255,.35), 0 10px 26px rgba(0,0,0,.4);
+  }
+  .icon-grid .icon-img{
+    width:52px;
+    height:52px;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+  }
   .icon-desc{
     display:block;
     margin-top:6px;
@@ -214,7 +262,7 @@
 
     <div id="forms-error" class="notice" hidden></div>
 
-    <section class="icon-grid" id="forms-grid" role="grid" aria-label="Forms and tools">
+    <section class="icon-grid forms-grid" id="forms-grid" role="grid" aria-label="Forms and tools">
         <a href="./lib/assets/forms/locus.html"
            data-href-rel="./lib/assets/forms/locus.html"
            data-rel="./lib/assets/forms/locus.html"
