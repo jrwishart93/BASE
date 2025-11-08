@@ -10,10 +10,10 @@
     const css = `
 /* === GlassNav v2.1 (injected) ============================== */
 :root{
-  --logo-badge-h: 60px;
-  --logo-badge-r: 16px;
+  --logo-badge-h: 68px;
+  --logo-badge-r: 18px;
   --logo-badge-pad: 6px;
-  --logo-glow: 0 0 28px rgba(122,162,255,.35), 0 0 80px rgba(122,162,255,.18);
+  --logo-glow: 0 0 32px rgba(122,162,255,.35), 0 0 90px rgba(122,162,255,.2);
   --logo-stroke: rgba(255,255,255,.18);
   --logo-fill: rgba(255,255,255,.08);
 }
@@ -42,7 +42,7 @@
 }
 .nav-inner{
   width:100%;
-  min-height:64px;
+  min-height:clamp(64px, 7vw, 72px);
   display:flex; align-items:center; justify-content:space-between;
   gap:clamp(12px, 2vw, 20px);
   flex-wrap:wrap;
@@ -62,6 +62,7 @@
   backdrop-filter: blur(10px);
   position:relative;
   overflow:hidden;
+  flex-shrink:0;
 }
 .nav-logo-badge::before{
   content:"";
@@ -98,16 +99,27 @@ a.nav-logo-badge:focus-visible{
 
 @media (max-width: 960px){
   :root{
-    --logo-badge-h: 54px;
-    --logo-badge-r: 14px;
+    --logo-badge-h: 58px;
+    --logo-badge-r: 16px;
+    --logo-glow: 0 0 26px rgba(122,162,255,.3), 0 0 70px rgba(122,162,255,.16);
   }
 }
 
 @media (max-width: 640px){
   :root{
-    --logo-badge-h: 48px;
-    --logo-badge-r: 12px;
+    --logo-badge-h: 50px;
+    --logo-badge-r: 14px;
     --logo-badge-pad: 5px;
+    --logo-glow: 0 0 22px rgba(122,162,255,.25), 0 0 55px rgba(122,162,255,.12);
+  }
+}
+
+@media (max-width: 480px){
+  :root{
+    --logo-badge-h: 46px;
+    --logo-badge-r: 12px;
+    --logo-badge-pad: 4px;
+    --logo-glow: 0 0 18px rgba(122,162,255,.22), 0 0 40px rgba(122,162,255,.1);
   }
 }
 
