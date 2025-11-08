@@ -18,7 +18,7 @@
     --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
     --radius:18px; --radius-sm:12px;
     --warn-bg: rgba(255,107,107,0.12); --warn-bd: rgba(255,107,107,0.55);
-    --dur: 5200ms; --morph: 560ms ease;
+    --dur: 3200ms; --morph: 560ms ease;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -49,6 +49,7 @@
     backdrop-filter:blur(12px) saturate(130%);
     display:flex;align-items:center;justify-content:center;padding:10px 18px;z-index:10;
     animation:breathe 2.6s ease-in-out infinite;
+    cursor:pointer;user-select:none;
   }
   @keyframes breathe{50%{transform:translate(-50%,-50%) scale(1.02)}}
   .title{
@@ -315,11 +316,16 @@
   const label  = document.getElementById('loaderLabel');
   const dots   = document.getElementById('dots');
   const skip   = document.getElementById('skip');
+  const hero   = document.getElementById('hero');
   const app = document.getElementById('app');
   const DURATION = getComputedStyle(document.documentElement).getPropertyValue('--dur').trim();
   const D_MS = parseInt(DURATION,10) || 5200;
-  const COUNT = 22;
+  const COUNT = 16;
   let raf;
+  let introDone = false;
+  let dotsTimer;
+  let progTimer;
+  let autoStartTimer;
   function makeBubble(text, idx){
     const s = document.createElement('span'); s.className = 'bubble'; s.textContent = text; clouds.appendChild(s);
     const W = window.innerWidth, H = window.innerHeight;
@@ -347,39 +353,47 @@
   function initBubbles(){ clouds.innerHTML=''; for(let i=0;i<COUNT;i++) makeBubble(WORDS[i%WORDS.length], i); if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }
   initBubbles(); window.addEventListener('resize', ()=>{ if(raf) cancelAnimationFrame(raf); initBubbles(); });
 
-  let d=0; const dotsTimer = setInterval(()=>{ d=(d+1)%4; dots.textContent='.'.repeat(d); }, 300);
-  let progress = 0; const progTimer = setInterval(()=>{ progress = Math.min(100, progress + 5); loader.setAttribute('aria-valuenow', String(progress)); }, D_MS/20);
+  let d=0; dotsTimer = setInterval(()=>{ d=(d+1)%4; dots.textContent='.'.repeat(d); }, 300);
+  let progress = 0; progTimer = setInterval(()=>{ progress = Math.min(100, progress + 5); loader.setAttribute('aria-valuenow', String(progress)); }, Math.max(120, D_MS/20));
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const morphAt = reduce ? 400 : D_MS;
   setTimeout(()=>{ morphToButton(); }, morphAt);
 
-  function morphToButton(){
-    clearInterval(dotsTimer); clearInterval(progTimer);
-    loader.classList.add('toBtn');
-    loader.setAttribute('role','button'); loader.setAttribute('tabindex','0'); loader.setAttribute('aria-label','Start antecedents');
-    const go = ()=>{
-      intro.classList.add('fade-out');
-      setTimeout(()=>{
-        intro.style.display='none';
-        document.body.classList.add('app-scroll');
-        app.setAttribute('aria-hidden','false');
-        app.classList.add('ready');
-      }, 520);
-    };
-    loader.addEventListener('click', go, {once:true});
-    loader.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
-    label.textContent = 'Ready';
-  }
-  skip.addEventListener('click', ()=>{
+  function startApp({fast=false}={}){
+    if(introDone) return;
+    introDone = true;
+    clearInterval(dotsTimer);
+    clearInterval(progTimer);
+    if(autoStartTimer) clearTimeout(autoStartTimer);
     if(raf) cancelAnimationFrame(raf);
+    loader.setAttribute('aria-valuenow', '100');
     intro.classList.add('fade-out');
+    const delay = fast ? 280 : 520;
     setTimeout(()=>{
       intro.style.display='none';
       document.body.classList.add('app-scroll');
       app.setAttribute('aria-hidden','false');
       app.classList.add('ready');
-    }, 280);
-  });
+    }, delay);
+  }
+
+  function morphToButton(){
+    if(introDone) return;
+    clearInterval(dotsTimer); clearInterval(progTimer);
+    loader.classList.add('toBtn');
+    loader.setAttribute('role','button'); loader.setAttribute('tabindex','0'); loader.setAttribute('aria-label','Start antecedents');
+    const go = ()=> startApp();
+    loader.addEventListener('click', go, {once:true});
+    loader.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
+    label.textContent = 'Ready';
+    autoStartTimer = setTimeout(()=> startApp(), reduce ? 200 : 500);
+  }
+  skip.addEventListener('click', ()=> startApp({fast:true}));
+  hero.setAttribute('role','button');
+  hero.setAttribute('tabindex','0');
+  const heroGo = ()=> startApp({fast:true});
+  hero.addEventListener('click', heroGo);
+  hero.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); heroGo(); } });
 })();
 
 /* APP LOGIC */
