@@ -1721,3 +1721,22 @@ html[data-theme="light"] .settings-panel-icon::after{
 .empty { opacity: .8; padding: 8px 0; }
 .graphs-section.minimised .section-body { display: none !important; }
 .graphs-section.minimised .section-header { border-bottom: 0; }
+#generatedCodeBlock {
+  margin-top: 1.5rem;
+}
+
+#generatedCodeOutput {
+  width: 100%;
+  min-height: 200px;
+  background: var(--bg1);
+  color: var(--ink);
+  border: 1px solid var(--stroke);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--font-mono, monospace);
+  resize: vertical;
+}
+
+#generatedCodeBlock button {
+  margin-top: 0.75rem;
+}
