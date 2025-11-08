@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Seizure Log — B.A.S.E.</title>
+  <link rel="icon" href="./lib/assets/images/logos/base-logo.png">
+  <link rel="stylesheet" href="./styles/base.css">
+  <script defer src="./scripts/nav.js"></script>
+</head>
+<body>
+  <nav class="glassnav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a class="nav-logo-badge" href="./index.html" aria-label="Home">
+        <img class="nav-logo-img" src="./lib/assets/images/logos/base-logo.png" alt="B.A.S.E. logo" loading="lazy">
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false">
+        <span class="icon-burger" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span class="icon-close" aria-hidden="true">×</span>
+      </button>
+      <ul id="primary-navigation" class="nav-list">
+        <li>
+          <a class="nav-link" data-page="home" href="./index.html">
+            <span class="label">Home</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="briefing" href="./briefing.html">
+            <span class="label">Briefing</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="applications" href="./applications.html">
+            <span class="label">Applications</span>
+            <svg class="underline" viewBox="0 0 140 14" preserveAspectRatio="none">
+              <path d="M6,10 Q70,2 134,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="forms" href="./forms.html">
+            <span class="label">Forms</span>
+            <svg class="underline" viewBox="0 0 90 14" preserveAspectRatio="none">
+              <path d="M6,10 Q45,2 84,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="recoveries" href="./recoveries.html">
+            <span class="label">Recoveries</span>
+            <svg class="underline" viewBox="0 0 130 14" preserveAspectRatio="none">
+              <path d="M6,10 Q65,2 124,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="directory" href="./directory.html">
+            <span class="label">Directory</span>
+            <svg class="underline" viewBox="0 0 120 14" preserveAspectRatio="none">
+              <path d="M6,10 Q60,2 114,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-page="settings" href="./settings.html">
+            <span class="label">Settings</span>
+            <svg class="underline" viewBox="0 0 105 14" preserveAspectRatio="none">
+              <path d="M6,10 Q52,2 99,10" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link is-active" data-page="seizure-log" href="./seizure-log.html" aria-current="page">
+            <span class="label">Seizure Log</span>
+            <svg class="underline" viewBox="0 0 140 14" preserveAspectRatio="none">
+              <path d="M6,10 Q70,2 134,10" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container recovery-page">
+    <section class="card" aria-labelledby="seizure-log-title">
+      <header class="section-header">
+        <h1 id="seizure-log-title">Seizure Log</h1>
+        <p class="fine-print">This log lists every recorded seizure entry. Update <code>data/seizure-log.json</code> to make changes.</p>
+      </header>
+      <div class="section-body">
+        <div class="table-wrap table-wrapper">
+          <table class="table" aria-describedby="seizure-log-title">
+            <thead>
+              <tr>
+                <th scope="col">Date &amp; Time</th>
+                <th scope="col">Incident</th>
+                <th scope="col">Type</th>
+                <th scope="col">Division</th>
+                <th scope="col">Location</th>
+                <th scope="col">Officers</th>
+                <th scope="col">Details</th>
+                <th scope="col">Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="seizure-log-body"></tbody>
+          </table>
+        </div>
+        <p id="seizure-log-status" class="fine-print" hidden role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    const STATUS_MESSAGES = {
+      empty: 'No seizures recorded yet. Add a new entry to data/seizure-log.json to populate the log.',
+      error: 'Unable to load seizure log data. Please try again later.'
+    };
+
+    const tableBody = document.getElementById('seizure-log-body');
+    const statusNode = document.getElementById('seizure-log-status');
+    const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+    const currencyFormatter = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+
+    function showStatus(messageKey) {
+      if (!statusNode) return;
+      statusNode.textContent = STATUS_MESSAGES[messageKey] || '';
+      statusNode.hidden = !STATUS_MESSAGES[messageKey];
+    }
+
+    function formatDetails(record) {
+      const details = record?.details || {};
+      switch (record?.type) {
+        case 'Vehicle':
+          return [details.colour, details.make, details.model, details.vrm]
+            .filter(Boolean)
+            .join(' • ');
+        case 'Drug':
+          return [details.drugType, details.quantityOrWeight, valueLabel(details.estimatedValueGBP)]
+            .filter(Boolean)
+            .join(' • ');
+        case 'Cash':
+          return valueLabel(details.amountGBP);
+        case 'Stolen Property':
+        case 'Counterfeit Goods':
+          return [details.description, quantityLabel(details.quantity), valueLabel(details.estimatedValueGBP)]
+            .filter(Boolean)
+            .join(' • ');
+        default:
+          return '';
+      }
+    }
+
+    function quantityLabel(value) {
+      if (value == null || value === '') return '';
+      return `${value} item${Number(value) === 1 ? '' : 's'}`;
+    }
+
+    function valueLabel(value) {
+      if (value == null || value === '') return '';
+      const number = Number(value);
+      if (Number.isNaN(number)) return '';
+      return currencyFormatter.format(number);
+    }
+
+    async function loadSeizureLog() {
+      try {
+        const response = await fetch('./data/seizure-log.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error('Unexpected payload');
+        if (!data.length) {
+          showStatus('empty');
+          return;
+        }
+
+        const rows = document.createDocumentFragment();
+        data
+          .slice()
+          .sort((a, b) => {
+            const aTime = Date.parse(a?.datetime || a?.updatedAt || 0);
+            const bTime = Date.parse(b?.datetime || b?.updatedAt || 0);
+            return Number.isNaN(bTime - aTime) ? 0 : bTime - aTime;
+          })
+          .forEach((record) => {
+            const row = document.createElement('tr');
+
+            const dtCell = document.createElement('td');
+            const dt = Date.parse(record?.datetime || record?.updatedAt || '');
+            dtCell.textContent = Number.isNaN(dt) ? '—' : dateFormatter.format(new Date(dt));
+            row.appendChild(dtCell);
+
+            const incidentCell = document.createElement('td');
+            incidentCell.textContent = record?.incidentNumber || '—';
+            row.appendChild(incidentCell);
+
+            const typeCell = document.createElement('td');
+            typeCell.textContent = record?.type || '—';
+            row.appendChild(typeCell);
+
+            const divisionCell = document.createElement('td');
+            divisionCell.textContent = record?.division || '—';
+            row.appendChild(divisionCell);
+
+            const locationCell = document.createElement('td');
+            locationCell.textContent = record?.location || '—';
+            row.appendChild(locationCell);
+
+            const officersCell = document.createElement('td');
+            officersCell.textContent = Array.isArray(record?.officers) && record.officers.length
+              ? record.officers.join(', ')
+              : (record?.enquiryOfficer || '—');
+            row.appendChild(officersCell);
+
+            const detailsCell = document.createElement('td');
+            const detailsText = formatDetails(record);
+            detailsCell.textContent = detailsText || '—';
+            row.appendChild(detailsCell);
+
+            const remarksCell = document.createElement('td');
+            remarksCell.textContent = record?.remarks || '—';
+            row.appendChild(remarksCell);
+
+            rows.appendChild(row);
+          });
+
+        tableBody.innerHTML = '';
+        tableBody.appendChild(rows);
+        showStatus();
+      } catch (error) {
+        console.error('Failed to load seizure log', error);
+        showStatus('error');
+      }
+    }
+
+    loadSeizureLog();
+  </script>
+</body>
+</html>
