@@ -110,21 +110,18 @@
           <header class="card-head">
             <div>
               <h2>Analytics</h2>
-              <p class="fine-print">Data loads automatically from the Recovery Folder.</p>
+              <p class="fine-print">Data loads from the manual data block below. Update the array and refresh to see changes.</p>
             </div>
             <div class="analytics-controls">
-              <button type="button" class="btn ghost no-caret" id="grant-access">Grant access to Recovery Folder</button>
-              <button type="button" class="btn ghost no-caret" id="grant-legacy">Add legacy folder</button>
-              <button type="button" class="btn ghost no-caret" id="reload-data">Reload</button>
+              <button type="button" class="btn ghost no-caret" id="reload-data">Refresh data</button>
               <button type="button" class="btn ghost no-caret" id="export-png">Save dashboard as PNG</button>
               <label class="analytics-fy">
                 <span class="sr-only">Financial year</span>
                 <select id="analytics-fy" disabled></select>
               </label>
-              <span id="legacy-status-chip" class="chip muted" hidden>Legacy folder connected</span>
             </div>
           </header>
-          <p id="analytics-status" class="analytics-status muted">Permission needed. Click 'Grant access to Recovery Folder'.</p>
+          <p id="analytics-status" class="analytics-status muted">Manual mode active. Edit the data block to change recoveries.</p>
           <div class="analytics-overview" id="analytics-overview" hidden>
             <div class="analytics-overview-grid">
               <section class="ytd-card" aria-labelledby="analytics-ytd-title">
@@ -617,25 +614,50 @@
 
         <section class="card recover-card" data-card="actions">
           <header class="card-head">
-            <h2>Save &amp; Export</h2>
+            <h2>Generate JSON Code</h2>
           </header>
-          <p id="fs-support-note" class="muted fine-print" hidden>Folder saving is not available in this browser. The JSON will download instead.</p>
+          <p class="muted fine-print">Generate a formatted block and paste it into the manual data array below.</p>
           <div class="action-bar">
-            <button type="button" id="btn-set-folder" class="btn ghost no-caret">Set Save Folder</button>
-            <button type="button" id="save" class="btn primary">Save seizure (JSON)</button>
+            <button type="button" id="generate" class="btn primary">Generate code</button>
             <button type="reset" class="btn">Reset form</button>
           </div>
           <div class="action-messages">
-            <span id="folder-status" class="muted" aria-live="polite">No folder permission. Use 'Grant access to Recovery Folder' to enable direct saving; downloads will be used.</span>
             <span id="save-status" class="muted" aria-live="polite"></span>
           </div>
           <span id="validation-status" class="sr-only" role="status" aria-live="polite"></span>
+          <div id="generatedCodeBlock" class="card" hidden>
+            <p>Copy and paste the code below into the manual data block in <code>recoveries.html</code>.</p>
+            <textarea readonly id="generatedCodeOutput"></textarea>
+            <button type="button" id="copyCodeBtn" class="btn ghost">Copy to clipboard</button>
+          </div>
         </section>
         </form>
       </div>
     </section>
 
   </main>
+
+  <script id="recoveries-data">
+  window.RECOVERIES_DATA = [
+    /* -------------------------------------------------
+       SEIZURE ENTRY #001 — Example
+       Date: 12 April 2025
+    --------------------------------------------------- */
+    {
+      id: "REC-EXAMPLE",
+      datetime: "2025-04-12T10:15:00Z",
+      incidentNumber: "EXAMPLE",
+      division: "E",
+      location: "Example Location",
+      type: "Vehicle",
+      details: {
+        reason: "Example Only"
+      },
+      remarks: "Placeholder record",
+      createdBy: "System"
+    }
+  ];
+  </script>
 
   <div id="save-toast" class="toast" role="status" aria-live="polite" hidden></div>
   <div id="manage-modal" class="dialog" role="dialog" aria-modal="true" aria-labelledby="manage-modal-title" hidden>
@@ -841,19 +863,6 @@
       </div>
     </div>
   </div>
-  <div id="download-reminder" class="modal-reminder" hidden>
-    <div class="modal-reminder__dialog" role="alertdialog" aria-modal="true" aria-labelledby="download-reminder-title" aria-describedby="download-reminder-message" tabindex="-1">
-      <h3 id="download-reminder-title">Move the saved file</h3>
-      <p id="download-reminder-message">
-        Move <span class="modal-reminder__file" id="download-reminder-file"></span> from your Downloads folder into
-        <code>/Users/macbookair/Desktop/BASE/Desktop/Recovery Folder</code> so it appears in future searches.
-      </p>
-      <div class="modal-reminder__actions">
-        <button type="button" class="btn primary" id="download-reminder-close">Got it</button>
-      </div>
-    </div>
-  </div>
-
   <div id="fatal-banner" hidden class="fatal-banner"></div>
   <script>
     function showFatalBanner(msg) {
@@ -863,7 +872,6 @@
       b.hidden = false;
     }
   </script>
-  <script type="module" src="./scripts/recoveries.store.js"></script>
   <script>
     (function () {
       if (window.__REC_BOOTED__) return;
@@ -879,22 +887,23 @@
     })();
   </script>
   <script type="module">
-    import {
-      supportsFS,
-      pickFolder,
-      writeToFolder,
-      readRecoveriesFromFolder,
-      storeHandle,
-      getStoredHandle,
-      idbPutRecord,
-      idbGetAllRecords,
-      idbDeleteRecord,
-      removeFromFolder,
-      downloadJson
-    } from './scripts/recoveries.store.js';
-
     (function () {
     'use strict';
+
+    const cloneRecord = (record) => {
+      if (typeof structuredClone === 'function') {
+        try {
+          return structuredClone(record);
+        } catch (err) {
+          /* ignore and fall back */
+        }
+      }
+      try {
+        return JSON.parse(JSON.stringify(record));
+      } catch (err) {
+        return { ...record };
+      }
+    };
 
     (function setupGraphsCollapsible(){
       const section = document.getElementById('graphs-section');
@@ -1118,25 +1127,20 @@
       };
     }
 
-    const folderButton = document.getElementById('btn-set-folder');
-    const saveButton = document.getElementById('save');
+    const generateButton = document.getElementById('generate');
     const setNowButton = document.getElementById('btn-now');
-    const folderStatus = document.getElementById('folder-status');
     const saveStatus = document.getElementById('save-status');
     const validationStatus = document.getElementById('validation-status');
-    const fsSupportNote = document.getElementById('fs-support-note');
     const toast = (typeof window !== 'undefined' && typeof window.toast !== 'undefined')
       ? window.toast
       : document.getElementById('save-toast');
     if (typeof window !== 'undefined') {
       window.toast = toast;
     }
-    const downloadReminder = document.getElementById('download-reminder');
-    const downloadReminderFile = document.getElementById('download-reminder-file');
-    const downloadReminderClose = document.getElementById('download-reminder-close');
-    const grantPrimaryButton = document.getElementById('grant-access');
+    const generatedCodeBlock = document.getElementById('generatedCodeBlock');
+    const generatedCodeOutput = document.getElementById('generatedCodeOutput');
+    const copyCodeButton = document.getElementById('copyCodeBtn');
     const reloadDataButton = document.getElementById('reload-data');
-    const grantLegacyButton = document.getElementById('grant-legacy');
     const exportButton = document.getElementById('export-png');
     const analyticsStatusEl = document.getElementById('analytics-status');
     const fySelect = document.getElementById('analytics-fy');
@@ -1176,7 +1180,6 @@
     const monthTableLabelEl = document.getElementById('month-table-label');
     const monthTableBodyEl = document.getElementById('month-table-body');
     const monthTableEmptyEl = document.getElementById('month-table-empty');
-    const legacyStatusChip = document.getElementById('legacy-status-chip');
     const prevTrackEl = document.getElementById('analytics-prev-track');
     const prevBarEl = document.getElementById('analytics-prev-bar');
     const prevLabelEl = document.getElementById('analytics-prev-label');
@@ -1193,7 +1196,6 @@
       errorMap.set(key, list);
     });
 
-    const supportsIndexedDB = 'indexedDB' in window;
 
     const fyControls = [fySelect, divisionFYSelect, typeFYSelect, monthFYSelect, manageFYSelect].filter(Boolean);
 
@@ -1231,11 +1233,6 @@
     if (typeof window !== 'undefined') {
       window.toastTimer = toastTimer;
     }
-    let reminderLastFocus = null;
-    let primaryDirectoryHandle = null;
-    let primaryHasReadAccess = false;
-    let legacyDirectoryHandle = null;
-    let legacyHasReadAccess = false;
     window.__REC_DATA = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
     window.__REC_INVALID = typeof window.__REC_INVALID === 'number' ? window.__REC_INVALID : 0;
 
@@ -1307,7 +1304,7 @@
     }
 
     window.__recoveriesBoot = async function () {
-      ['grant-access', 'grant-legacy', 'save', 'reload-data', 'export-png'].forEach((id) => {
+      ['grant-access', 'grant-legacy', 'generate', 'reload-data', 'export-png'].forEach((id) => {
         const btn = document.getElementById(id);
         if (btn && !btn.getAttribute('type')) btn.setAttribute('type', 'button');
       });
@@ -1440,99 +1437,22 @@
           });
         }
 
-        if (downloadReminder && downloadReminderClose) {
-          downloadReminderClose.addEventListener('click', hideDownloadReminder);
-          downloadReminder.addEventListener('click', (event) => {
-            if (event.target === downloadReminder) {
-              hideDownloadReminder();
-            }
-          });
-          document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && !downloadReminder.hidden) {
-              hideDownloadReminder();
-            }
-          });
+        if (generateButton) {
+          generateButton.addEventListener('click', handleGenerate);
         }
 
-        if (grantPrimaryButton) {
-          grantPrimaryButton.addEventListener('click', async () => {
-            if (!supportsFS()) {
-              setAnalyticsStatus('Your browser does not support Recovery Folder access.');
-              return;
-            }
+        if (copyCodeButton) {
+          copyCodeButton.addEventListener('click', () => {
+            if (!generatedCodeOutput) return;
+            generatedCodeOutput.focus();
+            generatedCodeOutput.select();
             try {
-              const handle = await pickFolder('base-recoveries-primary');
-              if (!handle) {
-                setAnalyticsStatus('Permission denied.');
-                return;
-              }
-              primaryDirectoryHandle = handle;
-              primaryHasReadAccess = true;
-              await storeHandle('primary', handle);
-              setAnalyticsStatus('Recovery Folder connected.');
-              setFolderStatus('Saving directly to Recovery Folder.');
-              await reloadAllData();
+              document.execCommand('copy');
+              alert('Code copied to clipboard!');
             } catch (err) {
-              if (err && err.name === 'AbortError') return;
-              console.error(err);
-              setAnalyticsStatus('Selection failed. Try again.');
+              console.warn('Copy failed', err);
             }
           });
-        }
-
-        if (grantLegacyButton) {
-          grantLegacyButton.addEventListener('click', async () => {
-            if (!supportsFS()) {
-              setAnalyticsStatus('Browser not supported.');
-              return;
-            }
-            try {
-              const handle = await pickFolder('base-recoveries-legacy');
-              if (!handle) {
-                setAnalyticsStatus('Legacy permission denied.');
-                return;
-              }
-              legacyDirectoryHandle = handle;
-              legacyHasReadAccess = true;
-              await storeHandle('legacy', handle);
-              setAnalyticsStatus('Legacy folder connected.');
-              refreshLegacyUI();
-              await reloadAllData();
-            } catch (err) {
-              if (err && err.name === 'AbortError') return;
-              console.error(err);
-              setAnalyticsStatus('Legacy selection failed.');
-            }
-          });
-        }
-
-        if (folderButton) {
-          folderButton.addEventListener('click', async () => {
-            if (!supportsFS()) {
-              setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
-              return;
-            }
-            try {
-              const handle = await pickFolder('base-recoveries-primary');
-              if (!handle) {
-                setFolderStatus('Permission denied. Downloads will be used.');
-                return;
-              }
-              primaryDirectoryHandle = handle;
-              primaryHasReadAccess = true;
-              await storeHandle('primary', handle);
-              setFolderStatus(`Saving directly to ${handle.name || 'Recovery Folder'}.`);
-              await reloadAllData();
-            } catch (err) {
-              if (err && err.name === 'AbortError') return;
-              console.error(err);
-              setFolderStatus('Selection failed. Downloads will be used.');
-            }
-          });
-        }
-
-        if (saveButton) {
-          saveButton.addEventListener('click', handleSave);
         }
 
         if (reloadDataButton) {
@@ -1608,35 +1528,8 @@
         typeFilter.value = state.type === 'All' ? 'ALL' : state.type;
       }
 
-      if (!supportsFS()) {
-        if (fsSupportNote) fsSupportNote.hidden = false;
-        setFolderStatus('Folder saving unavailable in this browser; downloads will be used.');
-        if (grantPrimaryButton) grantPrimaryButton.disabled = true;
-        if (grantLegacyButton) grantLegacyButton.disabled = true;
-        if (reloadDataButton) reloadDataButton.disabled = true;
-        setAnalyticsStatus('File System Access not supported in this browser. Downloads will be used.');
-      } else {
-        if (fsSupportNote) fsSupportNote.hidden = true;
-        if (grantPrimaryButton) grantPrimaryButton.disabled = false;
-        if (grantLegacyButton) grantLegacyButton.disabled = false;
-        if (reloadDataButton) reloadDataButton.disabled = false;
-      }
-
-      try {
-        if (supportsFS()) {
-          primaryDirectoryHandle = await getStoredHandle('primary');
-          legacyDirectoryHandle = await getStoredHandle('legacy');
-          primaryHasReadAccess = !!primaryDirectoryHandle;
-          legacyHasReadAccess = !!legacyDirectoryHandle;
-        } else {
-          primaryDirectoryHandle = null;
-          primaryHasReadAccess = false;
-          legacyDirectoryHandle = null;
-          legacyHasReadAccess = false;
-        }
-      } catch (err) {
-        console.warn('Handle restore failed', err);
-      }
+      if (reloadDataButton) reloadDataButton.disabled = false;
+      setAnalyticsStatus('Manual mode active. Edit the data block to change recoveries.');
 
       refreshLegacyUI();
 
@@ -1653,46 +1546,9 @@
     async function reloadAllData() {
       setAnalyticsStatus('Loading…');
 
-      let fsPrimary = { records: [], skipped: 0 };
-      if (primaryDirectoryHandle && primaryHasReadAccess && supportsFS()) {
-        try {
-          fsPrimary = await readRecoveriesFromFolder(primaryDirectoryHandle);
-        } catch (err) {
-          console.error('Primary folder read failed', err);
-          fsPrimary = { records: [], skipped: 0 };
-          primaryHasReadAccess = false;
-        }
-      }
-
-      let fsLegacy = { records: [], skipped: 0 };
-      if (legacyDirectoryHandle && legacyHasReadAccess && supportsFS()) {
-        try {
-          fsLegacy = await readRecoveriesFromFolder(legacyDirectoryHandle);
-        } catch (err) {
-          console.error('Legacy folder read failed', err);
-          fsLegacy = { records: [], skipped: 0 };
-          legacyHasReadAccess = false;
-        }
-      }
-
-      let idbRecords = [];
-      try {
-        idbRecords = await idbGetAllRecords();
-      } catch (err) {
-        console.warn('IndexedDB read failed', err);
-        idbRecords = [];
-      }
-
-      const map = new Map();
-      const feed = (arr) => arr.forEach((record) => {
-        if (record && record.id) map.set(record.id, record);
-      });
-      feed(fsPrimary.records);
-      feed(fsLegacy.records);
-      feed(idbRecords);
-
-      window.__REC_DATA = Array.from(map.values());
-      window.__REC_INVALID = (fsPrimary.skipped || 0) + (fsLegacy.skipped || 0);
+      const manualData = Array.isArray(window.RECOVERIES_DATA) ? window.RECOVERIES_DATA : [];
+      window.__REC_DATA = manualData.map((record) => cloneRecord(record));
+      window.__REC_INVALID = 0;
       if (window.__REC_DATA.length) {
         manageDemoRecords = [];
       }
@@ -1706,13 +1562,32 @@
 
       const total = window.__REC_DATA.length;
       const message = total
-        ? `Loaded ${total} record${total === 1 ? '' : 's'}${fsPrimary.records.length ? ` · primary:${fsPrimary.records.length}` : ''}${fsLegacy.records.length ? ` · legacy:${fsLegacy.records.length}` : ''}${window.__REC_INVALID ? ` · skipped:${window.__REC_INVALID}` : ''}.`
-        : 'No recovery files found. You can still save; entries will be cached locally.';
+        ? `Loaded ${total} record${total === 1 ? '' : 's'} from manual data.`
+        : 'No manual recovery entries yet. Generate code and paste it into the data block.';
       setAnalyticsStatus(message);
       refreshLegacyUI();
     }
 
-    async function handleSave() {
+    function presentGeneratedCode(manualRecord, dt, entryNumber) {
+      if (!manualRecord) return '';
+      const numberLabel = String(entryNumber).padStart(3, '0');
+      const officerLabel = manualRecord.createdBy || 'Unknown';
+      const dateLabel = formatCommentDate(dt instanceof Date ? dt : new Date());
+      const headerComment = `/* -------------------------------------------------\n   SEIZURE ENTRY #${numberLabel} — ${manualRecord.type || 'Unknown'}\n   Date: ${dateLabel}\n   Officer: ${officerLabel || 'Unknown'}\n--------------------------------------------------- */`;
+      const formattedRecord = JSON.stringify(manualRecord, null, 2);
+      const output = `${headerComment}\n${formattedRecord},`;
+      if (generatedCodeOutput) {
+        generatedCodeOutput.value = output;
+        const rows = output.split('\n').length;
+        generatedCodeOutput.setAttribute('rows', String(Math.max(rows, 8)));
+      }
+      if (generatedCodeBlock) {
+        generatedCodeBlock.hidden = false;
+      }
+      return output;
+    }
+
+    async function handleGenerate() {
       clearErrors();
       setSaveMessage('');
       setValidationMessage('');
@@ -1728,45 +1603,20 @@
         return;
       }
 
-      const { payload, filename } = buildPayload(dt);
-      payload.fileName = filename;
-      const json = JSON.stringify(payload, null, 2);
+      if (generateButton) {
+        generateButton.disabled = true;
+      }
 
-      if (!saveButton) return;
-      saveButton.disabled = true;
       try {
-        try {
-          await idbPutRecord(payload);
-        } catch (err) {
-          console.warn('IDB cache failed', err);
-        }
+        const { payload } = buildPayload(dt);
+        const manualRecord = toManualRecord(payload);
+        const existingCount = Array.isArray(window.__REC_DATA) ? window.__REC_DATA.length : 0;
+        const entryNumber = existingCount + 1;
 
-        let wroteFS = false;
-        if (primaryDirectoryHandle && supportsFS()) {
-          try {
-            const result = await writeToFolder(primaryDirectoryHandle, filename, json);
-            if (result && result.ok) {
-              wroteFS = true;
-              primaryHasReadAccess = true;
-              setFolderStatus('Saving directly to Recovery Folder.');
-              const message = `Saved to Recovery Folder: ${filename}`;
-              setSaveMessage(message);
-              showToast(message);
-            } else if (result && result.error === 'no-permission') {
-              setFolderStatus('Recovery Folder read-only. Download used.');
-            }
-          } catch (err) {
-            console.error('Folder write failed', err);
-          }
-        }
+        presentGeneratedCode(manualRecord, dt, entryNumber);
 
-        if (!wroteFS) {
-          downloadJson(filename, json);
-          const message = `Downloaded: ${filename}. To save directly, click “Grant access to Recovery Folder”.`;
-          setSaveMessage(message);
-          showToast(message);
-          showDownloadReminder(filename);
-        }
+        setSaveMessage('Code generated successfully. Copy and paste it into the MANUAL DATA BLOCK section.');
+        setValidationMessage('Code generated successfully. Copy and paste it into the MANUAL DATA BLOCK section.');
 
         form.reset();
         if (inputs?.datetime) {
@@ -1774,23 +1624,21 @@
         }
         syncTiles();
         showSectionForType();
-        setValidationMessage('');
 
         if (!Array.isArray(window.__REC_DATA)) window.__REC_DATA = [];
         const byId = new Map(window.__REC_DATA.map((record) => [record.id, record]));
-        byId.set(payload.id, payload);
+        byId.set(manualRecord.id, manualRecord);
         window.__REC_DATA = Array.from(byId.values());
         renderAnalytics();
         syncFYControls();
-
-        if (primaryDirectoryHandle && supportsFS()) {
-          await reloadAllData();
-        }
       } catch (err) {
-        console.error('Save failed', err);
-        setSaveMessage('Error: saving failed. Check permissions and try again.');
+        console.error('Generate failed', err);
+        setSaveMessage('Error: unable to generate code. Try again.');
+        setValidationMessage('Error: unable to generate code. Try again.');
       } finally {
-        saveButton.disabled = false;
+        if (generateButton) {
+          generateButton.disabled = false;
+        }
       }
     }
 
@@ -1984,10 +1832,6 @@
       });
     }
 
-    function setFolderStatus(message) {
-      if (folderStatus) folderStatus.textContent = message;
-    }
-
     function setSaveMessage(message) {
       if (saveStatus) saveStatus.textContent = message;
     }
@@ -1996,25 +1840,7 @@
       if (validationStatus) validationStatus.textContent = message || '';
     }
 
-    function refreshLegacyUI() {
-      if (!grantLegacyButton || !legacyStatusChip) return;
-      if (!supportsFS() || !supportsIndexedDB) {
-        grantLegacyButton.disabled = true;
-        grantLegacyButton.hidden = true;
-        legacyStatusChip.hidden = true;
-        return;
-      }
-      const hasLegacy = Boolean(legacyDirectoryHandle && legacyHasReadAccess);
-      grantLegacyButton.disabled = false;
-      grantLegacyButton.hidden = hasLegacy;
-      legacyStatusChip.hidden = !hasLegacy;
-      if (hasLegacy) {
-        const legacyName = legacyDirectoryHandle && legacyDirectoryHandle.name ? legacyDirectoryHandle.name : 'Legacy folder';
-        legacyStatusChip.textContent = `Legacy folder connected (${legacyName})`;
-      } else {
-        legacyStatusChip.textContent = 'Legacy folder connected';
-      }
-    }
+    function refreshLegacyUI() {}
 
     function getTypeFromFields(fieldMap) {
       if (!fieldMap) return getSelectedType();
@@ -2085,6 +1911,32 @@
       }
 
       return { payload, filename: baseFilename };
+    }
+
+    function toManualRecord(payload) {
+      if (!payload || typeof payload !== 'object') return {};
+      const officerLabel = payload.enquiryOfficer
+        || (Array.isArray(payload.officers) && payload.officers.length ? payload.officers.join(', ') : '')
+        || payload.createdBy
+        || '';
+      const record = {
+        id: payload.id,
+        datetime: payload.datetime,
+        incidentNumber: payload.incidentNumber,
+        division: payload.division,
+        location: payload.location,
+        type: payload.type,
+        details: payload.details || {},
+        remarks: payload.remarks || '',
+        createdBy: officerLabel || 'Unknown'
+      };
+      if (Array.isArray(payload.officers) && payload.officers.length) {
+        record.officers = payload.officers;
+      }
+      if (payload.enquiryOfficer) {
+        record.enquiryOfficer = payload.enquiryOfficer;
+      }
+      return record;
     }
 
     function buildDetails(type, fieldMap = inputs) {
@@ -2164,6 +2016,19 @@
       const offset = date.getTimezoneOffset();
       const local = new Date(date.getTime() - offset * 60000);
       return local.toISOString().slice(0, 16);
+    }
+
+    function formatCommentDate(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+      try {
+        return date.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' });
+      } catch (err) {
+        const yyyy = date.getFullYear();
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const mm = months[date.getMonth()] || '';
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${dd} ${mm} ${yyyy}`.trim();
+      }
     }
 
     function setAnalyticsStatus(message) {
@@ -2824,11 +2689,9 @@
       const isDemo = manageActiveSource === 'demo';
       const existing = mode === 'edit' && !isDemo ? manageActiveRecord : null;
       const nowISO = new Date().toISOString();
-      const fileNameHint = existing ? (existing.fileName || `${existing.id}.json`) : undefined;
 
-      const { payload, filename } = buildPayload(dt, manageInputs, {
+      const { payload } = buildPayload(dt, manageInputs, {
         id: existing ? existing.id : undefined,
-        fileName: fileNameHint,
         createdAt: existing ? existing.createdAt || existing.datetime || nowISO : nowISO,
         createdBy: existing ? existing.createdBy || 'BASE recoveries.html v1.0' : 'BASE manage UI',
         updatedAt: nowISO,
@@ -2836,63 +2699,41 @@
         updatedBy: 'BASE Manage UI'
       });
 
-      const fileNameToUse = fileNameHint || filename;
-      payload.fileName = fileNameToUse;
-      if (existing?.createdAt) payload.createdAt = existing.createdAt;
-      if (existing?.createdBy) payload.createdBy = existing.createdBy;
-      payload.updatedAt = nowISO;
-      payload.updatedBy = 'BASE Manage UI';
+      const existingList = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+      const existingIndex = existing ? existingList.findIndex((item) => item.id === existing.id) : -1;
+      const existingCount = existingList.length;
+      const entryNumber = mode === 'edit' && existing
+        ? (existingIndex >= 0 ? existingIndex + 1 : Math.max(existingCount, 1))
+        : existingCount + 1;
 
-      const json = JSON.stringify(payload, null, 2);
+      const manualRecord = toManualRecord(payload);
+      if (existing?.createdAt) manualRecord.createdAt = existing.createdAt;
+      manualRecord.updatedAt = nowISO;
+
       manageModalSave.disabled = true;
       try {
-        try {
-          await idbPutRecord(payload);
-        } catch (err) {
-          console.warn('IDB cache failed', err);
-        }
-
-        let wroteFS = false;
-        if (primaryDirectoryHandle && supportsFS()) {
-          try {
-            const result = await writeToFolder(primaryDirectoryHandle, fileNameToUse, json);
-            if (result && result.ok) {
-              wroteFS = true;
-              primaryHasReadAccess = true;
-            }
-          } catch (err) {
-            console.error('Manage FS write failed', err);
-          }
-        }
-
-        if (!wroteFS) {
-          downloadJson(fileNameToUse, json);
-          showDownloadReminder(fileNameToUse);
-        }
-
         if (isDemo && manageActiveRecord) {
           manageDemoRecords = manageDemoRecords.filter((demo) => demo.id !== manageActiveRecord.id);
         } else if (!existing && manageDemoRecords.length) {
           manageDemoRecords = [];
         }
 
-        const existingList = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
         const byId = new Map(existingList.map((record) => [record.id, record]));
-        byId.set(payload.id, payload);
+        byId.set(manualRecord.id, manualRecord);
         window.__REC_DATA = Array.from(byId.values());
+
+        presentGeneratedCode(manualRecord, dt, entryNumber);
 
         populateFYSelects(window.__REC_DATA);
         renderAnalytics();
         syncFYControls();
         renderManageTable();
 
-        const message = mode === 'edit' && !isDemo ? 'Updated.' : 'Saved. You can see it in Analytics and Manage.';
+        const message = mode === 'edit' && !isDemo
+          ? 'Updated locally. Copy the refreshed code snippet to update the manual data block.'
+          : 'Saved locally. Copy the generated code and update the manual data block.';
         showToast(message, { includePattern: false });
         closeManageModal();
-
-        if (primaryDirectoryHandle && supportsFS()) {
-          await reloadAllData();
-        }
       } catch (err) {
         console.error('Manage save failed', err);
         showToast('Save failed. Try again.', { includePattern: false });
@@ -2900,7 +2741,6 @@
         manageModalSave.disabled = false;
       }
     }
-
     function openDeleteConfirm(record, source) {
       if (!deleteConfirmModal || !record) return;
       pendingDeleteRecord = { record, source };
@@ -2930,30 +2770,13 @@
         return;
       }
 
-      try {
-        await idbDeleteRecord(record.id);
-      } catch (err) {
-        console.warn('IDB delete failed', err);
-      }
-
-      const fileName = record.fileName || `${record.id}.json`;
-      if (supportsFS()) {
-        if (primaryDirectoryHandle) {
-          try { await removeFromFolder(primaryDirectoryHandle, fileName); } catch (err) { console.warn('Primary delete failed', err); }
-        }
-        if (legacyDirectoryHandle) {
-          try { await removeFromFolder(legacyDirectoryHandle, fileName); } catch (err) { console.warn('Legacy delete failed', err); }
-        }
-      }
-
       window.__REC_DATA = (Array.isArray(window.__REC_DATA) ? window.__REC_DATA : []).filter((item) => item.id !== record.id);
       populateFYSelects(window.__REC_DATA);
       renderAnalytics();
       syncFYControls();
       renderManageTable();
-      showToast('Deleted.', { includePattern: false });
+      showToast('Deleted locally. Remember to remove the entry from the manual data block.', { includePattern: false });
     }
-
 
     function renderAnalytics() {
       if (!overviewSection) return;
@@ -4408,31 +4231,12 @@
       if (!event.key || event.key.toLowerCase() !== 'd') return;
       const recs = (window.__REC_DATA || []).length;
       console.table({
-        supportsFS: supportsFS(),
-        primaryHandle: !!primaryDirectoryHandle,
-        legacyHandle: !!legacyDirectoryHandle,
+        mode: 'manual',
         recCount: recs,
         skipped: window.__REC_INVALID || 0
       });
       showToast(`Diagnostics: ${recs} records loaded.`, { includePattern: false });
     });
-
-    function showDownloadReminder(fileName) {
-      if (!downloadReminder || !downloadReminderClose || !downloadReminderFile) return;
-      reminderLastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      downloadReminderFile.textContent = fileName;
-      downloadReminder.hidden = false;
-      downloadReminderClose.focus();
-    }
-
-    function hideDownloadReminder() {
-      if (!downloadReminder || downloadReminder.hidden) return;
-      downloadReminder.hidden = true;
-      if (reminderLastFocus && typeof reminderLastFocus.focus === 'function') {
-        reminderLastFocus.focus();
-      }
-      reminderLastFocus = null;
-    }
   })();
 </script>
 </body>
