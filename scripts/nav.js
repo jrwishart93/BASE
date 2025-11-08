@@ -9,6 +9,15 @@
     if (document.getElementById('glassnav-styles')) return;
     const css = `
 /* === GlassNav v2.1 (injected) ============================== */
+:root{
+  --logo-badge-h: 60px;
+  --logo-badge-r: 16px;
+  --logo-badge-pad: 6px;
+  --logo-glow: 0 0 28px rgba(122,162,255,.35), 0 0 80px rgba(122,162,255,.18);
+  --logo-stroke: rgba(255,255,255,.18);
+  --logo-fill: rgba(255,255,255,.08);
+}
+
 .glassnav{
   position:sticky; top:0; z-index:80;
   margin:clamp(10px, 2.5vw, 20px);
@@ -38,30 +47,68 @@
   gap:clamp(12px, 2vw, 20px);
   flex-wrap:wrap;
 }
-.nav-logo{
-  position:relative;
+.nav-logo-badge{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:4px;
-  min-width:44px;
-  min-height:44px;
-  border-radius:16px;
-  background:
-    radial-gradient(circle, rgba(122,162,255,.24) 0%, rgba(122,162,255,0) 70%),
-    rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);
+  height:var(--logo-badge-h);
+  min-width:var(--logo-badge-h);
+  padding:var(--logo-badge-pad);
+  border-radius:calc(var(--logo-badge-r) * 1.2);
+  background:radial-gradient(120% 120% at 50% 10%, rgba(122,162,255,.16) 0%, rgba(122,162,255,0) 55%), var(--logo-fill);
+  box-shadow:var(--logo-glow);
+  border:1px solid var(--logo-stroke);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow:0 0 12px rgba(122,162,255,.25);
+  position:relative;
+  overflow:hidden;
 }
-.nav-logo img{
-  height:44px; width:44px; display:block;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(12,20,36,.55);
+.nav-logo-badge::before{
+  content:"";
+  position:absolute; inset:-25%;
+  pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(122,162,255,.18), transparent 60%);
+}
+.nav-logo-badge::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:inherit;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.nav-logo-img{
+  height:calc(var(--logo-badge-h) - (var(--logo-badge-pad) * 2));
+  width:calc(var(--logo-badge-h) - (var(--logo-badge-pad) * 2));
+  border-radius:50%;
   object-fit:cover;
-  box-shadow:0 0 8px rgba(122,162,255,.18);
+  display:block;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+}
+a.nav-logo-badge:focus-visible{
+  outline:2px solid rgba(122,162,255,.8);
+  outline-offset:3px;
+  box-shadow:0 0 0 4px rgba(122,162,255,.25), var(--logo-glow);
+}
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))){
+  .nav-logo-badge{
+    background:rgba(20,30,50,.65);
+  }
+}
+
+@media (max-width: 960px){
+  :root{
+    --logo-badge-h: 54px;
+    --logo-badge-r: 14px;
+  }
+}
+
+@media (max-width: 640px){
+  :root{
+    --logo-badge-h: 48px;
+    --logo-badge-r: 12px;
+    --logo-badge-pad: 5px;
+  }
 }
 
 .nav-toggle{
@@ -198,7 +245,7 @@
     padding-inline-end:max(env(safe-area-inset-right), clamp(14px, 6vw, 24px));
   }
   .nav-inner{ gap:10px; }
-  .nav-logo img{ height:40px; width:auto; }
+  .nav-logo-img{ height:calc(var(--logo-badge-h) - (var(--logo-badge-pad) * 2)); width:calc(var(--logo-badge-h) - (var(--logo-badge-pad) * 2)); }
 }
 /* ============================================================ */
     `.trim();
