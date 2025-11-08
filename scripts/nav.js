@@ -38,9 +38,30 @@
   gap:clamp(12px, 2vw, 20px);
   flex-wrap:wrap;
 }
+.nav-logo{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px;
+  min-width:44px;
+  min-height:44px;
+  border-radius:16px;
+  background:
+    radial-gradient(circle, rgba(122,162,255,.24) 0%, rgba(122,162,255,0) 70%),
+    rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:0 0 12px rgba(122,162,255,.25);
+}
 .nav-logo img{
-  height:44px; width:auto; display:block;
-  filter: drop-shadow(0 0 6px rgba(122,162,255,.35));
+  height:44px; width:44px; display:block;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(12,20,36,.55);
+  object-fit:cover;
+  box-shadow:0 0 8px rgba(122,162,255,.18);
 }
 
 .nav-toggle{
