@@ -6,6 +6,8 @@
   <title>Seizure Log — B.A.S.E.</title>
   <link rel="icon" href="./lib/assets/images/logos/base-logo.png">
   <link rel="stylesheet" href="./styles/base.css">
+  <script src="./lib/vendor/js-yaml.min.js"></script>
+  <script src="./lib/js/recoveries.js"></script>
   <script defer src="./scripts/nav.js"></script>
 </head>
 <body>
@@ -96,7 +98,7 @@
       <header class="section-header">
         <div class="section-title">
           <h1 id="seizure-log-title">Seizure Log</h1>
-          <p class="fine-print">This log lists every recorded seizure entry. Update <code>data/seizure-log.json</code> to make changes.</p>
+          <p class="fine-print">This log lists every recorded seizure entry. Update <code>data/seizure-log.yaml</code> to make changes.</p>
         </div>
         <div class="section-actions">
           <a class="btn ghost no-caret" href="./recoveries.html#manage" data-link="recoveries">Open Recoveries manager</a>
@@ -107,10 +109,10 @@
           <summary>How to add a new seizure log</summary>
           <ol>
             <li>Open the <strong>Recoveries</strong> page and use <strong>Manage Recoveries</strong> to add or edit an entry.</li>
-            <li>Click <strong>Generate code</strong> to create a JSON block, then paste it inside the <code>entries</code> array in <code>data/seizure-log.json</code>.</li>
-            <li>Save the file and refresh this page. Each entry is wrapped with hidden <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> markers in the JSON file to keep updates organised.</li>
+            <li>Select <strong>Export YAML</strong> to download the updated <code>seizure-log.yaml</code> file.</li>
+            <li>Replace <code>data/seizure-log.yaml</code> in the shared folder, then refresh this page to see the latest entries.</li>
           </ol>
-          <p class="fine-print">The Recoveries dashboard and this log both read from the same JSON file, so every update stays in sync.</p>
+          <p class="fine-print">The Recoveries dashboard and this log both read from the same YAML file, so every update stays in sync.</p>
         </details>
         <div id="seizure-log-list" class="seizure-log-list" role="list" aria-live="polite"></div>
         <p id="seizure-log-status" class="fine-print" hidden role="status" aria-live="polite"></p>
@@ -120,7 +122,7 @@
 
   <script type="module">
     const STATUS_MESSAGES = {
-      empty: 'No seizures recorded yet. Use the Recoveries manager to add a new entry to data/seizure-log.json.',
+      empty: 'No seizures recorded yet. Use the Recoveries manager to add a new entry to data/seizure-log.yaml.',
       error: 'Unable to load seizure log data. Please try again later.'
     };
 
@@ -226,13 +228,16 @@
           showStatus('error');
           return;
         }
-        const response = await fetch('./data/seizure-log.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        if (!Array.isArray(data) && !(data && typeof data === 'object')) {
-          throw new Error('Unexpected payload');
+        const loader = window.BASE_RECOVERIES?.loadSeizures;
+        if (typeof loader !== 'function') {
+          throw new Error('YAML loader unavailable');
         }
-        const records = normaliseSeizureLogPayload(data);
+        const payload = await loader();
+        const source = window.BASE_RECOVERIES?.state?.lastSource;
+        if (source === 'none') {
+          throw new Error('Missing seizure-log.yaml');
+        }
+        const records = normaliseSeizureLogPayload(payload);
         if (!records.length) {
           if (logList) {
             logList.innerHTML = '';
