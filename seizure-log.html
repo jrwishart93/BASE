@@ -175,19 +175,41 @@
       return currencyFormatter.format(number);
     }
 
+    function isRecordCandidate(value) {
+      return value && typeof value === 'object' && !Array.isArray(value);
+    }
+
+    function normaliseSeizureLogPayload(payload) {
+      if (Array.isArray(payload)) {
+        return payload.filter(isRecordCandidate);
+      }
+      if (payload && typeof payload === 'object') {
+        if (Array.isArray(payload.entries)) {
+          return payload.entries.filter(isRecordCandidate);
+        }
+        if (Array.isArray(payload.records)) {
+          return payload.records.filter(isRecordCandidate);
+        }
+      }
+      return [];
+    }
+
     async function loadSeizureLog() {
       try {
         const response = await fetch('./data/seizure-log.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        if (!Array.isArray(data)) throw new Error('Unexpected payload');
-        if (!data.length) {
+        if (!Array.isArray(data) && !(data && typeof data === 'object')) {
+          throw new Error('Unexpected payload');
+        }
+        const records = normaliseSeizureLogPayload(data);
+        if (!records.length) {
           showStatus('empty');
           return;
         }
 
         const rows = document.createDocumentFragment();
-        data
+        records
           .slice()
           .sort((a, b) => {
             const aTime = Date.parse(a?.datetime || a?.updatedAt || 0);

@@ -894,6 +894,23 @@
       }
     };
 
+    const isSeizureRecord = (value) => value && typeof value === 'object' && !Array.isArray(value);
+
+    const normaliseSeizureLogPayload = (payload) => {
+      if (Array.isArray(payload)) {
+        return payload.filter(isSeizureRecord);
+      }
+      if (payload && typeof payload === 'object') {
+        if (Array.isArray(payload.entries)) {
+          return payload.entries.filter(isSeizureRecord);
+        }
+        if (Array.isArray(payload.records)) {
+          return payload.records.filter(isSeizureRecord);
+        }
+      }
+      return [];
+    };
+
     (function setupGraphsCollapsible(){
       const section = document.getElementById('graphs-section');
       const body = document.getElementById('graphs-body');
@@ -1222,7 +1239,7 @@
     if (typeof window !== 'undefined') {
       window.toastTimer = toastTimer;
     }
-    window.RECOVERIES_DATA = Array.isArray(window.RECOVERIES_DATA) ? window.RECOVERIES_DATA : [];
+    window.RECOVERIES_DATA = normaliseSeizureLogPayload(window.RECOVERIES_DATA);
     window.__REC_DATA = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
     window.__REC_INVALID = typeof window.__REC_INVALID === 'number' ? window.__REC_INVALID : 0;
 
@@ -1538,9 +1555,12 @@
         const response = await fetch(SEIZURE_LOG_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const payload = await response.json();
-        if (!Array.isArray(payload)) throw new Error('Unexpected payload shape');
+        if (!Array.isArray(payload) && !(payload && typeof payload === 'object')) {
+          throw new Error('Unexpected payload shape');
+        }
+        const records = normaliseSeizureLogPayload(payload);
         seizureLogLoadFailed = false;
-        return payload;
+        return records;
       } catch (error) {
         console.error('Unable to load seizure log data', error);
         seizureLogLoadFailed = true;
@@ -1551,11 +1571,11 @@
     async function reloadAllData({ forceFetch = false } = {}) {
       setAnalyticsStatus('Loading…');
 
-      let manualData = Array.isArray(window.RECOVERIES_DATA) ? window.RECOVERIES_DATA : [];
+      let manualData = normaliseSeizureLogPayload(window.RECOVERIES_DATA);
       if (forceFetch || !manualData.length) {
         const fetched = await fetchSeizureLogData();
-        manualData = fetched;
-        window.RECOVERIES_DATA = Array.isArray(fetched) ? fetched : [];
+        manualData = normaliseSeizureLogPayload(fetched);
+        window.RECOVERIES_DATA = manualData;
       } else if (manualData.length) {
         seizureLogLoadFailed = false;
       }
