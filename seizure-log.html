@@ -108,7 +108,7 @@
           <ol>
             <li>Open the <strong>Recoveries</strong> page and use <strong>Manage Recoveries</strong> to add or edit an entry.</li>
             <li>Click <strong>Generate code</strong> to create a JSON block, then paste it inside the <code>entries</code> array in <code>data/seizure-log.json</code>.</li>
-            <li>Save the file and refresh this page. Each entry will appear between <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> for easy scanning.</li>
+            <li>Save the file and refresh this page. Each entry is wrapped with hidden <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> markers in the JSON file to keep updates organised.</li>
           </ol>
           <p class="fine-print">The Recoveries dashboard and this log both read from the same JSON file, so every update stays in sync.</p>
         </details>
@@ -254,11 +254,6 @@
             entry.className = 'seizure-entry';
             entry.setAttribute('role', 'listitem');
 
-            const startMarker = document.createElement('p');
-            startMarker.className = 'seizure-marker seizure-marker--start';
-            startMarker.textContent = '**** START ****';
-            entry.appendChild(startMarker);
-
             const content = document.createElement('div');
             content.className = 'seizure-entry-content';
 
@@ -339,11 +334,6 @@
             }
 
             entry.appendChild(content);
-
-            const endMarker = document.createElement('p');
-            endMarker.className = 'seizure-marker seizure-marker--end';
-            endMarker.textContent = '**** END ****';
-            entry.appendChild(endMarker);
 
             entries.appendChild(entry);
           });

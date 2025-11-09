@@ -1828,19 +1828,6 @@ html[data-theme="light"] .seizure-entry {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
-.seizure-marker {
-  text-align: center;
-  font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.seizure-marker--end {
-  color: var(--muted);
-}
-
 .seizure-entry-content {
   display: grid;
   gap: clamp(14px, 2vw, 18px);
