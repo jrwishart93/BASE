@@ -129,7 +129,7 @@
               </label>
             </div>
           </header>
-          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.json</code> to change recoveries.</p>
+          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.json</code> to update recoveries and the START/END entries on the Seizure Log page.</p>
           <div class="analytics-overview" id="analytics-overview" hidden>
             <div class="analytics-overview-grid">
               <section class="ytd-card" aria-labelledby="analytics-ytd-title">
@@ -364,6 +364,7 @@
                 <li>Select the seizure type to reveal its additional detail fields.</li>
                 <li>Provide the extra information requested for the chosen seizure type.</li>
                 <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
+                <li>Paste the generated code into <code>data/seizure-log.json</code>. Each log will display between <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> on the Seizure Log page.</li>
                 <li>Use <strong>Save seizure (JSON)</strong> to export, or <strong>Reset form</strong> to clear the page.</li>
               </ol>
             </div>
@@ -624,7 +625,7 @@
           <header class="card-head">
             <h2>Generate JSON Code</h2>
           </header>
-          <p class="muted fine-print">Generate a formatted block and paste it into <code>data/seizure-log.json</code>.</p>
+          <p class="muted fine-print">Generate a formatted block and paste it into <code>data/seizure-log.json</code>. Refresh the Seizure Log page to see the entry framed by <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span>.</p>
           <div class="action-bar">
             <button type="button" id="generate" class="btn primary">Generate code</button>
             <button type="reset" class="btn">Reset form</button>
