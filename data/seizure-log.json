@@ -24,6 +24,30 @@
     "createdBy": "BASE recoveries.html v1.0"
   },
   {
+  "id": "REC-1234-20251030-121500",
+  "datetime": "2025-09-09T15:18:00.000Z",
+  "incidentNumber": "1234",
+  "division": "E",
+  "location": "Ferry Road, Edinburgh",
+  "type": "Vehicle",
+  "details": {
+    "reason": "Seized Stolen",
+    "colour": "Blue",
+    "make": "Ford",
+    "model": "Focus",
+    "vrm": "SF22DSD",
+    "estimatedValueGBP": 20000
+  },
+  "remarks": "stolen vehicle recovered.",
+  "createdBy": "PC Adams",
+  "officers": [
+    "PC Jill and Adams"
+  ],
+  "enquiryOfficer": "PC Adams",
+  "createdAt": "2025-10-31T12:15:55.686Z",
+  "updatedAt": "2025-11-09T09:52:08.205Z"
+}
+  {
     "schema": "base.recovery.v1",
     "id": "REC-3456-20251030-121500",
     "datetime": "2025-10-30T12:15:00.000Z",
