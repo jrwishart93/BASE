@@ -867,6 +867,38 @@ html[data-theme="light"] .settings-panel-icon::after{
   font:inherit; transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
   min-height:44px; line-height:1.2;
 }
+.input-hidden{
+  position:absolute !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  height:0; width:0;
+}
+.field-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.row-inline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.row-inline .chip{
+  min-width:max(130px, 40%);
+  justify-content:flex-start;
+}
+.row-inline .chip[readonly]{
+  cursor:default;
+  color:var(--muted-strong);
+}
+.mono{
+  font-family:var(--font-mono, "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace);
+  letter-spacing:.04em;
+}
+.row-inline .input{
+  flex:1 1 120px;
+}
 .recoveries-form input:focus,
 .recoveries-form select:focus,
 .recoveries-form textarea:focus{
