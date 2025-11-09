@@ -409,7 +409,16 @@
                 </span>
                 Incident number
               </label>
-              <input id="field-incident" name="incidentNumber" type="text" required>
+              <input id="field-incident" name="incidentNumber" type="text" class="input-hidden" required>
+              <div class="field-group">
+                <label for="incidentLast4">Storm Ref No.</label>
+                <div class="row-inline">
+                  <input id="incidentPrefix" type="text" readonly class="chip mono" aria-label="Storm reference prefix" value="PS-YYYYMMDD-" />
+                  <input id="incidentLast4" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="input mono" placeholder="Last 4 digits" aria-label="Last four digits" />
+                </div>
+                <p class="fine-print" id="stormRefPreview" aria-live="polite">Preview: PS-YYYYMMDD-____</p>
+                <small class="field-error" data-error-for="incidentLast4" hidden></small>
+              </div>
               <small class="field-error" data-error-for="field-incident" hidden></small>
             </div>
             <div class="form-field">
@@ -975,6 +984,63 @@
       counterfeitValue: document.getElementById('field-counterfeit-value')
     };
 
+    const incidentInput = document.getElementById('field-incident');
+    const dtInput = document.getElementById('field-datetime');
+    const prefixEl = document.getElementById('incidentPrefix');
+    const last4El = document.getElementById('incidentLast4');
+    const previewEl = document.getElementById('stormRefPreview');
+
+    function updateStormRefPreview() {
+      const date = getDateFromInputValue(dtInput?.value || '');
+      const prefix = date ? buildStormPrefix(date) : 'PS-YYYYMMDD-';
+      const last4 = sanitiseLast4(last4El?.value || '');
+      if (last4El && last4El.value !== last4) {
+        last4El.value = last4;
+      }
+      if (prefixEl) {
+        prefixEl.value = prefix;
+      }
+      const composed = `${prefix}${last4.padStart(4, '_')}`;
+      if (previewEl) {
+        previewEl.textContent = `Preview: ${composed}`;
+      }
+      if (incidentInput) {
+        incidentInput.value = last4 && last4.length === 4 ? `${prefix}${last4}` : prefix;
+      }
+    }
+
+    if (incidentInput && last4El) {
+      const existingIncident = String(incidentInput.value || '');
+      const match = /^PS-(\d{8})-(\d{4})$/.exec(existingIncident);
+      if (match) {
+        last4El.value = match[2];
+      } else {
+        last4El.value = sanitiseLast4(existingIncident);
+      }
+    }
+
+    updateStormRefPreview();
+
+    if (dtInput) {
+      dtInput.addEventListener('change', updateStormRefPreview);
+      dtInput.addEventListener('input', updateStormRefPreview);
+    }
+
+    if (last4El) {
+      last4El.addEventListener('input', () => {
+        const sanitised = sanitiseLast4(last4El.value);
+        if (last4El.value !== sanitised) {
+          last4El.value = sanitised;
+        }
+        updateStormRefPreview();
+      });
+      last4El.addEventListener('blur', () => {
+        const sanitised = sanitiseLast4(last4El.value);
+        last4El.value = sanitised.padStart(4, '0');
+        updateStormRefPreview();
+      });
+    }
+
     const typeRadios = Array.from(form.querySelectorAll('input[data-type-radio]'));
     const typeTiles = Array.from(form.querySelectorAll('[data-type-tile]'));
     const typePanels = Array.from(form.querySelectorAll('.type-panel'));
@@ -1083,7 +1149,8 @@
     if (inputs) {
       inputs.__refs = {
         'field-datetime': inputs.datetime,
-        'field-incident': inputs.incident,
+        'field-incident': last4El || inputs.incident,
+        incidentLast4: last4El,
         'field-division': inputs.division,
         'seizure-type': null,
         'field-location': inputs.location,
@@ -1364,6 +1431,12 @@
               showSectionForType();
               setSaveMessage('');
               setValidationMessage('');
+              if (last4El) {
+                last4El.value = '';
+                updateStormRefPreview();
+              } else if (incidentInput) {
+                incidentInput.value = '';
+              }
             });
             if (inputs.datetime) {
               inputs.datetime.value = formatLocalDateTime(new Date());
@@ -1572,6 +1645,7 @@
 
       if (inputs?.datetime && !inputs.datetime.value) {
         inputs.datetime.value = formatLocalDateTime(new Date());
+        updateStormRefPreview();
       }
 
       syncTiles();
@@ -1736,6 +1810,7 @@
         form.reset();
         if (inputs?.datetime) {
           inputs.datetime.value = formatLocalDateTime(new Date());
+          updateStormRefPreview();
         }
         syncTiles();
         showSectionForType();
@@ -1882,8 +1957,43 @@
         return fieldMap[key].value;
       };
 
-      if (!getValue('datetime')) pushError(issues, 'field-datetime', 'Enter the date and time.');
-      if (!getValue('incident').trim()) pushError(issues, 'field-incident', 'Provide the incident number.');
+      const rawDatetimeValue = getValue('datetime');
+      const dateObj = getDateFromInputValue(rawDatetimeValue);
+      if (!dateObj) {
+        pushError(issues, 'field-datetime', 'Provide a valid date and time.');
+      }
+
+      const isMainContext = fieldMap === inputs;
+      if (isMainContext) {
+        const last4Input = document.getElementById('incidentLast4');
+        const last4Val = sanitiseLast4(last4Input?.value || '');
+        if (last4Input && last4Input.value !== last4Val) {
+          last4Input.value = last4Val;
+        }
+        if (last4Val.length !== 4) {
+          pushError(issues, 'incidentLast4', 'Enter the last 4 digits (numbers only).');
+        }
+        if (dateObj && last4Val.length === 4) {
+          const expectedPrefix = buildStormPrefix(dateObj);
+          const composed = `${expectedPrefix}${last4Val}`;
+          if (inputs.incident) {
+            inputs.incident.value = composed;
+          }
+          if (!/^PS-\d{8}-\d{4}$/.test(composed)) {
+            pushError(issues, 'field-incident', 'Storm Ref No. must be PS-YYYYMMDD-####.');
+          }
+        } else if (dateObj && inputs.incident) {
+          inputs.incident.value = buildStormPrefix(dateObj);
+        }
+      } else {
+        const incidentValue = getValue('incident').trim();
+        if (!incidentValue) {
+          pushError(issues, 'field-incident', 'Provide the incident number.');
+        } else if (!/^PS-\d{8}-\d{4}$/.test(incidentValue)) {
+          pushError(issues, 'field-incident', 'Storm Ref No. must be PS-YYYYMMDD-####.');
+        }
+      }
+
       if (!getValue('division')) pushError(issues, 'field-division', 'Select the division.');
       if (!getValue('location').trim()) pushError(issues, 'field-location', 'Provide the location.');
 
@@ -2125,6 +2235,40 @@
       const min = String(date.getMinutes()).padStart(2, '0');
       const ss = String(date.getSeconds()).padStart(2, '0');
       return `${yyyy}${mm}${dd}-${hh}${min}${ss}`;
+    }
+
+    function yyyymmddFromDate(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'YYYYMMDD';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}${m}${d}`;
+    }
+
+    function getDateFromInputValue(val) {
+      if (!val) return null;
+      const d = new Date(val);
+      if (!Number.isNaN(d.getTime())) return d;
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(val.trim());
+      if (m) {
+        const dd = parseInt(m[1], 10);
+        const mm = parseInt(m[2], 10) - 1;
+        const yyyy = parseInt(m[3], 10);
+        const uk = new Date(yyyy, mm, dd, 12, 0, 0);
+        return Number.isNaN(uk.getTime()) ? null : uk;
+      }
+      return null;
+    }
+
+    function buildStormPrefix(date) {
+      const ymd = yyyymmddFromDate(date);
+      return `PS-${ymd}-`;
+    }
+
+    function sanitiseLast4(raw) {
+      return String(raw || '')
+        .replace(/\D+/g, '')
+        .slice(0, 4);
     }
 
     function formatLocalDateTime(date) {
