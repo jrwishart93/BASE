@@ -121,7 +121,7 @@
           <header class="card-head">
             <div>
               <h2>Analytics</h2>
-              <p class="fine-print">Data loads from the shared seizure log file. Update <code>data/seizure-log.yaml</code> (or the JSON fallback) and refresh to see changes.</p>
+              <p class="fine-print">Data loads from the shared seizure log file. Update <code>data/seizure-log.yaml</code> and refresh to see changes.</p>
             </div>
             <div class="analytics-controls">
               <button type="button" class="btn ghost no-caret" id="reload-data">Refresh data</button>
@@ -132,7 +132,7 @@
               </label>
             </div>
           </header>
-          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.yaml</code> to update recoveries. The JSON file remains available as a read-only fallback.</p>
+          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.yaml</code> to update recoveries.</p>
           <div class="analytics-overview" id="analytics-overview" hidden>
             <div class="analytics-overview-grid">
               <section class="ytd-card" aria-labelledby="analytics-ytd-title">
@@ -319,6 +319,7 @@
           <input id="manage-search" type="search" placeholder="Search incident, location, division" aria-label="Search recoveries">
           <select id="manage-fy" aria-label="Financial year"></select>
           <button type="button" id="btn-add-recovery" class="btn-primary">Add new recovery</button>
+          <button type="button" id="migrateJsonToYaml" class="btn ghost no-caret">Migrate JSON → YAML</button>
         </div>
       </header>
       <div class="section-body">
@@ -367,7 +368,7 @@
                 <li>Select the seizure type to reveal its additional detail fields.</li>
                 <li>Provide the extra information requested for the chosen seizure type.</li>
                 <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
-                <li>When prompted, replace <code>data/seizure-log.yaml</code> in the shared folder with the exported file. The JSON fallback remains view-only.</li>
+                <li>When prompted, replace <code>data/seizure-log.yaml</code> in the shared folder with the exported file.</li>
                 <li>Use <strong>Export YAML</strong> to download, or <strong>Reset form</strong> to clear the page.</li>
               </ol>
             </div>
@@ -628,7 +629,7 @@
           <header class="card-head">
             <h2>Export YAML</h2>
           </header>
-          <p class="muted fine-print">Export an updated <code>data/seizure-log.yaml</code> file. The JSON file remains a read-only fallback.</p>
+          <p class="muted fine-print">Export an updated <code>data/seizure-log.yaml</code> file.</p>
           <div class="action-bar">
             <button type="button" id="generate" class="btn primary">Export YAML</button>
             <button type="reset" class="btn">Reset form</button>
@@ -1014,6 +1015,7 @@
     const manageSearchInput = document.getElementById('manage-search');
     const manageFYSelect = document.getElementById('manage-fy');
     const addRecoveryButton = document.getElementById('btn-add-recovery');
+    const migrateButton = document.getElementById('migrateJsonToYaml');
     const manageModal = document.getElementById('manage-modal');
     const manageModalTitle = document.getElementById('manage-modal-title');
     const manageModalSave = document.getElementById('manage-modal-save');
@@ -1489,6 +1491,31 @@
           });
         }
 
+        if (migrateButton) {
+          migrateButton.addEventListener('click', async () => {
+            try {
+              const response = await fetch('./data/seizure-log.json', { cache: 'no-store' });
+              if (!response.ok) throw new Error(`Unable to fetch JSON file (${response.status})`);
+              const jsonPayload = await response.json();
+              const entries = Array.isArray(jsonPayload) ? jsonPayload : (jsonPayload?.entries || []);
+              const yamlText = jsyaml.dump(entries, { lineWidth: 120 });
+              const blob = new Blob([yamlText], { type: 'text/yaml;charset=utf-8' });
+              const objectUrl = URL.createObjectURL(blob);
+              const downloadLink = document.createElement('a');
+              downloadLink.href = objectUrl;
+              downloadLink.download = 'seizure-log.yaml';
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+              setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+              alert('YAML file downloaded. Replace /data/seizure-log.yaml with this file.');
+            } catch (err) {
+              alert('Migration failed. See console for details.');
+              console.error(err);
+            }
+          });
+        }
+
         if (manageInputs?.type) {
           manageInputs.type.addEventListener('change', () => {
             updateManageTypePanels(manageInputs.type.value);
@@ -1539,7 +1566,7 @@
       }
 
       if (reloadDataButton) reloadDataButton.disabled = false;
-      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.yaml (JSON fallback loads read-only).');
+      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.yaml to update recoveries.');
 
       refreshLegacyUI();
 
@@ -1602,16 +1629,14 @@
 
       const total = window.__REC_DATA.length;
       const source = window.BASE_RECOVERIES?.state?.lastSource;
-      const sourceLabel = source === 'json'
-        ? 'data/seizure-log.json (JSON fallback)'
-        : source === 'yaml'
-          ? 'data/seizure-log.yaml'
-          : 'the seizure log data file';
+      const sourceLabel = source === 'yaml'
+        ? 'data/seizure-log.yaml'
+        : 'the seizure log data file';
       const message = seizureLogLoadFailed
         ? 'Unable to load seizure log data. Check console for details.'
         : (total
           ? `Loaded ${total} record${total === 1 ? '' : 's'} from ${sourceLabel}.`
-          : 'No recovery entries yet. Update data/seizure-log.yaml (JSON fallback is read-only).');
+          : 'No recovery entries yet. Update data/seizure-log.yaml and refresh.');
       setAnalyticsStatus(message);
       refreshLegacyUI();
     }
