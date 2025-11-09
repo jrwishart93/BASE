@@ -411,13 +411,20 @@
               </label>
               <input id="field-incident" name="incidentNumber" type="text" class="input-hidden" required>
               <div class="field-group">
-                <label for="incidentLast4">Storm Ref No.</label>
-                <div class="row-inline">
-                  <input id="incidentPrefix" type="text" readonly class="chip mono" aria-label="Storm reference prefix" value="PS-YYYYMMDD-" />
-                  <input id="incidentLast4" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="input mono" placeholder="Last 4 digits" aria-label="Last four digits" />
-                </div>
-                <p class="fine-print" id="stormRefPreview" aria-live="polite">Preview: PS-YYYYMMDD-____</p>
-                <small class="field-error" data-error-for="incidentLast4" hidden></small>
+                <label for="incidentStormRef">Storm Ref No.</label>
+                <input id="incidentStormRef"
+                       name="incidentStormRef"
+                       type="text"
+                       class="input mono"
+                       inputmode="text"
+                       autocomplete="off"
+                       spellcheck="false"
+                       autocapitalize="characters"
+                       maxlength="16"
+                       placeholder="PS-YYYYMMDD-1234"
+                       aria-describedby="stormRefHelp">
+                <p class="fine-print" id="stormRefHelp" aria-live="polite">Format: PS-YYYYMMDD-1234</p>
+                <small class="field-error" data-error-for="incidentStormRef" hidden></small>
               </div>
               <small class="field-error" data-error-for="field-incident" hidden></small>
             </div>
@@ -986,59 +993,56 @@
 
     const incidentInput = document.getElementById('field-incident');
     const dtInput = document.getElementById('field-datetime');
-    const prefixEl = document.getElementById('incidentPrefix');
-    const last4El = document.getElementById('incidentLast4');
-    const previewEl = document.getElementById('stormRefPreview');
+    const stormRefEl = document.getElementById('incidentStormRef');
+    const stormRefHelpEl = document.getElementById('stormRefHelp');
 
-    function updateStormRefPreview() {
+    if (stormRefHelpEl && !stormRefHelpEl.dataset.defaultText) {
+      stormRefHelpEl.dataset.defaultText = stormRefHelpEl.textContent || 'Format: PS-YYYYMMDD-1234';
+    }
+
+    function updateStormRefPlaceholder() {
+      if (!stormRefEl) return;
       const date = getDateFromInputValue(dtInput?.value || '');
-      const prefix = date ? buildStormPrefix(date) : 'PS-YYYYMMDD-';
-      const last4 = sanitiseLast4(last4El?.value || '');
-      if (last4El && last4El.value !== last4) {
-        last4El.value = last4;
-      }
-      if (prefixEl) {
-        prefixEl.value = prefix;
-      }
-      const composed = `${prefix}${last4.padStart(4, '_')}`;
-      if (previewEl) {
-        previewEl.textContent = `Preview: ${composed}`;
+      const placeholder = date ? `PS-${yyyymmddFromDate(date)}-1234` : 'PS-YYYYMMDD-1234';
+      stormRefEl.placeholder = placeholder;
+      stormRefEl.setAttribute('title', placeholder);
+    }
+
+    function syncStormRef() {
+      if (!stormRefEl) return;
+      const { display, submit, isComplete } = normaliseStormRef(stormRefEl.value);
+      if (stormRefEl.value !== display) {
+        stormRefEl.value = display;
       }
       if (incidentInput) {
-        incidentInput.value = last4 && last4.length === 4 ? `${prefix}${last4}` : prefix;
+        incidentInput.value = submit;
+      }
+      if (stormRefHelpEl) {
+        const defaultText = stormRefHelpEl.dataset.defaultText || 'Format: PS-YYYYMMDD-1234';
+        stormRefHelpEl.textContent = isComplete && display
+          ? `Reference ready: ${display}`
+          : defaultText;
       }
     }
 
-    if (incidentInput && last4El) {
-      const existingIncident = String(incidentInput.value || '');
-      const match = /^PS-(\d{8})-(\d{4})$/.exec(existingIncident);
-      if (match) {
-        last4El.value = match[2];
-      } else {
-        last4El.value = sanitiseLast4(existingIncident);
-      }
+    if (stormRefEl && incidentInput && incidentInput.value) {
+      stormRefEl.value = incidentInput.value;
     }
 
-    updateStormRefPreview();
+    syncStormRef();
+    updateStormRefPlaceholder();
 
     if (dtInput) {
-      dtInput.addEventListener('change', updateStormRefPreview);
-      dtInput.addEventListener('input', updateStormRefPreview);
+      dtInput.addEventListener('change', () => {
+        updateStormRefPlaceholder();
+        syncStormRef();
+      });
+      dtInput.addEventListener('input', updateStormRefPlaceholder);
     }
 
-    if (last4El) {
-      last4El.addEventListener('input', () => {
-        const sanitised = sanitiseLast4(last4El.value);
-        if (last4El.value !== sanitised) {
-          last4El.value = sanitised;
-        }
-        updateStormRefPreview();
-      });
-      last4El.addEventListener('blur', () => {
-        const sanitised = sanitiseLast4(last4El.value);
-        last4El.value = sanitised.padStart(4, '0');
-        updateStormRefPreview();
-      });
+    if (stormRefEl) {
+      stormRefEl.addEventListener('input', syncStormRef);
+      stormRefEl.addEventListener('blur', syncStormRef);
     }
 
     const typeRadios = Array.from(form.querySelectorAll('input[data-type-radio]'));
@@ -1149,8 +1153,8 @@
     if (inputs) {
       inputs.__refs = {
         'field-datetime': inputs.datetime,
-        'field-incident': last4El || inputs.incident,
-        incidentLast4: last4El,
+        'field-incident': stormRefEl || inputs.incident,
+        incidentStormRef: stormRefEl,
         'field-division': inputs.division,
         'seizure-type': null,
         'field-location': inputs.location,
@@ -1431,9 +1435,10 @@
               showSectionForType();
               setSaveMessage('');
               setValidationMessage('');
-              if (last4El) {
-                last4El.value = '';
-                updateStormRefPreview();
+              if (stormRefEl) {
+                stormRefEl.value = '';
+                syncStormRef();
+                updateStormRefPlaceholder();
               } else if (incidentInput) {
                 incidentInput.value = '';
               }
@@ -1965,32 +1970,33 @@
 
       const isMainContext = fieldMap === inputs;
       if (isMainContext) {
-        const last4Input = document.getElementById('incidentLast4');
-        const last4Val = sanitiseLast4(last4Input?.value || '');
-        if (last4Input && last4Input.value !== last4Val) {
-          last4Input.value = last4Val;
-        }
-        if (last4Val.length !== 4) {
-          pushError(issues, 'incidentLast4', 'Enter the last 4 digits (numbers only).');
-        }
-        if (dateObj && last4Val.length === 4) {
-          const expectedPrefix = buildStormPrefix(dateObj);
-          const composed = `${expectedPrefix}${last4Val}`;
+        const stormRefInput = document.getElementById('incidentStormRef');
+        if (stormRefInput) {
+          const { display, submit, isComplete } = normaliseStormRef(stormRefInput.value);
+          if (stormRefInput.value !== display) {
+            stormRefInput.value = display;
+          }
+          if (!display) {
+            pushError(issues, 'incidentStormRef', 'Enter the Storm Ref No.');
+          } else if (!isComplete) {
+            pushError(issues, 'incidentStormRef', 'Storm Ref No. must be PS-YYYYMMDD-####.');
+          }
           if (inputs.incident) {
-            inputs.incident.value = composed;
+            inputs.incident.value = submit;
           }
-          if (!/^PS-\d{8}-\d{4}$/.test(composed)) {
-            pushError(issues, 'field-incident', 'Storm Ref No. must be PS-YYYYMMDD-####.');
-          }
-        } else if (dateObj && inputs.incident) {
-          inputs.incident.value = buildStormPrefix(dateObj);
+        }
+        if (inputs.incident && !inputs.incident.value) {
+          inputs.incident.value = '';
         }
       } else {
-        const incidentValue = getValue('incident').trim();
+        const incidentValueRaw = getValue('incident').trim();
+        const incidentValue = incidentValueRaw.toUpperCase();
         if (!incidentValue) {
           pushError(issues, 'field-incident', 'Provide the incident number.');
         } else if (!/^PS-\d{8}-\d{4}$/.test(incidentValue)) {
           pushError(issues, 'field-incident', 'Storm Ref No. must be PS-YYYYMMDD-####.');
+        } else if (fieldMap.incident) {
+          fieldMap.incident.value = incidentValue;
         }
       }
 
@@ -2260,15 +2266,41 @@
       return null;
     }
 
-    function buildStormPrefix(date) {
-      const ymd = yyyymmddFromDate(date);
-      return `PS-${ymd}-`;
-    }
-
-    function sanitiseLast4(raw) {
-      return String(raw || '')
-        .replace(/\D+/g, '')
-        .slice(0, 4);
+    function normaliseStormRef(raw) {
+      let value = String(raw || '').toUpperCase().trim();
+      if (!value) {
+        return { display: '', submit: '', isComplete: false };
+      }
+      value = value.replace(/\s+/g, '');
+      value = value.replace(/^PSPS/, 'PS');
+      if (!value.startsWith('PS')) {
+        value = `PS-${value.replace(/^PS-?/, '')}`;
+      }
+      if (!value.startsWith('PS-')) {
+        value = value.replace(/^PS/, 'PS-');
+      }
+      value = value.replace(/[^A-Z0-9-]/g, '');
+      value = value.slice(0, 16);
+      const withoutPrefix = value.slice(3);
+      const segments = withoutPrefix.split('-');
+      const datePart = (segments[0] || '').replace(/\D/g, '').slice(0, 8);
+      const tailDigits = segments.slice(1).join('');
+      const lastPart = tailDigits.replace(/\D/g, '').slice(0, 4);
+      const hyphenCount = (value.match(/-/g) || []).length;
+      const displayParts = ['PS'];
+      if (hyphenCount >= 1 || datePart) {
+        displayParts.push(datePart);
+      }
+      if (lastPart || hyphenCount >= 2 || (value.endsWith('-') && datePart)) {
+        displayParts.push(lastPart);
+      }
+      let display = displayParts.join('-');
+      if (!lastPart && display.endsWith('--')) {
+        display = display.slice(0, -1);
+      }
+      const isComplete = datePart.length === 8 && lastPart.length === 4;
+      const submit = isComplete ? `PS-${datePart}-${lastPart}` : '';
+      return { display, submit, isComplete };
     }
 
     function formatLocalDateTime(date) {
