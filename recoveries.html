@@ -10,6 +10,8 @@
   <link rel="preload" as="image" href="./lib/assets/images/logos/base-logo.png">
   <link rel="stylesheet" href="./styles/base.css">
 
+  <script src="./lib/vendor/js-yaml.min.js"></script>
+  <script src="./lib/js/recoveries.js"></script>
   <script defer src="./Applications/JSON/app-registry.js"></script>
   <script defer src="./scripts/briefings.js"></script>
   <script defer src="./scripts/data.js"></script>
@@ -118,7 +120,7 @@
           <header class="card-head">
             <div>
               <h2>Analytics</h2>
-              <p class="fine-print">Data loads from the shared seizure log file. Update <code>data/seizure-log.json</code> and refresh to see changes.</p>
+              <p class="fine-print">Data loads from the shared seizure log file. Update <code>data/seizure-log.yaml</code> (or the JSON fallback) and refresh to see changes.</p>
             </div>
             <div class="analytics-controls">
               <button type="button" class="btn ghost no-caret" id="reload-data">Refresh data</button>
@@ -129,7 +131,7 @@
               </label>
             </div>
           </header>
-          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.json</code> to update recoveries and the START/END entries on the Seizure Log page.</p>
+          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.yaml</code> (or <code>data/seizure-log.json</code>) to update recoveries and the START/END entries on the Seizure Log page.</p>
           <div class="analytics-overview" id="analytics-overview" hidden>
             <div class="analytics-overview-grid">
               <section class="ytd-card" aria-labelledby="analytics-ytd-title">
@@ -877,7 +879,6 @@
     (function () {
     'use strict';
 
-    const SEIZURE_LOG_URL = './data/seizure-log.json';
     let seizureLogLoadFailed = false;
 
     const cloneRecord = (record) => {
@@ -1537,7 +1538,7 @@
       }
 
       if (reloadDataButton) reloadDataButton.disabled = false;
-      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.json to change recoveries.');
+      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.yaml (or data/seizure-log.json) to change recoveries.');
 
       refreshLegacyUI();
 
@@ -1552,16 +1553,21 @@
     };
 
     async function fetchSeizureLogData() {
+      const loader = window.BASE_RECOVERIES && window.BASE_RECOVERIES.loadSeizures;
+      if (typeof loader !== 'function') {
+        console.error('Unable to load seizure log data: loader missing');
+        seizureLogLoadFailed = true;
+        return [];
+      }
+
       try {
-        const response = await fetch(SEIZURE_LOG_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json();
-        if (!Array.isArray(payload) && !(payload && typeof payload === 'object')) {
-          throw new Error('Unexpected payload shape');
+        const records = await loader();
+        const source = window.BASE_RECOVERIES?.state?.lastSource;
+        seizureLogLoadFailed = source === 'none';
+        if (seizureLogLoadFailed) {
+          return [];
         }
-        const records = normaliseSeizureLogPayload(payload);
-        seizureLogLoadFailed = false;
-        return records;
+        return normaliseSeizureLogPayload(records);
       } catch (error) {
         console.error('Unable to load seizure log data', error);
         seizureLogLoadFailed = true;
@@ -1594,11 +1600,17 @@
       syncFYControls();
 
       const total = window.__REC_DATA.length;
+      const source = window.BASE_RECOVERIES?.state?.lastSource;
+      const sourceLabel = source === 'json'
+        ? 'data/seizure-log.json (JSON fallback)'
+        : source === 'yaml'
+          ? 'data/seizure-log.yaml'
+          : 'the seizure log data file';
       const message = seizureLogLoadFailed
         ? 'Unable to load seizure log data. Check console for details.'
         : (total
-          ? `Loaded ${total} record${total === 1 ? '' : 's'} from data/seizure-log.json.`
-          : 'No recovery entries yet. Generate code and paste it into data/seizure-log.json.');
+          ? `Loaded ${total} record${total === 1 ? '' : 's'} from ${sourceLabel}.`
+          : 'No recovery entries yet. Update data/seizure-log.yaml or data/seizure-log.json.');
       setAnalyticsStatus(message);
       refreshLegacyUI();
     }
