@@ -116,9 +116,11 @@
     position:absolute;
     inset:14px;
     border-radius:18px;
-    background:radial-gradient(circle at 50% 45%, rgba(255,255,255,.78), rgba(178,221,255,.18) 62%, rgba(178,221,255,0) 82%);
-    filter:blur(0.5px);
-    opacity:.95;
+    background:
+      radial-gradient(60% 60% at 50% 52%, rgba(96,162,255,.58), rgba(96,162,255,0) 74%),
+      radial-gradient(circle at 50% 45%, rgba(255,255,255,.78), rgba(178,221,255,.18) 62%, rgba(178,221,255,0) 82%);
+    filter:blur(0.5px) drop-shadow(0 0 18px rgba(96,162,255,.4));
+    opacity:.98;
     mix-blend-mode:screen;
     z-index:0;
   }
