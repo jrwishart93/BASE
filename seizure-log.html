@@ -94,27 +94,25 @@
   <main class="container recovery-page">
     <section class="card" aria-labelledby="seizure-log-title">
       <header class="section-header">
-        <h1 id="seizure-log-title">Seizure Log</h1>
-        <p class="fine-print">This log lists every recorded seizure entry. Update <code>data/seizure-log.json</code> to make changes.</p>
+        <div class="section-title">
+          <h1 id="seizure-log-title">Seizure Log</h1>
+          <p class="fine-print">This log lists every recorded seizure entry. Update <code>data/seizure-log.json</code> to make changes.</p>
+        </div>
+        <div class="section-actions">
+          <a class="btn ghost no-caret" href="./recoveries.html#manage" data-link="recoveries">Open Recoveries manager</a>
+        </div>
       </header>
       <div class="section-body">
-        <div class="table-wrap table-wrapper">
-          <table class="table" aria-describedby="seizure-log-title">
-            <thead>
-              <tr>
-                <th scope="col">Date &amp; Time</th>
-                <th scope="col">Incident</th>
-                <th scope="col">Type</th>
-                <th scope="col">Division</th>
-                <th scope="col">Location</th>
-                <th scope="col">Officers</th>
-                <th scope="col">Details</th>
-                <th scope="col">Remarks</th>
-              </tr>
-            </thead>
-            <tbody id="seizure-log-body"></tbody>
-          </table>
-        </div>
+        <details class="seizure-guidance">
+          <summary>How to add a new seizure log</summary>
+          <ol>
+            <li>Open the <strong>Recoveries</strong> page and use <strong>Manage Recoveries</strong> to add or edit an entry.</li>
+            <li>Click <strong>Generate code</strong> to create a JSON block, then paste it inside the <code>entries</code> array in <code>data/seizure-log.json</code>.</li>
+            <li>Save the file and refresh this page. Each entry will appear between <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> for easy scanning.</li>
+          </ol>
+          <p class="fine-print">The Recoveries dashboard and this log both read from the same JSON file, so every update stays in sync.</p>
+        </details>
+        <div id="seizure-log-list" class="seizure-log-list" role="list" aria-live="polite"></div>
         <p id="seizure-log-status" class="fine-print" hidden role="status" aria-live="polite"></p>
       </div>
     </section>
@@ -122,11 +120,11 @@
 
   <script type="module">
     const STATUS_MESSAGES = {
-      empty: 'No seizures recorded yet. Add a new entry to data/seizure-log.json to populate the log.',
+      empty: 'No seizures recorded yet. Use the Recoveries manager to add a new entry to data/seizure-log.json.',
       error: 'Unable to load seizure log data. Please try again later.'
     };
 
-    const tableBody = document.getElementById('seizure-log-body');
+    const logList = document.getElementById('seizure-log-list');
     const statusNode = document.getElementById('seizure-log-status');
     const dateFormatter = new Intl.DateTimeFormat('en-GB', {
       dateStyle: 'medium',
@@ -179,6 +177,34 @@
       return value && typeof value === 'object' && !Array.isArray(value);
     }
 
+    function formatDetailKey(key) {
+      if (!key) return '';
+      const DETAIL_LABELS = {
+        reason: 'Reason',
+        colour: 'Colour',
+        make: 'Make',
+        model: 'Model',
+        vrm: 'VRM',
+        estimatedValueGBP: 'Estimated value (GBP)',
+        drugType: 'Drug type',
+        quantityOrWeight: 'Quantity / Weight',
+        amountGBP: 'Amount (GBP)',
+        description: 'Description',
+        quantity: 'Quantity',
+        estimatedValue: 'Estimated value',
+        amount: 'Amount'
+      };
+      if (DETAIL_LABELS[key]) return DETAIL_LABELS[key];
+      const normalisedKey = key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
+      const cleaned = normalisedKey
+        .replace(/\b([A-Z])\b/g, (match) => match.toUpperCase())
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleaned) return key;
+      const collapsed = cleaned.replace(/\b([A-Z])(?:\s+([A-Z]))+\b/g, (segment) => segment.replace(/\s+/g, ''));
+      return collapsed.charAt(0).toUpperCase() + collapsed.slice(1);
+    }
+
     function normaliseSeizureLogPayload(payload) {
       if (Array.isArray(payload)) {
         return payload.filter(isRecordCandidate);
@@ -196,6 +222,10 @@
 
     async function loadSeizureLog() {
       try {
+        if (!logList) {
+          showStatus('error');
+          return;
+        }
         const response = await fetch('./data/seizure-log.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
@@ -204,11 +234,14 @@
         }
         const records = normaliseSeizureLogPayload(data);
         if (!records.length) {
+          if (logList) {
+            logList.innerHTML = '';
+          }
           showStatus('empty');
           return;
         }
 
-        const rows = document.createDocumentFragment();
+        const entries = document.createDocumentFragment();
         records
           .slice()
           .sort((a, b) => {
@@ -217,52 +250,112 @@
             return Number.isNaN(bTime - aTime) ? 0 : bTime - aTime;
           })
           .forEach((record) => {
-            const row = document.createElement('tr');
+            const entry = document.createElement('article');
+            entry.className = 'seizure-entry';
+            entry.setAttribute('role', 'listitem');
 
-            const dtCell = document.createElement('td');
-            const dt = Date.parse(record?.datetime || record?.updatedAt || '');
-            dtCell.textContent = Number.isNaN(dt) ? '—' : dateFormatter.format(new Date(dt));
-            row.appendChild(dtCell);
+            const startMarker = document.createElement('p');
+            startMarker.className = 'seizure-marker seizure-marker--start';
+            startMarker.textContent = '**** START ****';
+            entry.appendChild(startMarker);
 
-            const incidentCell = document.createElement('td');
-            incidentCell.textContent = record?.incidentNumber || '—';
-            row.appendChild(incidentCell);
+            const content = document.createElement('div');
+            content.className = 'seizure-entry-content';
 
-            const typeCell = document.createElement('td');
-            typeCell.textContent = record?.type || '—';
-            row.appendChild(typeCell);
+            const fieldGrid = document.createElement('dl');
+            fieldGrid.className = 'seizure-entry-grid';
 
-            const divisionCell = document.createElement('td');
-            divisionCell.textContent = record?.division || '—';
-            row.appendChild(divisionCell);
+            const fields = [
+              ['Entry ID', record?.id],
+              ['Date & Time', (() => {
+                const dt = Date.parse(record?.datetime || record?.updatedAt || '');
+                return Number.isNaN(dt) ? '—' : dateFormatter.format(new Date(dt));
+              })()],
+              ['Incident', record?.incidentNumber],
+              ['Type', record?.type],
+              ['Division', record?.division],
+              ['Location', record?.location],
+              ['Officers', (() => {
+                if (Array.isArray(record?.officers) && record.officers.length) {
+                  return record.officers.join(', ');
+                }
+                return record?.enquiryOfficer;
+              })()],
+              ['Details', formatDetails(record)],
+              ['Remarks', record?.remarks]
+            ];
 
-            const locationCell = document.createElement('td');
-            locationCell.textContent = record?.location || '—';
-            row.appendChild(locationCell);
+            fields.forEach(([label, value]) => {
+              if (!label) return;
+              const dtElement = document.createElement('dt');
+              dtElement.textContent = label;
+              fieldGrid.appendChild(dtElement);
 
-            const officersCell = document.createElement('td');
-            officersCell.textContent = Array.isArray(record?.officers) && record.officers.length
-              ? record.officers.join(', ')
-              : (record?.enquiryOfficer || '—');
-            row.appendChild(officersCell);
+              const ddElement = document.createElement('dd');
+              ddElement.textContent = value && String(value).trim() ? String(value).trim() : '—';
+              fieldGrid.appendChild(ddElement);
+            });
 
-            const detailsCell = document.createElement('td');
-            const detailsText = formatDetails(record);
-            detailsCell.textContent = detailsText || '—';
-            row.appendChild(detailsCell);
+            content.appendChild(fieldGrid);
 
-            const remarksCell = document.createElement('td');
-            remarksCell.textContent = record?.remarks || '—';
-            row.appendChild(remarksCell);
+            if (record?.details && typeof record.details === 'object') {
+              const detailList = Object.entries(record.details)
+                .filter(([key, val]) => val != null && val !== '')
+                .map(([key, val]) => {
+                  const label = formatDetailKey(key);
+                  let displayValue = val;
+                  if (typeof displayValue === 'number' || /^[-+]?\d+(\.\d+)?$/.test(String(displayValue))) {
+                    if (/\b(GBP|Amount|Value)\b/i.test(label)) {
+                      displayValue = valueLabel(displayValue) || displayValue;
+                    }
+                  }
+                  return { key: label, val: displayValue };
+                });
+              if (detailList.length) {
+                const detailSection = document.createElement('section');
+                detailSection.className = 'seizure-entry-details';
 
-            rows.appendChild(row);
+                const heading = document.createElement('h3');
+                heading.textContent = 'Detail breakdown';
+                detailSection.appendChild(heading);
+
+                const list = document.createElement('ul');
+                list.className = 'seizure-detail-list';
+
+                detailList.forEach(({ key, val }) => {
+                  const item = document.createElement('li');
+                  const labelSpan = document.createElement('span');
+                  labelSpan.textContent = key;
+                  const valueStrong = document.createElement('strong');
+                  valueStrong.textContent = val;
+                  item.appendChild(labelSpan);
+                  item.appendChild(valueStrong);
+                  list.appendChild(item);
+                });
+
+                detailSection.appendChild(list);
+                content.appendChild(detailSection);
+              }
+            }
+
+            entry.appendChild(content);
+
+            const endMarker = document.createElement('p');
+            endMarker.className = 'seizure-marker seizure-marker--end';
+            endMarker.textContent = '**** END ****';
+            entry.appendChild(endMarker);
+
+            entries.appendChild(entry);
           });
 
-        tableBody.innerHTML = '';
-        tableBody.appendChild(rows);
+        logList.innerHTML = '';
+        logList.appendChild(entries);
         showStatus();
       } catch (error) {
         console.error('Failed to load seizure log', error);
+        if (logList) {
+          logList.innerHTML = '';
+        }
         showStatus('error');
       }
     }
