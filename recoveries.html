@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./styles/base.css">
 
   <script src="./lib/vendor/js-yaml.min.js"></script>
+  <script src="./lib/js/recoveries-save.js"></script>
   <script src="./lib/js/recoveries.js"></script>
   <script defer src="./Applications/JSON/app-registry.js"></script>
   <script defer src="./scripts/briefings.js"></script>
@@ -131,7 +132,7 @@
               </label>
             </div>
           </header>
-          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.yaml</code> (or <code>data/seizure-log.json</code>) to update recoveries and the START/END entries on the Seizure Log page.</p>
+          <p id="analytics-status" class="analytics-status muted">Seizure log mode active. Edit <code>data/seizure-log.yaml</code> to update recoveries. The JSON file remains available as a read-only fallback.</p>
           <div class="analytics-overview" id="analytics-overview" hidden>
             <div class="analytics-overview-grid">
               <section class="ytd-card" aria-labelledby="analytics-ytd-title">
@@ -366,8 +367,8 @@
                 <li>Select the seizure type to reveal its additional detail fields.</li>
                 <li>Provide the extra information requested for the chosen seizure type.</li>
                 <li>Optional: choose <strong>Set Save Folder</strong> so Chrome/Edge can save directly to that location.</li>
-                <li>Paste the generated code into <code>data/seizure-log.json</code>. The <span class="marker-inline">**** START ****</span> and <span class="marker-inline">**** END ****</span> markers stay in the JSON file only and are hidden on the Seizure Log page.</li>
-                <li>Use <strong>Save seizure (JSON)</strong> to export, or <strong>Reset form</strong> to clear the page.</li>
+                <li>When prompted, replace <code>data/seizure-log.yaml</code> in the shared folder with the exported file. The JSON fallback remains view-only.</li>
+                <li>Use <strong>Export YAML</strong> to download, or <strong>Reset form</strong> to clear the page.</li>
               </ol>
             </div>
           </details>
@@ -625,11 +626,11 @@
 
         <section class="card recover-card" data-card="actions">
           <header class="card-head">
-            <h2>Generate JSON Code</h2>
+            <h2>Export YAML</h2>
           </header>
-          <p class="muted fine-print">Generate a formatted block and paste it into <code>data/seizure-log.json</code>.</p>
+          <p class="muted fine-print">Export an updated <code>data/seizure-log.yaml</code> file. The JSON file remains a read-only fallback.</p>
           <div class="action-bar">
-            <button type="button" id="generate" class="btn primary">Generate code</button>
+            <button type="button" id="generate" class="btn primary">Export YAML</button>
             <button type="reset" class="btn">Reset form</button>
           </div>
           <div class="action-messages">
@@ -637,9 +638,9 @@
           </div>
           <span id="validation-status" class="sr-only" role="status" aria-live="polite"></span>
           <div id="generatedCodeBlock" class="card" hidden>
-            <p>Copy and paste the code below into <code>data/seizure-log.json</code>, adding commas between entries as needed.</p>
+            <p>Preview of the exported YAML. You can copy this text if you prefer to update <code>data/seizure-log.yaml</code> manually.</p>
             <textarea readonly id="generatedCodeOutput"></textarea>
-            <button type="button" id="copyCodeBtn" class="btn ghost">Copy to clipboard</button>
+            <button type="button" id="copyCodeBtn" class="btn ghost">Copy YAML to clipboard</button>
           </div>
         </section>
         </form>
@@ -1457,7 +1458,7 @@
             generatedCodeOutput.select();
             try {
               document.execCommand('copy');
-              alert('Code copied to clipboard!');
+              alert('YAML copied to clipboard!');
             } catch (err) {
               console.warn('Copy failed', err);
             }
@@ -1538,7 +1539,7 @@
       }
 
       if (reloadDataButton) reloadDataButton.disabled = false;
-      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.yaml (or data/seizure-log.json) to change recoveries.');
+      setAnalyticsStatus('Seizure log mode active. Edit data/seizure-log.yaml (JSON fallback loads read-only).');
 
       refreshLegacyUI();
 
@@ -1610,14 +1611,57 @@
         ? 'Unable to load seizure log data. Check console for details.'
         : (total
           ? `Loaded ${total} record${total === 1 ? '' : 's'} from ${sourceLabel}.`
-          : 'No recovery entries yet. Update data/seizure-log.yaml or data/seizure-log.json.');
+          : 'No recovery entries yet. Update data/seizure-log.yaml (JSON fallback is read-only).');
       setAnalyticsStatus(message);
       refreshLegacyUI();
     }
 
-    function presentGeneratedCode(manualRecord) {
-      if (!manualRecord) return '';
-      const output = JSON.stringify(manualRecord, null, 2);
+    function getYamlHelper() {
+      const helper = window.BASE_RECOVERIES_SAVE;
+      if (!helper) throw new Error('YAML helper unavailable');
+      return helper;
+    }
+
+    async function loadYamlEntriesForUpdate() {
+      try {
+        const helper = getYamlHelper();
+        const raw = await helper.loadYamlFile();
+        return normaliseSeizureLogPayload(raw);
+      } catch (error) {
+        console.warn('Unable to load YAML for export. Falling back to in-memory data.', error);
+        const fallback = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
+        return normaliseSeizureLogPayload(fallback);
+      }
+    }
+
+    function upsertEntries(entries, record) {
+      const list = Array.isArray(entries) ? entries.map((entry) => cloneRecord(entry)) : [];
+      if (!record || typeof record !== 'object') return list;
+      const cloned = cloneRecord(record);
+      const id = cloned.id;
+      if (!id) {
+        list.push(cloned);
+        return list;
+      }
+      const idx = list.findIndex((entry) => entry?.id === id);
+      if (idx >= 0) {
+        list[idx] = cloned;
+      } else {
+        list.push(cloned);
+      }
+      return list;
+    }
+
+    function presentGeneratedYaml(entries) {
+      if (!Array.isArray(entries)) {
+        if (generatedCodeOutput) generatedCodeOutput.value = '';
+        if (generatedCodeBlock) generatedCodeBlock.hidden = true;
+        return '';
+      }
+      const helper = window.BASE_RECOVERIES_SAVE;
+      const serializer = helper && typeof helper.toYaml === 'function' ? helper.toYaml : null;
+      if (!serializer) return '';
+      const output = serializer(entries);
       if (generatedCodeOutput) {
         generatedCodeOutput.value = output;
         const rows = output.split('\n').length;
@@ -1627,6 +1671,11 @@
         generatedCodeBlock.hidden = false;
       }
       return output;
+    }
+
+    async function exportYamlEntries(entries) {
+      const helper = getYamlHelper();
+      await helper.exportYaml(entries);
     }
 
     async function handleGenerate() {
@@ -1651,11 +1700,13 @@
 
       try {
         const { payload } = buildPayload(dt);
-        const manualRecord = toManualRecord(payload);
-        presentGeneratedCode(manualRecord);
+        const existingEntries = await loadYamlEntriesForUpdate();
+        const updatedEntries = upsertEntries(existingEntries, payload);
+        await exportYamlEntries(updatedEntries);
+        presentGeneratedYaml(updatedEntries);
 
-        setSaveMessage('Code generated successfully. Copy and paste it into data/seizure-log.json (ensure valid JSON).');
-        setValidationMessage('Code generated successfully. Copy and paste it into data/seizure-log.json (ensure valid JSON).');
+        setSaveMessage('YAML exported. Replace the file in /data if prompted.');
+        setValidationMessage('YAML exported. Replace the file in /data if prompted.');
 
         form.reset();
         if (inputs?.datetime) {
@@ -1666,14 +1717,14 @@
 
         if (!Array.isArray(window.__REC_DATA)) window.__REC_DATA = [];
         const byId = new Map(window.__REC_DATA.map((record) => [record.id, record]));
-        byId.set(manualRecord.id, manualRecord);
+        byId.set(payload.id, cloneRecord(payload));
         window.__REC_DATA = Array.from(byId.values());
         renderAnalytics();
         syncFYControls();
       } catch (err) {
-        console.error('Generate failed', err);
-        setSaveMessage('Error: unable to generate code. Try again.');
-        setValidationMessage('Error: unable to generate code. Try again.');
+        console.error('YAML export failed', err);
+        setSaveMessage('Error: unable to export YAML. Try again.');
+        setValidationMessage('Error: unable to export YAML. Try again.');
       } finally {
         if (generateButton) {
           generateButton.disabled = false;
@@ -2726,10 +2777,6 @@
       });
 
       const existingList = Array.isArray(window.__REC_DATA) ? window.__REC_DATA : [];
-      const existingIndex = existing ? existingList.findIndex((item) => item.id === existing.id) : -1;
-      const manualRecord = toManualRecord(payload);
-      if (existing?.createdAt) manualRecord.createdAt = existing.createdAt;
-      manualRecord.updatedAt = nowISO;
 
       manageModalSave.disabled = true;
       try {
@@ -2739,25 +2786,26 @@
           manageDemoRecords = [];
         }
 
+        const currentEntries = await loadYamlEntriesForUpdate();
+        const updatedEntries = upsertEntries(currentEntries, payload);
+        await exportYamlEntries(updatedEntries);
+
         const byId = new Map(existingList.map((record) => [record.id, record]));
-        byId.set(manualRecord.id, manualRecord);
+        byId.set(payload.id, cloneRecord(payload));
         window.__REC_DATA = Array.from(byId.values());
 
-        presentGeneratedCode(manualRecord);
+        presentGeneratedYaml(updatedEntries);
 
         populateFYSelects(window.__REC_DATA);
         renderAnalytics();
         syncFYControls();
         renderManageTable();
 
-        const message = mode === 'edit' && !isDemo
-          ? 'Updated locally. Copy the refreshed code snippet to update data/seizure-log.json.'
-          : 'Saved locally. Copy the generated code and update data/seizure-log.json.';
-        showToast(message, { includePattern: false });
+        showToast('YAML exported. Replace the file in /data if prompted.', { includePattern: false });
         closeManageModal();
       } catch (err) {
         console.error('Manage save failed', err);
-        showToast('Save failed. Try again.', { includePattern: false });
+        showToast('YAML export failed. Try again.', { includePattern: false });
       } finally {
         manageModalSave.disabled = false;
       }
@@ -2796,7 +2844,7 @@
       renderAnalytics();
       syncFYControls();
       renderManageTable();
-      showToast('Deleted locally. Remember to remove the entry from data/seizure-log.json.', { includePattern: false });
+      showToast('Deleted locally. Update data/seizure-log.yaml manually if needed.', { includePattern: false });
     }
 
     function renderAnalytics() {
