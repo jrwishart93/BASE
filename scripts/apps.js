@@ -5,6 +5,14 @@ const AppsStore = (() => {
   const SHARED_JSON_PATH = './Applications/JSON/app.json';
   const isFileProtocol = typeof window !== 'undefined' && window.location && window.location.protocol === 'file:';
 
+  const sortApps = (typeof window.sortAppsByName === 'function')
+    ? window.sortAppsByName
+    : (list = []) => (list || []).slice().sort((a, b) => {
+        const nameA = String(a?.label || a?.name || '').toLocaleLowerCase();
+        const nameB = String(b?.label || b?.name || '').toLocaleLowerCase();
+        return nameA.localeCompare(nameB, undefined, { sensitivity:'base' });
+      });
+
   let apps = [];
   let meta = { version:'', updated:'', updatedBy:'' };
   let status = { source:null, error:null, note:null };
@@ -93,7 +101,7 @@ const AppsStore = (() => {
 
   function applyPayload(payload, source, error = null, note = null){
     const parsed = parsePayload(payload);
-    apps = normalize(parsed.apps);
+    apps = sortApps(normalize(parsed.apps));
     meta = {
       version: parsed.meta.version || '',
       updated: parsed.meta.updated || '',
@@ -192,7 +200,7 @@ const AppsStore = (() => {
   function addApp({label, href, icon, action}){
     const key = (label||'app').toLowerCase().replace(/\s+/g,'-');
     const normalizedAction = normalizeAction(action, label, key, href);
-    apps.push({ key, label, href, icon: icon || '', action: normalizedAction });
+    apps = sortApps([ ...apps, { key, label, href, icon: icon || '', action: normalizedAction } ]);
     render();
   }
 
@@ -204,6 +212,7 @@ const AppsStore = (() => {
     const icon = data.icon ?? current.icon;
     const nextAction = data.action ? normalizeAction(data.action, label, current.key, href) : normalizeAction(current.action, label, current.key, href);
     apps[index] = { ...current, label, href, icon, action: nextAction };
+    apps = sortApps(apps);
     render();
   }
 
@@ -337,7 +346,7 @@ const AppsStore = (() => {
   }
 
   function setAll(list, options = {}){
-    apps = normalize(list);
+    apps = sortApps(normalize(list));
     if(!options.silent){
       console.log('[AppsStore] setAll', { count: apps.length });
       render();
@@ -377,6 +386,14 @@ window.AppsStore = AppsStore;
     searchTerm: '',
     searchInput: null
   };
+
+  const sortApps = (typeof window.sortAppsByName === 'function')
+    ? window.sortAppsByName
+    : (list = []) => (list || []).slice().sort((a, b) => {
+        const nameA = String(a?.label || a?.name || '').toLocaleLowerCase();
+        const nameB = String(b?.label || b?.name || '').toLocaleLowerCase();
+        return nameA.localeCompare(nameB, undefined, { sensitivity:'base' });
+      });
 
   function init(){
     const grid = document.getElementById('apps-grid');
@@ -421,6 +438,8 @@ window.AppsStore = AppsStore;
     syncErrorState(status);
 
     if(!apps.length) apps = window.Apps || [];
+
+    apps = sortApps(apps);
 
     const fragment = document.createDocumentFragment();
     const entries = [];
