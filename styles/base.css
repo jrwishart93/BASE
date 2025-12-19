@@ -135,6 +135,17 @@ html[data-motion="reduced"] *{
 /* Place items by data-col without renaming existing IDs */
 .grid--main > [data-col="left"]{ grid-column:1; }
 .grid--main > [data-col="right"]{ grid-column:2; }
+@media (max-width:980px){
+  .grid--main > [data-col="right"]{ grid-column:1; }
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.gap8{ gap:8px; }
 
 /* ------------------------------------------------------------------ */
 /* CARDS                                                              */
@@ -630,6 +641,15 @@ html[data-theme="light"] .settings-panel-icon::after{
   .home-hero{ padding:14px 16px; margin-bottom:10px; }
   .apps-controls{ margin:8px 0 10px; }
   .apps-search{ height:44px; }
+}
+
+@media (max-width:640px){
+  .card-head .chip{ width:100%; }
+  .card-actions{ width:100%; }
+  .card-actions .btn{ flex:1 1 100%; width:100%; }
+  .section-head-actions{ width:100%; justify-content:flex-start; }
+  .section-head-actions .btn,
+  .section-head-actions .btn-ghost{ flex:1 1 100%; width:100%; }
 }
 
 /* ------------------------------------------------------------------ */
