@@ -4,16 +4,10 @@
   "updatedBy": "BASE Maintainers",
   "apps": [
     {
-      "key": "intranet",
-      "label": "INTRANET",
-      "icon": "./lib/assets/images/icons/icon-intranet.png",
-      "href": "https://placeholder.local/intranet"
-    },
-    {
-      "key": "storm",
-      "label": "STORM",
-      "icon": "./lib/assets/images/icons/icon-storm.png",
-      "href": "https://placeholder.local/storm"
+      "key": "anpr",
+      "label": "ANPR",
+      "icon": "./lib/assets/images/icons/icon-anpr.png",
+      "href": "https://placeholder.local/anpr"
     },
     {
       "key": "case",
@@ -22,16 +16,22 @@
       "href": "https://placeholder.local/case"
     },
     {
+      "key": "desc",
+      "label": "DESC",
+      "icon": "./lib/assets/images/icons/icon-desc.png",
+      "href": "https://placeholder.local/desc"
+    },
+    {
+      "key": "intranet",
+      "label": "INTRANET",
+      "icon": "./lib/assets/images/icons/icon-intranet.png",
+      "href": "https://placeholder.local/intranet"
+    },
+    {
       "key": "insight",
       "label": "INSIGHT",
       "icon": "./lib/assets/images/icons/icon-insight.png",
       "href": "https://placeholder.local/insight"
-    },
-    {
-      "key": "unifi",
-      "label": "UNIFI",
-      "icon": "./lib/assets/images/icons/icon-unifi.png",
-      "href": "https://placeholder.local/unifi"
     },
     {
       "key": "pronto",
@@ -40,22 +40,22 @@
       "href": "https://placeholder.local/pronto"
     },
     {
-      "key": "anpr",
-      "label": "ANPR",
-      "icon": "./lib/assets/images/icons/icon-anpr.png",
-      "href": "https://placeholder.local/anpr"
-    },
-    {
-      "key": "desc",
-      "label": "DESC",
-      "icon": "./lib/assets/images/icons/icon-desc.png",
-      "href": "https://placeholder.local/desc"
-    },
-    {
       "key": "reports",
       "label": "REPORTS",
       "icon": "./lib/assets/images/icons/icon-reports.png",
       "href": "https://placeholder.local/reports"
+    },
+    {
+      "key": "storm",
+      "label": "STORM",
+      "icon": "./lib/assets/images/icons/icon-storm.png",
+      "href": "https://placeholder.local/storm"
+    },
+    {
+      "key": "unifi",
+      "label": "UNIFI",
+      "icon": "./lib/assets/images/icons/icon-unifi.png",
+      "href": "https://placeholder.local/unifi"
     }
   ]
 }
